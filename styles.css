@@ -479,3 +479,19 @@ h1 {
   max-width: 340px;
   line-height: 1.6;
 }
+
+.simple-website-button {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: #ff6700;
+  color: #fff;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.simple-website-button:hover {
+  background: #ff944d;
+}
