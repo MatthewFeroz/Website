@@ -2,11 +2,7 @@
 // Requires gsap and ScrollTrigger loaded in index.html
 
 (function () {
-  if (!window.gsap) return;
-  const gsap = window.gsap;
-  if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
-
-  // Mobile nav toggle
+  // Mobile nav toggle (runs regardless of GSAP availability)
   const navToggle = document.querySelector('.nav-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
   if (navToggle && mobileMenu) {
@@ -15,9 +11,11 @@
       if (open) {
         mobileMenu.removeAttribute('hidden');
         mobileMenu.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
       } else {
         mobileMenu.setAttribute('hidden', '');
         mobileMenu.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
       }
     };
     setOpen(false);
@@ -25,7 +23,21 @@
       const open = navToggle.getAttribute('aria-expanded') === 'true';
       setOpen(!open);
     });
+
+    // Close on close button or when a menu link/cta is clicked
+    const mobileCloseButton = mobileMenu.querySelector('.mobile-close');
+    if (mobileCloseButton) {
+      mobileCloseButton.addEventListener('click', () => setOpen(false));
+    }
+    mobileMenu.querySelectorAll('.mobile-link, .mobile-cta').forEach((el) => {
+      el.addEventListener('click', () => setOpen(false));
+    });
   }
+
+  // GSAP-powered animations below — safe to skip if GSAP failed to load
+  if (!window.gsap) return;
+  const gsap = window.gsap;
+  if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
   // Entrance animation for hero
   gsap.set([".hero-image", ".hero-content h1", ".hero-content p", ".primary-button"], { opacity: 0, y: 24 });
@@ -101,7 +113,6 @@
       gsap.to(el, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.2 });
     }
   });
-
   // Prev/Next buttons scroll
   const scroller = document.getElementById('videos-scroller');
   const prevBtn = document.getElementById('videos-prev');
@@ -114,3 +125,4 @@
 
   // Parallax on hover removed per request — image stays static
 })();
+
