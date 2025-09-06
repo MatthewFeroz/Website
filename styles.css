@@ -8,6 +8,9 @@
   --bg-dark: #171719;
   --text-light: #dbdbdb;
   --white: #ffffff;
+  --navbar-margin-x: 5%;
+  --navbar-offset-y: 0.5rem;
+  --navbar-height: 64px;
 }
 
 html,
@@ -47,7 +50,7 @@ p {
   background: rgba(36, 37, 40, 0.8);
   border: 1px solid #3a3a3a;
   border-radius: 1rem;
-  margin: 0.5rem 5%;
+  margin: var(--navbar-offset-y) var(--navbar-margin-x);
   padding: 0.5rem 1rem;
 }
 
@@ -101,10 +104,13 @@ p {
   padding: 0.55rem 1rem;
   border-radius: 999px;
   font-weight: 700;
+  transition: all 0.25s ease;
 }
 
 .nav-cta:hover {
   background: var(--brand-dark);
+  box-shadow: 0 6px 18px rgba(var(--brand-rgb), 0.24);
+  transform: translateY(-1px);
 }
 
 .nav-toggle {
@@ -137,20 +143,22 @@ p {
   justify-content: flex-start; /* Align items to the top vertically */
   text-align: center;       /* Center text inside items */
   gap: 1.5rem;
-  padding: 2.5rem 2rem 6rem;
+  padding: 2rem;
   border: none;
-  border-radius: 0;
+  border-radius: 1rem;
   background: rgba(24, 28, 34, 0.97);
   backdrop-filter: blur(18px) saturate(1.2);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
+
   position: fixed;
-  left: 0;
-  width: 100%;
-  max-width: 100vw;
-  height: calc(100vh - var(--navbar-height, 64px));
+  top: calc(var(--navbar-height) + var(--navbar-offset-y)); /* below navbar */
+  left: var(--navbar-margin-x);                /* same as navbar margin */
+  right: var(--navbar-margin-x);               /* align right edge with navbar */
+  width: calc(100% - 2 * var(--navbar-margin-x) - 70px); /* 100% minus left/right margins, minus 10px */
+  height: auto;            /* let content define height */
+  overflow-y: auto;
   z-index: 60;
-  overflow: auto;
-  transition: height 0.5s, transform 400ms;
+  transition:  width 0.5s, height 0.5s, transform 400ms;
 }
 
 /* Lock page scroll when mobile menu is open (site-wide) */
@@ -178,6 +186,8 @@ body.menu-open {
   text-decoration: none;
   font-weight: 600;
   color: var(--white);
+  font-size: 1.125rem; /* larger dropdown text */
+  line-height: 1.6;
 }
 
 .mobile-cta {
@@ -283,7 +293,7 @@ body.menu-open {
 
 .help-header {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 3rem;
 }
 
 .help-cards {
@@ -313,7 +323,8 @@ body.menu-open {
 
 .help-card-image {
   width: 100%;
-  max-width: 280px;
+  max-height: 250px;
+  max-width: 200px;
   border-radius: 12px;
   object-fit: cover;
 }
@@ -346,30 +357,27 @@ body.menu-open {
 .about-collage {
   flex: 1 1 300px;
   position: relative;
-  height: 360px;
+  height: 420px;
 }
 
 .about-photo {
   position: absolute;
-  width: 50%;
+  width: 46%;
   border-radius: 8px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .about-photo-1 {
-  top: 0;
-  left: 10%;
+  top: 2%;
+  left: 0;
 }
 
 .about-photo-2 {
-  top: 10%;
+  top: 2%;
   right: 0;
 }
 
-.about-photo-3 {
-  bottom: 0;
-  left: 25%;
-}
+/* removed third photo */
 
 /* Videos Section */
 .videos {
@@ -395,6 +403,13 @@ body.menu-open {
   gap: 1rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  /* hide scrollbar UI but keep scrolling */
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
+.videos-scroller::-webkit-scrollbar { /* Chrome/Safari */
+  display: none;
 }
 
 .video-card {
