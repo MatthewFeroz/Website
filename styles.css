@@ -64,6 +64,20 @@ p {
   text-decoration: none;
 }
 
+/* Responsive text swaps for logo and CTA */
+.nav-logo .logo-short,
+.nav-cta .cta-short { display: none; }
+.nav-logo .logo-full,
+.nav-cta .cta-full { display: inline; }
+
+@media (max-width: 520px) {
+  .nav-logo .logo-full { display: none; }
+  .nav-logo .logo-short { display: inline; }
+  .nav-cta .cta-full { display: none; }
+  .nav-cta .cta-short { display: inline; }
+  .nav-cta { padding: 0.45rem 0.8rem; font-size: 0.95rem; }
+}
+
 .nav-menu {
   display: none;
   gap: 1.25rem;
