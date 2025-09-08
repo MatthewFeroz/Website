@@ -1,0 +1,8 @@
+plugins:
+  - jekyll-redirect-from
+markdown: kramdown
+theme: null
+exclude:
+  - node_modules
+  - README.md
+
