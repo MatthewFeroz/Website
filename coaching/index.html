@@ -170,7 +170,7 @@
 <!-- Full-width Typeform Embed -->
 <section class="typeform-section" id="typeform-section">
   <iframe
-    src="https://form.typeform.com/to/T2ZPmUED"
+    src="https://form.typeform.com/to/T2ZPmUED?disable-auto-focus=true"
     frameborder="0"
     allow="camera; microphone; autoplay; encrypted-media;"
     title="Book a Coaching Call Form"
@@ -457,5 +457,14 @@
     defer
   ></script>
   <script src="/main.js" defer></script>
+  
+  <!-- PostHog Analytics -->
+  <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
+  <script>
+      posthog.init('phc_NYfQd50P3VMosArZ6rMnOUWB4RDO7nfFG4XJFCOpSog', {
+          api_host: 'https://us.i.posthog.com',
+          person_profiles: 'identified_only'
+      })
+  </script>
 </body>
 </html>

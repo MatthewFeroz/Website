@@ -46,7 +46,7 @@
       if (typeformLoaded) return;
       
       typeformLoaded = true;
-      typeformIframe.src = 'https://form.typeform.com/to/T2ZPmUED';
+      typeformIframe.src = 'https://form.typeform.com/to/T2ZPmUED?disable-auto-focus=true';
       typeformIframe.style.display = 'block';
       typeformPlaceholder.style.display = 'none';
     };

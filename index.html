@@ -167,5 +167,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="main.js" defer></script>
     <script src="https://embed.typeform.com/next/embed.js" defer></script>
+    
+    <!-- PostHog Analytics -->
+    <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
+    <script>
+        posthog.init('phc_NYfQd50P3VMosArZ6rMnOUWB4RDO7nfFG4XJFCOpSog', {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'identified_only'
+        })
+    </script>
 </body>
 </html>
