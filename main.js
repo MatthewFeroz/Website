@@ -49,11 +49,6 @@
       typeformIframe.src = 'https://form.typeform.com/to/T2ZPmUED';
       typeformIframe.style.display = 'block';
       typeformPlaceholder.style.display = 'none';
-      
-      // Smooth scroll to the form after loading
-      setTimeout(() => {
-        typeformIframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 500);
     };
     
     // Load on button click
