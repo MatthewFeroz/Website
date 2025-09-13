@@ -201,7 +201,7 @@ body.menu-open {
 
 /* Hero */
 .hero {
-  padding: 4rem 1.5rem 2rem;
+  padding: 2rem 1.5rem 2rem;
   margin-bottom: 2rem;
   position: relative;
 }
@@ -505,4 +505,971 @@ body.menu-open {
 
 .footer-link:hover {
   color: var(--white);
+}
+
+/* Audience Callout */
+.audience-callout {
+  width: 100%;
+  background: rgba(var(--brand-rgb), 0.18);
+  border: 2px solid rgba(var(--brand-rgb), 0.6);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  margin: 1rem auto;
+  max-width: 600px; /* smaller than navbar max-width */
+  text-align: center;
+  position: relative;
+  box-shadow: 
+    0 0 15px rgba(var(--brand-rgb), 0.25),
+    0 0 30px rgba(var(--brand-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.audience-callout::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(45deg, 
+    rgba(var(--brand-rgb), 0.6), 
+    rgba(var(--brand-rgb), 0.3), 
+    rgba(var(--brand-rgb), 0.6));
+  border-radius: 14px;
+  z-index: -1;
+  filter: blur(6px);
+  opacity: 0.5;
+}
+
+.audience-callout h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.2px;
+}
+
+/* Mobile adjustments for audience callout */
+@media (max-width: 768px) {
+  .audience-callout h2 {
+    font-size: 0.9rem;
+    letter-spacing: 0.1px;
+    white-space: normal; /* Allow text to wrap on mobile */
+    line-height: 1.4;
+  }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Hero section mobile adjustments */
+  .hero {
+    padding: 1.5rem 1rem 2rem;
+  }
+  
+  .hero-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  
+  .hero-content {
+    order: 2;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .hero-content h1 {
+    font-size: 1.8rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure audience callout is visible */
+  .audience-callout {
+    padding: 0.6rem 1rem;
+    margin: 1rem auto;
+    max-width: 95%;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .audience-callout h2 {
+    font-size: 0.9rem;
+    letter-spacing: 0.1px;
+    white-space: normal;
+    line-height: 1.4;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  /* Button row mobile adjustments */
+  .button-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+    margin: 0 auto;
+  }
+  
+  /* Step CTA mobile adjustments */
+  .step-cta {
+    margin: 1.5rem 0;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .step-callout {
+    display: inline-block !important;
+    visibility: visible !important;
+  }
+  
+  /* Typeform intro mobile adjustments */
+  .typeform-intro {
+    padding: 2rem 1rem 1.5rem;
+  }
+  
+  .typeform-intro h1 {
+    font-size: 1.6rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+  
+  .typeform-intro p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .typeform-section {
+    padding: 1rem;
+  }
+  
+  .typeform-section iframe {
+    height: 70vh;
+  }
+  
+  .step-cta-1 {
+    margin: 0.5rem 0 1rem 0;
+    padding: 0 1rem;
+  }
+  
+  .step-cta-2 {
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 0 1rem;
+  }
+  
+  /* Company logos mobile adjustments */
+  .company-logos-grid {
+    padding: 1.5rem 0;
+  }
+  
+  .logo-row {
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .company-logo {
+    height: 65px;
+    width: 130px;
+  }
+  
+  .company-logo img {
+    max-height: 55px;
+    max-width: 130px;
+  }
+  
+  .logo-placeholder {
+    font-size: 1.2rem;
+  }
+  
+  /* What you get section mobile adjustments */
+  .what-you-get {
+    padding: 2rem 1rem;
+  }
+  
+  .what-header h1 {
+    font-size: 1.4rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+  
+  .what-header p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .what-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .what-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .what-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  /* Help section mobile adjustments */
+  .help {
+    padding: 1.5rem 1rem;
+  }
+  
+.help-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+  
+  .help-header p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .help-card {
+    padding: 1.25rem;
+  }
+  
+  .help-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .help-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  /* FAQ mobile adjustments */
+  .faq {
+    padding: 2rem 1rem;
+  }
+  
+  .faq-header h1 {
+    font-size: 1.4rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+  
+  .faq-header p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .faq-question {
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .faq-answer p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+/* FAQ Section */
+.faq {
+  padding: 3rem 1rem;
+  background: #141518;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.faq-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faq-item {
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1b1d22;
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: none;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-icon {
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  padding: 0 1.25rem;
+}
+
+.faq-answer p {
+  margin: 1rem 0;
+  color: #cbd5e1;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px; /* large enough to fit text */
+  padding: 0 1.25rem 1rem;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(45deg); /* turns + into an × */
+}
+
+/* Slim Disclaimer Tab */
+.disclaimer-tab {
+  background: #0f1012; /* darker strip for separation */
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.disclaimer-tab p {
+  margin: 0 auto;
+  max-width: 900px;
+  font-size: 0.75rem;      /* small text */
+  line-height: 1.5;
+  color: #9aa0aa;          /* lighter-muted gray */
+}
+
+/* Step CTA Block */
+.step-cta {
+  text-align: center;
+  margin: 2rem 0 1rem;
+}
+
+.step-cta .step-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #f85f00; /* your brand orange */
+  margin-bottom: 1rem;
+}
+
+.secondary-button {
+  display: inline-block;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.secondary-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Step CTA Container */
+.step-cta {
+  text-align: center;
+  margin: 2rem 0 1rem;
+}
+
+/* Callout box for step labels */
+.step-callout {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  background: rgba(var(--brand-rgb), 0.18);
+  border: 2px solid rgba(var(--brand-rgb), 0.6);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--white);
+  position: relative;
+  box-shadow: 
+    0 0 15px rgba(var(--brand-rgb), 0.25),
+    0 0 30px rgba(var(--brand-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.3px;
+}
+
+.step-callout::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(45deg, 
+    rgba(var(--brand-rgb), 0.6), 
+    rgba(var(--brand-rgb), 0.3), 
+    rgba(var(--brand-rgb), 0.6));
+  border-radius: 14px;
+  z-index: -1;
+  filter: blur(6px);
+  opacity: 0.5;
+}
+
+/* Already-have secondary button style for Learn How It Works */
+.secondary-callout {
+  display: inline-block;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.secondary-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Full-width Typeform section */
+.typeform-section {
+  width: 100%;
+  margin: 0;
+  padding: 2rem 1.5rem;
+  background: #141518;
+}
+
+.typeform-section iframe {
+  display: block;
+  width: 100%;       /* full page width */
+  height: 75vh;     /* full viewport height */
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Typeform intro section */
+.typeform-intro {
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+  background: #141518;
+}
+
+.typeform-intro-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.typeform-intro h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.typeform-intro p {
+  font-size: 1.1rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+/* Step 1 CTA styling */
+.step-cta-1 {
+  text-align: center;
+  margin: 1rem 0 1.5rem 0;
+  padding: 0 1.5rem;
+}
+
+/* Step 2 CTA styling */
+.step-cta-2 {
+  text-align: center;
+  margin: 0.5rem 0 2rem 0;
+  padding: 0 1.5rem;
+}
+
+/* Company Logos Grid */
+.company-logos-grid {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.logo-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.logo-row:last-child {
+  margin-bottom: 0;
+}
+
+.company-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  width: 160px;
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.company-logo:hover {
+  opacity: 1;
+}
+
+.company-logo img {
+  max-height: 70px;
+  max-width: 160px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.logo-placeholder {
+  color: var(--white);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Typeform placeholder styling */
+.typeform-placeholder {
+  width: 100%;
+  height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #141518;
+  border: 2px dashed rgba(var(--brand-rgb), 0.3);
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.typeform-loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.typeform-loading h3 {
+  color: var(--white);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.typeform-loading p {
+  color: #cbd5e1;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Mobile adjustments for typeform placeholder */
+@media (max-width: 768px) {
+  .typeform-placeholder {
+    height: 60vh;
+    margin: 1rem 0;
+  }
+  
+  .typeform-loading {
+    padding: 1.5rem;
+  }
+  
+  .typeform-loading h3 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+  
+  .typeform-loading p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .hero-content h1 {
+    font-size: 1.6rem;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .hero-content p {
+    font-size: 0.95rem;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .audience-callout {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .audience-callout h2 {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .primary-button,
+  .secondary-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    margin: 0 auto;
+  }
+  
+  .what-header h1,
+  .help-header h1,
+  .faq-header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .typeform-intro h1 {
+    font-size: 1.4rem;
+  }
+  
+  .typeform-intro p {
+    font-size: 0.95rem;
+  }
+  
+  .typeform-section {
+    padding: 0.75rem;
+  }
+  
+  .typeform-section iframe {
+    height: 65vh;
+  }
+  
+  .step-cta-1 {
+    margin: 0.5rem 0 1rem 0;
+    padding: 0 0.75rem;
+  }
+  
+  .step-cta-2 {
+    margin: 0.5rem 0 1.25rem 0;
+    padding: 0 0.75rem;
+  }
+  
+  /* Company logos small mobile adjustments */
+  .company-logos-grid {
+    padding: 1rem 0;
+  }
+  
+  .logo-row {
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .company-logo {
+    height: 55px;
+    width: 110px;
+  }
+  
+  .company-logo img {
+    max-height: 45px;
+    max-width: 110px;
+  }
+  
+  .logo-placeholder {
+    font-size: 1rem;
+  }
+}
+
+/* What You’ll Get Section */
+.what-you-get {
+  padding: 4rem 1.5rem;
+  background: #141518; /* dark background to match site */
+}
+
+.what-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.what-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.what-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.help-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.what-header p {
+  color: #cbd5e1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.what-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+/* Responsive layout for What You'll Get section */
+@media (max-width: 900px) {
+  .what-cards {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.what-card {
+  background: #1b1d22;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+
+.what-image-wrapper {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 1rem;
+}
+
+.what-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.what-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.what-card p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+/* VSL Hero Section - Coaching Page Specific */
+.hero-vsl {
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.hero-vsl-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-vsl-content {
+  flex: none;
+  width: 100%;
+  max-width: 900px;
+  text-align: center;
+}
+
+.hero-vsl-content h1 {
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 800;
+  margin-bottom: 2rem;
+  line-height: 1.1;
+}
+
+.hero-vsl-content p {
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+/* VSL Video Container */
+.vsl-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 1.5rem auto 2rem;
+  padding: 0 1.5rem;
+}
+
+.vsl-wrapper {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(248, 95, 0, 0.2);
+}
+
+.vsl-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* VSL Step CTA adjustments */
+.hero-vsl .step-cta {
+  margin: 2rem 0 0.5rem;
+}
+
+.hero-vsl .button-row {
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.hero-vsl .primary-button,
+.hero-vsl .secondary-button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  min-width: 200px;
+}
+
+/* Mobile adjustments for VSL */
+@media (max-width: 768px) {
+  .hero-vsl {
+    padding: 2rem 1rem 1.5rem;
+  }
+  
+  .hero-vsl-content h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .hero-vsl-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .vsl-container {
+    margin: 1.5rem auto 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .vsl-wrapper {
+    border-radius: 12px;
+  }
+  
+  .hero-vsl .step-cta {
+    margin: 2rem 0 0.5rem;
+  }
+  
+  .hero-vsl .button-row {
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .hero-vsl .primary-button,
+  .hero-vsl .secondary-button {
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    min-width: 180px;
+    max-width: 280px;
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-vsl-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero-vsl-content p {
+    font-size: 1rem;
+  }
+  
+  .vsl-container {
+    margin: 1.5rem auto 1rem;
+    padding: 0 0.5rem;
+  }
+  
+  .hero-vsl .step-cta {
+    margin: 2rem 0 0.5rem;
+  }
+  
+  .hero-vsl .button-row {
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .hero-vsl .primary-button,
+  .hero-vsl .secondary-button {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+    min-width: 160px;
+    max-width: 240px;
+    flex: 1;
+  }
 }
