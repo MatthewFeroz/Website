@@ -34,6 +34,53 @@
     });
   }
 
+  // Typeform lazy loading functionality
+  const typeformPlaceholder = document.getElementById('typeform-placeholder');
+  const typeformIframe = document.getElementById('typeform-iframe');
+  const loadTypeformBtn = document.getElementById('load-typeform-btn');
+  
+  if (typeformPlaceholder && typeformIframe && loadTypeformBtn) {
+    let typeformLoaded = false;
+    
+    const loadTypeform = () => {
+      if (typeformLoaded) return;
+      
+      typeformLoaded = true;
+      typeformIframe.src = 'https://form.typeform.com/to/T2ZPmUED?disable-auto-focus=true';
+      typeformIframe.style.display = 'block';
+      typeformPlaceholder.style.display = 'none';
+    };
+    
+    // Load on button click
+    loadTypeformBtn.addEventListener('click', loadTypeform);
+    
+    // Load when user scrolls near the form (Intersection Observer)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !typeformLoaded) {
+          // Load the form when it comes into view
+          loadTypeform();
+        }
+      });
+    }, {
+      threshold: 0.3, // Load when 30% of the placeholder is visible
+      rootMargin: '50px' // Start loading 50px before it's fully visible
+    });
+    
+    observer.observe(typeformPlaceholder);
+    
+    // Also load when any "BOOK A FREE CALL" button is clicked
+    document.querySelectorAll('[data-tf-popup="T2ZPmUED"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        // If it's not a popup button, load the embedded form
+        if (!button.hasAttribute('data-tf-popup') || button.getAttribute('data-tf-medium') !== 'site-cta') {
+          e.preventDefault();
+          loadTypeform();
+        }
+      });
+    });
+  }
+
   // GSAP-powered animations below — safe to skip if GSAP failed to load
   if (!window.gsap) return;
   const gsap = window.gsap;
@@ -45,6 +92,16 @@
   gsap.to(".hero-content h1", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: 0.15 });
   gsap.to(".hero-content p", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: 0.28 });
   gsap.to(".primary-button", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.42 });
+  
+  // Ensure elements are visible on mobile (override any GSAP hiding)
+  if (window.innerWidth <= 768) {
+    gsap.set([".hero-content h1", ".hero-content p", ".audience-callout", ".audience-callout h2"], { 
+      opacity: 1, 
+      y: 0, 
+      display: "block",
+      visibility: "visible"
+    });
+  }
 
   // Logos stagger reveal
   const logos = document.querySelectorAll(".logos-grid .logo-item");
@@ -124,5 +181,23 @@
   }
 
   // Parallax on hover removed per request — image stays static
+
+  // FAQ Toggle functionality (multiple can be open)
+  const faqQuestions = document.querySelectorAll('.faq-question');
+  faqQuestions.forEach(question => {
+    question.addEventListener('click', () => {
+      const faqItem = question.parentElement;
+      const isActive = faqItem.classList.contains('active');
+      
+      // Toggle current FAQ item
+      if (isActive) {
+        faqItem.classList.remove('active');
+        question.setAttribute('aria-expanded', 'false');
+      } else {
+        faqItem.classList.add('active');
+        question.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
 })();
 
