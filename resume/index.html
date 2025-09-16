@@ -7,7 +7,105 @@
     <meta name="description" content="Coaching with Matt Feroz. Engineering confidence and interview success for aspiring software engineers." />
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <style>
+        /* Resume Hero (scoped to this page) */
+        .resume-hero {
+            padding: 4rem 1.5rem 2rem;
+            position: relative;
+        }
+        .resume-hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .resume-hero-image {
+            flex: 1 1 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .resume-hero-image img {
+            width: 100%;
+            max-width: 460px;
+            border-radius: 16px;
+            filter: drop-shadow(0 24px 60px rgba(0,0,0,0.45));
+        }
+        .resume-card {
+            flex: 1 1 520px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border: 1px solid #333;
+            border-radius: 24px;
+            padding: 2rem;
+        }
+        .resume-card, .resume-card * { box-sizing: border-box; }
+        .resume-card h1 {
+            font-size: clamp(2rem, 4.4vw, 2.6rem);
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+        }
+        .resume-card p {
+            color: #cbd5e1;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+        .resume-form {
+            display: grid;
+            gap: 14px;
+            width: 100%;
+        }
+        .resume-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #3a3a3a;
+            color: var(--white);
+            border-radius: 999px;
+            padding: 0.95rem 1.2rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        .resume-input::placeholder { color: #98a2b3; }
+        .resume-input:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.25);
+        }
+        .resume-submit {
+            border: 1px solid var(--brand);
+            background: rgba(var(--brand-rgb), 0.18);
+            color: var(--white);
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 0.95rem 1.2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .resume-submit:hover {
+            background: var(--brand-dark);
+            box-shadow: 0 6px 18px rgba(var(--brand-rgb), 0.24);
+            transform: translateY(-1px);
+        }
+        .resume-disclaimer {
+            display: block;
+            color: #9aa3b2;
+            text-align: center;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 900px) {
+            .resume-hero-inner { flex-direction: column; text-align: center; }
+            .resume-card { width: 100%; }
+            .resume-hero-image { order: -1; }
+        }
+        /* Center the CTA in the personalized help section */
+        .help .button-row { justify-content: center; }
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -33,17 +131,32 @@
         </div>
     </header>
 
-    <section class="hero">
-        <div class="hero-inner">
-            <div class="hero-image-wrapper">
-                <span class="hero-glow"></span>
-                <img src="/profilepicture.png" alt="Profile" class="hero-image">
+    <section class="resume-hero">
+        <div class="resume-hero-inner">
+            <div class="resume-hero-image">
+                <img src="/images/resume.svg" alt="Resume mockup">
             </div>
-            <div class="hero-content">
-                <h1>Resume</h1>
-                <p>More information coming soon. In the meantime, book a free call to get started.</p>
+            <div class="resume-card" role="region" aria-labelledby="resume-form-title">
+                <h1 id="resume-form-title">Get My Resume Template.</h1>
+                <p>The resume template that helped me land interviews. Where should I send it?</p>
+                <form class="resume-form" action="#" method="post">
+                    <input class="resume-input" type="text" name="first_name" placeholder="YOUR NAME" autocomplete="name" required>
+                    <input class="resume-input" type="email" name="email_address" placeholder="YOUR EMAIL ADDRESS" autocomplete="email" required>
+                    <button type="submit" class="resume-submit">SUBMIT</button>
+                </form>
+                <small class="resume-disclaimer">By submitting this form, you'll receive an email with a link to the free resource.</small>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Personalized Help Section -->
+    <section class="help">
+        <div class="help-inner">
+            <div class="help-header">
+                <h2>Tired of feeling uncertain about your resume?</h2>
+                <p>Stop second-guessing yourself. Get personalized feedback and a clear roadmap to a resume that actually gets you interviews.</p>
                 <div class="button-row">
-                    <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="primary-button" data-tf-popup="T2ZPmUED" data-tf-medium="hero-cta" data-tf-size="70" data-tf-opacity="100">WORK WITH ME</a>
+                    <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="primary-button" data-tf-popup="T2ZPmUED" data-tf-medium="resume-help-cta" data-tf-size="70" data-tf-opacity="100">GET PERSONALIZED HELP</a>
                 </div>
             </div>
         </div>
