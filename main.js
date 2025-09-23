@@ -87,11 +87,11 @@
   if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
   // Entrance animation for hero
-  gsap.set([".hero-image", ".hero-content h1", ".hero-content p", ".primary-button"], { opacity: 0, y: 24 });
+  gsap.set([".hero-image", ".hero-content h1", ".hero-content p", ".primary-button", ".secondary-button"], { opacity: 0, y: 24 });
   gsap.to(".hero-image", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.05 });
   gsap.to(".hero-content h1", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: 0.15 });
   gsap.to(".hero-content p", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: 0.28 });
-  gsap.to(".primary-button", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.42 });
+  gsap.to([".primary-button", ".secondary-button"], { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.42 });
   
   // Ensure elements are visible on mobile (override any GSAP hiding)
   if (window.innerWidth <= 768) {
