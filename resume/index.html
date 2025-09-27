@@ -17,9 +17,12 @@
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
-            gap: 2rem;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 60vh;
+            width: 90%;
+            padding: 0 16px;
+            overflow: visible;
         }
         .resume-hero-image {
             flex: 1 1 420px;
@@ -33,14 +36,9 @@
             border-radius: 16px;
             filter: drop-shadow(0 24px 60px rgba(0,0,0,0.45));
         }
-        .resume-card {
-            flex: 1 1 520px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-            border: 1px solid #333;
-            border-radius: 24px;
-            padding: 2rem;
-        }
-        .resume-card, .resume-card * { box-sizing: border-box; }
+        .kit-embed { width: 100%; max-width: 1100px; margin: 0 auto; display: flex; justify-content: center; }
+        .kit-embed > * { width: 100% !important; max-width: 100% !important; }
+        .kit-embed iframe { display: block; width: 100% !important; max-width: 100% !important; height: auto; }
         .resume-card h1 {
             font-size: clamp(2rem, 4.4vw, 2.6rem);
             font-weight: 800;
@@ -132,18 +130,8 @@
 
     <section class="resume-hero">
         <div class="resume-hero-inner">
-            <div class="resume-hero-image">
-                <img src="/images/resume.svg" alt="Resume mockup">
-            </div>
-            <div class="resume-card" role="region" aria-labelledby="resume-form-title">
-                <h1 id="resume-form-title">Get My Resume Template.</h1>
-                <p>The resume template that helped me land interviews. Where should I send it?</p>
-                <form class="resume-form" action="#" method="post">
-                    <input class="resume-input" type="text" name="first_name" placeholder="YOUR NAME" autocomplete="name" required>
-                    <input class="resume-input" type="email" name="email_address" placeholder="YOUR EMAIL ADDRESS" autocomplete="email" required>
-                    <button type="submit" class="resume-submit">SUBMIT</button>
-                </form>
-                <small class="resume-disclaimer">By submitting this form, you'll receive an email with a link to the free resource.</small>
+            <div class="kit-embed">
+                <script async data-uid="e64fad7850" src="https://alive-company.kit.com/e64fad7850/index.js"></script>
             </div>
         </div>
     </section>
