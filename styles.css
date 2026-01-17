@@ -202,7 +202,6 @@ body.menu-open {
 /* Hero */
 .hero {
   padding: 2rem 1.5rem 2rem;
-  margin-bottom: 2rem;
   position: relative;
 }
 
@@ -284,7 +283,7 @@ body.menu-open {
 
 /* Help Section */
 .help {
-  padding: 2rem 1rem;
+  padding: 4rem 1.5rem;
 }
 
 .help-inner {
@@ -294,7 +293,7 @@ body.menu-open {
 
 .help-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .help-cards {
@@ -514,7 +513,7 @@ body.menu-open {
   border: 2px solid rgba(var(--brand-rgb), 0.6);
   border-radius: 12px;
   padding: 0.6rem 1rem;
-  margin: 1rem auto;
+  margin: 0 auto 1.5rem;
   max-width: 600px; /* smaller than navbar max-width */
   text-align: center;
   position: relative;
@@ -602,7 +601,7 @@ body.menu-open {
   /* Ensure audience callout is visible */
   .audience-callout {
     padding: 0.6rem 1rem;
-    margin: 1rem auto;
+    margin: 0 auto 1.25rem;
     max-width: 95%;
     display: block !important;
     visibility: visible !important;
@@ -650,7 +649,7 @@ body.menu-open {
   
   /* Typeform intro mobile adjustments */
   .typeform-intro {
-    padding: 2rem 1rem 1.5rem;
+    padding: 2rem 1rem;
   }
   
   .typeform-intro h1 {
@@ -669,16 +668,16 @@ body.menu-open {
   }
   
   .typeform-section iframe {
-    height: 70vh;
+    height: 500px;
   }
   
   .step-cta-1 {
-    margin: 0.5rem 0 1rem 0;
+    margin: 0.75rem 0 1.25rem;
     padding: 0 1rem;
   }
   
   .step-cta-2 {
-    margin: 0.5rem 0 1.5rem 0;
+    margin: 1.5rem 0;
     padding: 0 1rem;
   }
   
@@ -708,7 +707,7 @@ body.menu-open {
   
   /* What you get section mobile adjustments */
   .what-you-get {
-    padding: 2rem 1rem;
+    padding: 3rem 1rem;
   }
   
   .what-header h1 {
@@ -738,7 +737,7 @@ body.menu-open {
   
   /* Help section mobile adjustments */
   .help {
-    padding: 1.5rem 1rem;
+    padding: 3rem 1rem;
   }
   
 .help-header h1 {
@@ -769,7 +768,7 @@ body.menu-open {
   
   /* FAQ mobile adjustments */
   .faq {
-    padding: 2rem 1rem;
+    padding: 3rem 1rem;
   }
   
   .faq-header h1 {
@@ -796,7 +795,7 @@ body.menu-open {
 
 /* FAQ Section */
 .faq {
-  padding: 3rem 1rem;
+  padding: 4rem 1.5rem;
   background: #141518;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -808,7 +807,7 @@ body.menu-open {
 
 .faq-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .faq-list {
@@ -977,18 +976,19 @@ body.menu-open {
   transform: translateY(-1px);
 }
 
-/* Full-width Typeform section */
+/* Compact Typeform section */
 .typeform-section {
   width: 100%;
-  margin: 0;
-  padding: 2rem 1.5rem;
-  background: #141518;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  background: var(--bg-dark);
 }
 
 .typeform-section iframe {
   display: block;
-  width: 100%;       /* full page width */
-  height: 75vh;     /* full viewport height */
+  width: 100%;
+  height: 550px;
   border: none;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -996,9 +996,9 @@ body.menu-open {
 
 /* Typeform intro section */
 .typeform-intro {
-  padding: 3rem 1.5rem 2rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
-  background: #141518;
+  background: var(--bg-dark);
 }
 
 .typeform-intro-inner {
@@ -1022,14 +1022,14 @@ body.menu-open {
 /* Step 1 CTA styling */
 .step-cta-1 {
   text-align: center;
-  margin: 1rem 0 1.5rem 0;
+  margin: 1rem 0 1.5rem;
   padding: 0 1.5rem;
 }
 
 /* Step 2 CTA styling */
 .step-cta-2 {
   text-align: center;
-  margin: 0.5rem 0 2rem 0;
+  margin: 2rem 0;
   padding: 0 1.5rem;
 }
 
@@ -1191,16 +1191,16 @@ body.menu-open {
   }
   
   .typeform-section iframe {
-    height: 65vh;
+    height: 480px;
   }
   
   .step-cta-1 {
-    margin: 0.5rem 0 1rem 0;
+    margin: 0.5rem 0 1rem;
     padding: 0 0.75rem;
   }
   
   .step-cta-2 {
-    margin: 0.5rem 0 1.25rem 0;
+    margin: 1.25rem 0;
     padding: 0 0.75rem;
   }
   
@@ -1242,7 +1242,7 @@ body.menu-open {
 
 .what-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .what-header h1 {
@@ -1339,14 +1339,14 @@ body.menu-open {
 .hero-vsl-content h1 {
   font-size: clamp(2.5rem, 6vw, 3.5rem);
   font-weight: 800;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   line-height: 1.1;
 }
 
 .hero-vsl-content p {
   font-size: 1.2rem;
   color: #cbd5e1;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   line-height: 1.6;
 }
 
@@ -1354,7 +1354,7 @@ body.menu-open {
 .vsl-container {
   width: 100%;
   max-width: 900px;
-  margin: 1.5rem auto 2rem;
+  margin: 2rem auto 0;
   padding: 0 1.5rem;
 }
 
@@ -1380,7 +1380,7 @@ body.menu-open {
 
 /* VSL Step CTA adjustments */
 .hero-vsl .step-cta {
-  margin: 2rem 0 0.5rem;
+  margin: 1rem 0 0;
 }
 
 .hero-vsl .button-row {
@@ -1398,21 +1398,21 @@ body.menu-open {
 /* Mobile adjustments for VSL */
 @media (max-width: 768px) {
   .hero-vsl {
-    padding: 2rem 1rem 1.5rem;
+    padding: 2.5rem 1rem 1.5rem;
   }
   
   .hero-vsl-content h1 {
     font-size: 2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
   
   .hero-vsl-content p {
     font-size: 1.1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
   
   .vsl-container {
-    margin: 1.5rem auto 1.5rem;
+    margin: 1.5rem auto 0;
     padding: 0 1rem;
   }
   
@@ -1421,7 +1421,7 @@ body.menu-open {
   }
   
   .hero-vsl .step-cta {
-    margin: 2rem 0 0.5rem;
+    margin: 0.75rem 0 0;
   }
   
   .hero-vsl .button-row {
@@ -1450,12 +1450,12 @@ body.menu-open {
   }
   
   .vsl-container {
-    margin: 1.5rem auto 1rem;
+    margin: 1.25rem auto 0;
     padding: 0 0.5rem;
   }
   
   .hero-vsl .step-cta {
-    margin: 2rem 0 0.5rem;
+    margin: 0.5rem 0 0;
   }
   
   .hero-vsl .button-row {
