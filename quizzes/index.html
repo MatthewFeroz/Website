@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Platform | Matt Feroz</title>
+    <meta name="description" content="Practice LeetCode and Python skills with interactive quizzes" />
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <nav class="nav-menu">
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
+                <a href="/quizzes/" class="nav-link nav-link-active">Quizzes</a>
+                <a href="/contact/" class="nav-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Login Section (shown when not logged in) -->
+        <section id="login-section" class="quiz-login">
+            <div class="login-inner">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h1>Access Your Quizzes</h1>
+                        <p>Enter your access code to start practicing LeetCode patterns and Python fundamentals.</p>
+                    </div>
+                    
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label for="access-code">Access Code</label>
+                            <input 
+                                type="text" 
+                                id="access-code" 
+                                name="access-code" 
+                                placeholder="XXXX-XXXX-XXXX"
+                                autocomplete="off"
+                                spellcheck="false"
+                                required
+                            >
+                            <p id="error-message" class="error-message" hidden></p>
+                        </div>
+                        <button type="submit" class="primary-button login-button" id="login-button">
+                            <span class="button-text">Access Quizzes</span>
+                            <span class="button-loading" hidden>
+                                <span class="spinner"></span>
+                                Verifying...
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="login-footer">
+                        <p>Don't have an access code?</p>
+                        <a href="/coaching/" class="text-link">Learn about the Academy</a>
+                    </div>
+                </div>
+
+                <div class="login-features">
+                    <h2>What You'll Get</h2>
+                    <ul class="feature-list">
+                        <li>
+                            <span class="feature-icon">📝</span>
+                            <div>
+                                <strong>LeetCode Pattern Quizzes</strong>
+                                <p>Master arrays, strings, trees, and more</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-icon">🐍</span>
+                            <div>
+                                <strong>Python Fundamentals</strong>
+                                <p>Solidify your Python knowledge</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-icon">📊</span>
+                            <div>
+                                <strong>Progress Tracking</strong>
+                                <p>See your improvement over time</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-icon">📥</span>
+                            <div>
+                                <strong>Downloadable Resources</strong>
+                                <p>Unlock cheat sheets as you learn</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loading-section" class="loading-section" hidden>
+            <div class="loading-spinner"></div>
+            <p>Loading your dashboard...</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/alivecomp/" target="_blank" class="footer-link">Instagram</a>
+                <a href="/contact/" class="footer-link">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Convex Client -->
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL } from "./config.js";
+        
+        // Use config URL, or fallback to localStorage for backwards compatibility
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
+        
+        // Check if we have a Convex URL configured
+        if (!CONVEX_URL) {
+            // Show setup instructions
+            document.body.innerHTML = `
+                <div style="max-width: 600px; margin: 100px auto; padding: 2rem; text-align: center; font-family: sans-serif; color: #fff; background: #1b1d22; border-radius: 12px;">
+                    <h1 style="color: #f85f00;">Setup Required</h1>
+                    <p>Please configure your Convex URL in <code style="background: #333; padding: 2px 6px; border-radius: 4px;">quizzes/config.js</code></p>
+                    <p style="color: #9aa0aa;">You can find your URL in <code style="background: #333; padding: 2px 6px; border-radius: 4px;">.env.local</code> after running <code style="background: #333; padding: 2px 6px; border-radius: 4px;">npx convex dev</code></p>
+                </div>
+            `;
+            throw new Error('Convex URL not configured');
+        }
+        
+        // Store URL for other pages
+        localStorage.setItem('convex_url', CONVEX_URL);
+        
+        const client = new ConvexHttpClient(CONVEX_URL);
+
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const loadingSection = document.getElementById('loading-section');
+        const loginForm = document.getElementById('login-form');
+        const accessCodeInput = document.getElementById('access-code');
+        const errorMessage = document.getElementById('error-message');
+        const loginButton = document.getElementById('login-button');
+        const buttonText = loginButton.querySelector('.button-text');
+        const buttonLoading = loginButton.querySelector('.button-loading');
+
+        // Check for existing session
+        const checkSession = async () => {
+            const userId = localStorage.getItem('quiz_user_id');
+            if (userId && client) {
+                try {
+                    const result = await client.query('auth:validateSession', { userId });
+                    if (result.valid) {
+                        // Redirect to dashboard
+                        window.location.href = '/quizzes/dashboard.html';
+                        return;
+                    }
+                } catch (e) {
+                    // Session invalid, clear it
+                    localStorage.removeItem('quiz_user_id');
+                }
+            }
+            // Show login form
+            loginSection.hidden = false;
+            loadingSection.hidden = true;
+        };
+
+        // Format access code as user types
+        accessCodeInput.addEventListener('input', (e) => {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            
+            // Add dashes after every 4 characters
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4);
+            }
+            if (value.length > 9) {
+                value = value.slice(0, 9) + '-' + value.slice(9);
+            }
+            
+            // Limit to 14 characters (XXXX-XXXX-XXXX)
+            e.target.value = value.slice(0, 14);
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!client) {
+                showError('Convex not configured. Please refresh and enter your deployment URL.');
+                return;
+            }
+
+            const code = accessCodeInput.value.trim();
+            
+            if (!code) {
+                showError('Please enter your access code');
+                return;
+            }
+
+            // Show loading state
+            setLoading(true);
+            hideError();
+
+            try {
+                const result = await client.mutation('auth:validateAccessCode', { code });
+                
+                if (result.success) {
+                    // Store session
+                    localStorage.setItem('quiz_user_id', result.userId);
+                    localStorage.setItem('quiz_user_email', result.email);
+                    
+                    // Redirect to dashboard
+                    window.location.href = '/quizzes/dashboard.html';
+                } else {
+                    showError(result.error || 'Invalid access code');
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                showError('Something went wrong. Please try again.');
+                setLoading(false);
+            }
+        });
+
+        // Helper functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.hidden = false;
+            accessCodeInput.classList.add('input-error');
+        }
+
+        function hideError() {
+            errorMessage.hidden = true;
+            accessCodeInput.classList.remove('input-error');
+        }
+
+        function setLoading(loading) {
+            loginButton.disabled = loading;
+            buttonText.hidden = loading;
+            buttonLoading.hidden = !loading;
+        }
+
+        // Initialize
+        checkSession();
+    </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Quiz Platform | Matt Feroz</title>
+    <meta name="description" content="Your quiz dashboard - track progress and take quizzes" />
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <nav class="nav-menu">
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="/quizzes/dashboard.html" class="nav-link nav-link-active">Dashboard</a>
+                <a href="/quizzes/resources.html" class="nav-link">Resources</a>
+                <a href="/contact/" class="nav-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Loading State -->
+        <section id="loading-section" class="loading-section">
+            <div class="loading-spinner"></div>
+            <p>Loading your dashboard...</p>
+        </section>
+
+        <!-- Dashboard Content -->
+        <section id="dashboard-section" class="dashboard" hidden>
+            <div class="dashboard-inner">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <h1>Your Dashboard</h1>
+                    <div class="user-info">
+                        <span class="user-email" id="user-email"></span>
+                        <button class="logout-button" id="logout-button">Log Out</button>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-completed">0</div>
+                        <div class="stat-label">Quizzes Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total Quizzes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value highlight" id="stat-average">-</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-resources">0</div>
+                        <div class="stat-label">Resources Unlocked</div>
+                    </div>
+                </div>
+
+                <!-- Category Progress -->
+                <div class="category-progress" id="category-progress">
+                    <h2>Progress by Category</h2>
+                    <div class="progress-bars" id="progress-bars">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Quiz List -->
+                <div class="quiz-list-section">
+                    <h2>Available Quizzes</h2>
+                    <div class="quiz-grid" id="quiz-grid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/alivecomp/" target="_blank" class="footer-link">Instagram</a>
+                <a href="/contact/" class="footer-link">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        
+        // Initialize Convex client
+        const CONVEX_URL = localStorage.getItem('convex_url') || '';
+        if (!CONVEX_URL) {
+            window.location.href = '/quizzes/';
+        }
+        const client = new ConvexHttpClient(CONVEX_URL);
+
+        // DOM Elements
+        const loadingSection = document.getElementById('loading-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const userEmailEl = document.getElementById('user-email');
+        const logoutButton = document.getElementById('logout-button');
+        const statsCompleted = document.getElementById('stat-completed');
+        const statsTotal = document.getElementById('stat-total');
+        const statsAverage = document.getElementById('stat-average');
+        const statsResources = document.getElementById('stat-resources');
+        const progressBars = document.getElementById('progress-bars');
+        const quizGrid = document.getElementById('quiz-grid');
+
+        // Check session and load data
+        async function init() {
+            const userId = localStorage.getItem('quiz_user_id');
+            const userEmail = localStorage.getItem('quiz_user_email');
+
+            if (!userId) {
+                window.location.href = '/quizzes/';
+                return;
+            }
+
+            try {
+                // Validate session
+                const session = await client.query('auth:validateSession', { userId });
+                if (!session.valid) {
+                    localStorage.removeItem('quiz_user_id');
+                    localStorage.removeItem('quiz_user_email');
+                    window.location.href = '/quizzes/';
+                    return;
+                }
+
+                // Load user progress
+                const progress = await client.query('quizzes:getUserProgress', { userId });
+                
+                // Load available resources
+                const resources = await client.query('resources:getAvailableResources', { userId });
+                const unlockedCount = resources.filter(r => r.isUnlocked).length;
+
+                // Update UI
+                userEmailEl.textContent = userEmail || session.user.email;
+                
+                // Stats
+                statsCompleted.textContent = progress.completedQuizzes;
+                statsTotal.textContent = progress.totalQuizzes;
+                statsResources.textContent = unlockedCount;
+                
+                // Calculate average score
+                const quizzesWithScores = progress.quizzes.filter(q => q.bestScore !== null);
+                if (quizzesWithScores.length > 0) {
+                    const avgScore = Math.round(
+                        quizzesWithScores.reduce((sum, q) => sum + q.bestScore, 0) / quizzesWithScores.length
+                    );
+                    statsAverage.textContent = avgScore + '%';
+                }
+
+                // Category progress
+                renderCategoryProgress(progress.categories);
+
+                // Quiz grid
+                renderQuizGrid(progress.quizzes);
+
+                // Show dashboard
+                loadingSection.hidden = true;
+                dashboardSection.hidden = false;
+
+            } catch (err) {
+                console.error('Error loading dashboard:', err);
+                alert('Error loading dashboard. Please try logging in again.');
+                localStorage.removeItem('quiz_user_id');
+                window.location.href = '/quizzes/';
+            }
+        }
+
+        function renderCategoryProgress(categories) {
+            if (categories.length === 0) {
+                progressBars.innerHTML = '<p style="color: #9aa0aa;">No categories yet</p>';
+                return;
+            }
+
+            progressBars.innerHTML = categories.map(cat => `
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span class="progress-name">${formatCategoryName(cat.category)}</span>
+                        <span class="progress-count">${cat.passed}/${cat.total} passed</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${cat.percentage}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderQuizGrid(quizzes) {
+            if (quizzes.length === 0) {
+                quizGrid.innerHTML = '<p style="color: #9aa0aa;">No quizzes available yet</p>';
+                return;
+            }
+
+            quizGrid.innerHTML = quizzes.map(quiz => {
+                let statusHtml = '';
+                let buttonHtml = '';
+
+                if (quiz.passed) {
+                    statusHtml = `<span class="quiz-status status-passed">✓ Passed (${quiz.bestScore}%)</span>`;
+                    buttonHtml = `<a href="/quizzes/quiz.html?id=${quiz.quizId}" class="quiz-button quiz-button-secondary">Retake</a>`;
+                } else if (quiz.attemptCount > 0) {
+                    statusHtml = `<span class="quiz-status status-failed">Best: ${quiz.bestScore}%</span>`;
+                    buttonHtml = `<a href="/quizzes/quiz.html?id=${quiz.quizId}" class="quiz-button quiz-button-primary">Try Again</a>`;
+                } else {
+                    statusHtml = `<span class="quiz-status status-new">Not started</span>`;
+                    buttonHtml = `<a href="/quizzes/quiz.html?id=${quiz.quizId}" class="quiz-button quiz-button-primary">Start Quiz</a>`;
+                }
+
+                return `
+                    <div class="quiz-card">
+                        <div class="quiz-card-header">
+                            <h3>${quiz.title}</h3>
+                            <span class="difficulty-badge difficulty-${quiz.difficulty}">${quiz.difficulty}</span>
+                        </div>
+                        <div class="quiz-card-meta">
+                            <span>${formatCategoryName(quiz.category)}</span>
+                        </div>
+                        <div class="quiz-card-footer">
+                            ${statusHtml}
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatCategoryName(category) {
+            return category
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        // Logout handler
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('quiz_user_id');
+            localStorage.removeItem('quiz_user_email');
+            window.location.href = '/quizzes/';
+        });
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

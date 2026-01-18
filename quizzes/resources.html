@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources | Quiz Platform | Matt Feroz</title>
+    <meta name="description" content="Download resources you've unlocked by completing quizzes" />
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <nav class="nav-menu">
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="/quizzes/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="/quizzes/resources.html" class="nav-link nav-link-active">Resources</a>
+                <a href="/contact/" class="nav-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Loading State -->
+        <section id="loading-section" class="loading-section">
+            <div class="loading-spinner"></div>
+            <p>Loading resources...</p>
+        </section>
+
+        <!-- Resources Content -->
+        <section id="resources-section" class="resources-section" hidden>
+            <div class="resources-inner">
+                <div class="resources-header">
+                    <h1>Your Resources</h1>
+                    <p>Download resources you've unlocked by passing quizzes. Complete more quizzes to unlock additional materials.</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-value highlight" id="stat-unlocked">0</div>
+                        <div class="stat-label">Unlocked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-locked">0</div>
+                        <div class="stat-label">Locked</div>
+                    </div>
+                </div>
+
+                <!-- Unlocked Resources -->
+                <div id="unlocked-section" hidden>
+                    <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Available for Download</h2>
+                    <div class="resource-grid" id="unlocked-resources">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Locked Resources -->
+                <div id="locked-section" style="margin-top: 2rem;" hidden>
+                    <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #9aa0aa;">Locked Resources</h2>
+                    <div class="resource-grid" id="locked-resources">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- No Resources Message -->
+                <div id="no-resources" hidden style="text-align: center; padding: 3rem;">
+                    <p style="color: #9aa0aa; font-size: 1.1rem;">No resources available yet. Check back later!</p>
+                    <a href="/quizzes/dashboard.html" class="primary-button" style="margin-top: 1rem;">Go to Dashboard</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/alivecomp/" target="_blank" class="footer-link">Instagram</a>
+                <a href="/contact/" class="footer-link">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        
+        // Initialize Convex client
+        const CONVEX_URL = localStorage.getItem('convex_url') || '';
+        if (!CONVEX_URL) {
+            window.location.href = '/quizzes/';
+        }
+        const client = new ConvexHttpClient(CONVEX_URL);
+
+        // DOM Elements
+        const loadingSection = document.getElementById('loading-section');
+        const resourcesSection = document.getElementById('resources-section');
+        const unlockedSection = document.getElementById('unlocked-section');
+        const lockedSection = document.getElementById('locked-section');
+        const noResourcesEl = document.getElementById('no-resources');
+        const unlockedResources = document.getElementById('unlocked-resources');
+        const lockedResources = document.getElementById('locked-resources');
+        const statUnlocked = document.getElementById('stat-unlocked');
+        const statLocked = document.getElementById('stat-locked');
+
+        // Check session and load resources
+        async function init() {
+            const userId = localStorage.getItem('quiz_user_id');
+
+            if (!userId) {
+                window.location.href = '/quizzes/';
+                return;
+            }
+
+            try {
+                // Load resources
+                const resources = await client.query('resources:getAvailableResources', { userId });
+
+                if (resources.length === 0) {
+                    loadingSection.hidden = true;
+                    resourcesSection.hidden = false;
+                    noResourcesEl.hidden = false;
+                    return;
+                }
+
+                const unlocked = resources.filter(r => r.isUnlocked);
+                const locked = resources.filter(r => !r.isUnlocked);
+
+                // Update stats
+                statUnlocked.textContent = unlocked.length;
+                statLocked.textContent = locked.length;
+
+                // Render unlocked resources
+                if (unlocked.length > 0) {
+                    unlockedSection.hidden = false;
+                    unlockedResources.innerHTML = unlocked.map(resource => renderResourceCard(resource, true)).join('');
+                    
+                    // Add download handlers
+                    document.querySelectorAll('.download-button').forEach(button => {
+                        button.addEventListener('click', () => handleDownload(button.dataset.resourceId));
+                    });
+                }
+
+                // Render locked resources
+                if (locked.length > 0) {
+                    lockedSection.hidden = false;
+                    lockedResources.innerHTML = locked.map(resource => renderResourceCard(resource, false)).join('');
+                }
+
+                // Show resources
+                loadingSection.hidden = true;
+                resourcesSection.hidden = false;
+
+            } catch (err) {
+                console.error('Error loading resources:', err);
+                alert('Error loading resources. Please try logging in again.');
+                localStorage.removeItem('quiz_user_id');
+                window.location.href = '/quizzes/';
+            }
+        }
+
+        function renderResourceCard(resource, isUnlocked) {
+            const actionHtml = isUnlocked
+                ? `<button class="download-button" data-resource-id="${resource._id}">
+                     <span>📥</span> Download
+                   </button>`
+                : `<div class="locked-badge">
+                     <span>🔒</span> Pass "${resource.quizTitle}" to unlock
+                   </div>`;
+
+            return `
+                <div class="resource-card ${isUnlocked ? '' : 'locked'}">
+                    <div class="resource-info">
+                        <h3>${resource.title}</h3>
+                        <p>${resource.description}</p>
+                        <div class="resource-meta">
+                            <span>${resource.fileName}</span>
+                            <span>${resource.fileSize}</span>
+                        </div>
+                    </div>
+                    <div class="resource-action">
+                        ${actionHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function handleDownload(resourceId) {
+            const userId = localStorage.getItem('quiz_user_id');
+            
+            try {
+                // Get download URL
+                const result = await client.query('resources:getResourceDownloadUrl', {
+                    userId,
+                    resourceId
+                });
+
+                if (result.success) {
+                    // Record the download
+                    await client.mutation('resources:recordDownload', {
+                        userId,
+                        resourceId
+                    });
+
+                    // Trigger download
+                    const link = document.createElement('a');
+                    link.href = result.downloadUrl;
+                    link.download = result.fileName;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert(result.error || 'Unable to download resource');
+                }
+
+            } catch (err) {
+                console.error('Error downloading resource:', err);
+                alert('Error downloading resource. Please try again.');
+            }
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
