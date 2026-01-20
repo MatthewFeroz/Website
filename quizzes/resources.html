@@ -86,14 +86,33 @@
     </footer>
 
     <script type="module">
-        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
-        
+        import { ConvexHttpClient, anyApi } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL, DEV_MODE, DEV_ACCESS_CODE } from "./config.js";
+
         // Initialize Convex client
-        const CONVEX_URL = localStorage.getItem('convex_url') || '';
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
         if (!CONVEX_URL) {
             window.location.href = '/quizzes/';
         }
         const client = new ConvexHttpClient(CONVEX_URL);
+
+        // Create API references for Convex functions
+        const api = anyApi;
+
+        // DEV MODE: Auto-login if needed
+        async function ensureLoggedIn() {
+            let userId = localStorage.getItem('quiz_user_id');
+            if (DEV_MODE && !userId) {
+                console.log('[DEV MODE] Auto-logging in...');
+                const result = await client.mutation(api.auth.validateAccessCode, { code: DEV_ACCESS_CODE });
+                if (result.success) {
+                    localStorage.setItem('quiz_user_id', result.userId);
+                    localStorage.setItem('quiz_user_email', result.email);
+                    return result.userId;
+                }
+            }
+            return userId;
+        }
 
         // DOM Elements
         const loadingSection = document.getElementById('loading-section');
@@ -108,7 +127,7 @@
 
         // Check session and load resources
         async function init() {
-            const userId = localStorage.getItem('quiz_user_id');
+            const userId = await ensureLoggedIn();
 
             if (!userId) {
                 window.location.href = '/quizzes/';
@@ -117,7 +136,7 @@
 
             try {
                 // Load resources
-                const resources = await client.query('resources:getAvailableResources', { userId });
+                const resources = await client.query(api.resources.getAvailableResources, { userId });
 
                 if (resources.length === 0) {
                     loadingSection.hidden = true;
@@ -193,14 +212,14 @@
             
             try {
                 // Get download URL
-                const result = await client.query('resources:getResourceDownloadUrl', {
+                const result = await client.query(api.resources.getResourceDownloadUrl, {
                     userId,
                     resourceId
                 });
 
                 if (result.success) {
                     // Record the download
-                    await client.mutation('resources:recordDownload', {
+                    await client.mutation(api.resources.recordDownload, {
                         userId,
                         resourceId
                     });

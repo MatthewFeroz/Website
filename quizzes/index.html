@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Platform | Matt Feroz</title>
-    <meta name="description" content="Practice LeetCode and Python skills with interactive quizzes" />
+    <meta name="description" content="Practice LeetCode patterns and Python fundamentals with interactive quizzes" />
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="quiz-styles.css">
     <link rel="icon" href="../favicon.ico">
@@ -19,90 +19,125 @@
                 <a href="/quizzes/" class="nav-link nav-link-active">Quizzes</a>
                 <a href="/contact/" class="nav-link">Contact</a>
             </nav>
+            <a href="#" class="nav-cta" id="login-cta">MEMBER LOGIN</a>
         </div>
     </header>
 
     <main>
-        <!-- Login Section (shown when not logged in) -->
-        <section id="login-section" class="quiz-login">
-            <div class="login-inner">
-                <div class="login-card">
-                    <div class="login-header">
-                        <h1>Access Your Quizzes</h1>
-                        <p>Enter your access code to start practicing LeetCode patterns and Python fundamentals.</p>
-                    </div>
-                    
-                    <form id="login-form" class="login-form">
-                        <div class="form-group">
-                            <label for="access-code">Access Code</label>
-                            <input 
-                                type="text" 
-                                id="access-code" 
-                                name="access-code" 
-                                placeholder="XXXX-XXXX-XXXX"
-                                autocomplete="off"
-                                spellcheck="false"
-                                required
-                            >
-                            <p id="error-message" class="error-message" hidden></p>
-                        </div>
-                        <button type="submit" class="primary-button login-button" id="login-button">
-                            <span class="button-text">Access Quizzes</span>
-                            <span class="button-loading" hidden>
-                                <span class="spinner"></span>
-                                Verifying...
-                            </span>
-                        </button>
-                    </form>
-
-                    <div class="login-footer">
-                        <p>Don't have an access code?</p>
-                        <a href="/coaching/" class="text-link">Learn about the Academy</a>
-                    </div>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-image-wrapper">
+                    <span class="hero-glow"></span>
+                    <img src="../profilepicture.png" alt="Matt Feroz" class="hero-image">
                 </div>
-
-                <div class="login-features">
-                    <h2>What You'll Get</h2>
-                    <ul class="feature-list">
-                        <li>
-                            <span class="feature-icon">📝</span>
-                            <div>
-                                <strong>LeetCode Pattern Quizzes</strong>
-                                <p>Master arrays, strings, trees, and more</p>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="feature-icon">🐍</span>
-                            <div>
-                                <strong>Python Fundamentals</strong>
-                                <p>Solidify your Python knowledge</p>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="feature-icon">📊</span>
-                            <div>
-                                <strong>Progress Tracking</strong>
-                                <p>See your improvement over time</p>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="feature-icon">📥</span>
-                            <div>
-                                <strong>Downloadable Resources</strong>
-                                <p>Unlock cheat sheets as you learn</p>
-                            </div>
-                        </li>
-                    </ul>
+                <div class="hero-content">
+                    <h1>Master Technical Interviews</h1>
+                    <p>Interactive quizzes to help you <strong>understand LeetCode patterns</strong> and <strong>solidify your Python fundamentals</strong>. Track your progress, unlock resources, and get interview-ready.</p>
+                    <div class="button-row">
+                        <a href="#quizzes" class="primary-button">EXPLORE QUIZZES</a>
+                        <a href="/coaching/" class="secondary-button">GET FULL ACCESS</a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Loading State -->
-        <section id="loading-section" class="loading-section" hidden>
-            <div class="loading-spinner"></div>
-            <p>Loading your dashboard...</p>
+        <!-- What You Get Section -->
+        <section class="what-you-get">
+            <div class="what-inner">
+                <div class="what-header">
+                    <h1>What's Included</h1>
+                    <p>Everything you need to prepare for technical interviews</p>
+                </div>
+                <div class="what-cards">
+                    <div class="what-card">
+                        <h3>LeetCode Patterns</h3>
+                        <p>Master the most common interview patterns: arrays, two pointers, sliding window, trees, and more.</p>
+                    </div>
+                    <div class="what-card">
+                        <h3>Python Fundamentals</h3>
+                        <p>Solidify your Python knowledge with quizzes on data types, functions, and best practices.</p>
+                    </div>
+                    <div class="what-card">
+                        <h3>Progress Tracking</h3>
+                        <p>See your improvement over time and know exactly where you stand before interviews.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Available Quizzes Section -->
+        <section id="quizzes" class="help">
+            <div class="help-inner">
+                <div class="help-header">
+                    <h1>Available Quizzes</h1>
+                    <p style="color: #9aa0aa; margin-top: 0.5rem;">Click on any quiz to start practicing</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="quizzes-loading" class="loading-section" style="min-height: 200px;">
+                    <div class="loading-spinner"></div>
+                    <p>Loading quizzes...</p>
+                </div>
+
+                <!-- Quiz Grid -->
+                <div class="quiz-grid" id="quiz-grid" hidden>
+                    <!-- Dynamically populated -->
+                </div>
+
+                <!-- No Quizzes Message -->
+                <div id="no-quizzes" hidden style="text-align: center; padding: 2rem;">
+                    <p style="color: #9aa0aa;">No quizzes available yet. Check back soon!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="help" style="padding-top: 0;">
+            <div class="help-inner" style="text-align: center;">
+                <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
+                <p style="color: #9aa0aa; margin-bottom: 1.5rem;">Join the Academy to get full access to all quizzes and resources.</p>
+                <a href="/coaching/" class="primary-button">LEARN ABOUT THE ACADEMY</a>
+            </div>
         </section>
     </main>
+
+    <!-- Access Code Modal -->
+    <div id="access-modal" class="modal" hidden>
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <h2>Enter Your Access Code</h2>
+            <p>Enter the code you received when you joined the Academy.</p>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="access-code" 
+                        name="access-code" 
+                        placeholder="XXXX-XXXX-XXXX"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
+                    >
+                    <p id="error-message" class="error-message" hidden></p>
+                </div>
+                <button type="submit" class="primary-button login-button" id="login-button" style="width: 100%;">
+                    <span class="button-text">Access Quiz</span>
+                    <span class="button-loading" hidden>
+                        <span class="spinner"></span>
+                        Verifying...
+                    </span>
+                </button>
+            </form>
+
+            <div class="login-footer" style="margin-top: 1.5rem;">
+                <p>Don't have an access code?</p>
+                <a href="/coaching/" class="text-link">Join the Academy</a>
+            </div>
+        </div>
+    </div>
 
     <footer class="site-footer">
         <div class="footer-inner">
@@ -115,121 +150,252 @@
         </div>
     </footer>
 
-    <!-- Convex Client -->
+    <!-- Modal close handler - runs independently of Convex -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const accessModal = document.getElementById('access-modal');
+            const modalClose = document.getElementById('modal-close');
+            const modalBackdrop = accessModal ? accessModal.querySelector('.modal-backdrop') : null;
+
+            function closeModalAndNavigate() {
+                window.location.href = '/guide/';
+            }
+
+            if (modalClose) {
+                modalClose.addEventListener('click', closeModalAndNavigate);
+            }
+            if (modalBackdrop) {
+                modalBackdrop.addEventListener('click', closeModalAndNavigate);
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && accessModal && !accessModal.hidden) {
+                    closeModalAndNavigate();
+                }
+            });
+        });
+    </script>
+
     <script type="module">
-        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
-        import { CONVEX_URL as CONFIG_URL } from "./config.js";
-        
-        // Use config URL, or fallback to localStorage for backwards compatibility
+        import { ConvexHttpClient, anyApi } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL, DEV_MODE, DEV_ACCESS_CODE } from "./config.js";
+
         const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
-        
-        // Check if we have a Convex URL configured
+
         if (!CONVEX_URL) {
-            // Show setup instructions
-            document.body.innerHTML = `
-                <div style="max-width: 600px; margin: 100px auto; padding: 2rem; text-align: center; font-family: sans-serif; color: #fff; background: #1b1d22; border-radius: 12px;">
-                    <h1 style="color: #f85f00;">Setup Required</h1>
-                    <p>Please configure your Convex URL in <code style="background: #333; padding: 2px 6px; border-radius: 4px;">quizzes/config.js</code></p>
-                    <p style="color: #9aa0aa;">You can find your URL in <code style="background: #333; padding: 2px 6px; border-radius: 4px;">.env.local</code> after running <code style="background: #333; padding: 2px 6px; border-radius: 4px;">npx convex dev</code></p>
-                </div>
+            document.getElementById('quizzes-loading').innerHTML = `
+                <p style="color: #ef4444;">Configuration required. Please set CONVEX_URL in config.js</p>
             `;
             throw new Error('Convex URL not configured');
         }
-        
-        // Store URL for other pages
+
         localStorage.setItem('convex_url', CONVEX_URL);
-        
         const client = new ConvexHttpClient(CONVEX_URL);
 
+        // Create API references for Convex functions
+        const api = anyApi;
+
+        // State
+        let selectedQuizId = null;
+
         // DOM Elements
-        const loginSection = document.getElementById('login-section');
-        const loadingSection = document.getElementById('loading-section');
+        const quizzesLoading = document.getElementById('quizzes-loading');
+        const quizGrid = document.getElementById('quiz-grid');
+        const noQuizzes = document.getElementById('no-quizzes');
+        const accessModal = document.getElementById('access-modal');
+        const modalClose = document.getElementById('modal-close');
+        const modalBackdrop = accessModal.querySelector('.modal-backdrop');
         const loginForm = document.getElementById('login-form');
         const accessCodeInput = document.getElementById('access-code');
         const errorMessage = document.getElementById('error-message');
         const loginButton = document.getElementById('login-button');
-        const buttonText = loginButton.querySelector('.button-text');
-        const buttonLoading = loginButton.querySelector('.button-loading');
+        const loginCta = document.getElementById('login-cta');
 
-        // Check for existing session
-        const checkSession = async () => {
-            const userId = localStorage.getItem('quiz_user_id');
-            if (userId && client) {
-                try {
-                    const result = await client.query('auth:validateSession', { userId });
-                    if (result.valid) {
-                        // Redirect to dashboard
-                        window.location.href = '/quizzes/dashboard.html';
-                        return;
-                    }
-                } catch (e) {
-                    // Session invalid, clear it
-                    localStorage.removeItem('quiz_user_id');
-                }
+        // DEV MODE indicator
+        if (DEV_MODE) {
+            const devBanner = document.createElement('div');
+            devBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f85f00;color:#fff;text-align:center;padding:8px;font-size:14px;z-index:99999;';
+            devBanner.innerHTML = 'DEV MODE - <a href="/quizzes/dashboard.html" style="color:#fff;font-weight:bold;text-decoration:underline;">Go to Dashboard</a>';
+            document.body.prepend(devBanner);
+            document.body.style.paddingTop = '36px';
+            
+            // In dev mode, ensure modal is always closeable
+            accessModal.hidden = true;
+        }
+
+        // Check if already logged in
+        const isLoggedIn = () => !!localStorage.getItem('quiz_user_id');
+
+        // Update login CTA based on auth state
+        function updateLoginCta() {
+            if (isLoggedIn()) {
+                loginCta.textContent = 'MY DASHBOARD';
+                loginCta.href = '/quizzes/dashboard.html';
+            } else {
+                loginCta.textContent = 'MEMBER LOGIN';
+                loginCta.href = '#';
+                loginCta.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal();
+                });
             }
-            // Show login form
-            loginSection.hidden = false;
-            loadingSection.hidden = true;
-        };
+        }
+
+        // Load quizzes (public, no auth needed)
+        async function loadQuizzes() {
+            try {
+                const quizzes = await client.query(api.quizzes.getActiveQuizzes, {});
+                
+                if (quizzes.length === 0) {
+                    quizzesLoading.hidden = true;
+                    noQuizzes.hidden = false;
+                    return;
+                }
+
+                renderQuizGrid(quizzes);
+                quizzesLoading.hidden = true;
+                quizGrid.hidden = false;
+
+            } catch (err) {
+                console.error('Error loading quizzes:', err);
+                quizzesLoading.innerHTML = `
+                    <p style="color: #ef4444;">Failed to load quizzes. Make sure Convex is running.</p>
+                    <p style="color: #9aa0aa; font-size: 0.85rem;">Run: npx convex dev</p>
+                `;
+            }
+        }
+
+        function renderQuizGrid(quizzes) {
+            quizGrid.innerHTML = quizzes.map(quiz => `
+                <div class="quiz-card">
+                    <div class="quiz-card-header">
+                        <h3>${quiz.title}</h3>
+                        <span class="difficulty-badge difficulty-${quiz.difficulty}">${quiz.difficulty}</span>
+                    </div>
+                    <div class="quiz-card-meta">
+                        <span>${formatCategoryName(quiz.category)}</span>
+                        <span>${quiz.questionCount} questions</span>
+                    </div>
+                    <p class="quiz-card-description">${quiz.description}</p>
+                    <div class="quiz-card-footer">
+                        <span class="quiz-status" style="color: #9aa0aa;">Pass: ${quiz.passingScore}%</span>
+                        <button class="quiz-button quiz-button-primary start-quiz-btn" data-quiz-id="${quiz._id}">
+                            Start Quiz
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.start-quiz-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleStartQuiz(btn.dataset.quizId));
+            });
+        }
+
+        function handleStartQuiz(quizId) {
+            if (isLoggedIn()) {
+                // Already logged in, go directly to quiz
+                window.location.href = `/quizzes/quiz.html?id=${quizId}`;
+            } else if (DEV_MODE) {
+                // Dev mode: auto-login and go
+                autoLoginAndStart(quizId);
+            } else {
+                // Show access code modal
+                selectedQuizId = quizId;
+                openModal();
+            }
+        }
+
+        async function autoLoginAndStart(quizId) {
+            console.log('[DEV MODE] Auto-logging in...');
+            try {
+                const result = await client.mutation(api.auth.validateAccessCode, { code: DEV_ACCESS_CODE });
+                console.log('[DEV MODE] Login result:', result);
+                if (result.success) {
+                    localStorage.setItem('quiz_user_id', result.userId);
+                    localStorage.setItem('quiz_user_email', result.email);
+                    console.log('[DEV MODE] Redirecting to quiz...');
+                    window.location.href = `/quizzes/quiz.html?id=${quizId}`;
+                } else {
+                    console.error('[DEV MODE] Login failed:', result.error);
+                    alert('[DEV MODE] Auto-login failed: ' + result.error + '\n\nThe test code may have already been used. Check Convex dashboard.');
+                }
+            } catch (err) {
+                console.error('[DEV MODE] Auto-login error:', err);
+                alert('[DEV MODE] Connection error. Make sure npx convex dev is running.');
+            }
+        }
+
+        // Modal functions
+        function openModal() {
+            accessModal.hidden = false;
+            document.body.style.overflow = 'hidden';
+            accessCodeInput.focus();
+        }
+
+        function closeModal() {
+            accessModal.hidden = true;
+            document.body.style.overflow = '';
+            selectedQuizId = null;
+            accessCodeInput.value = '';
+            hideError();
+            window.location.href = '/guide/';
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+        
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !accessModal.hidden) {
+                closeModal();
+            }
+        });
 
         // Format access code as user types
         accessCodeInput.addEventListener('input', (e) => {
             let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            
-            // Add dashes after every 4 characters
-            if (value.length > 4) {
-                value = value.slice(0, 4) + '-' + value.slice(4);
-            }
-            if (value.length > 9) {
-                value = value.slice(0, 9) + '-' + value.slice(9);
-            }
-            
-            // Limit to 14 characters (XXXX-XXXX-XXXX)
+            if (value.length > 4) value = value.slice(0, 4) + '-' + value.slice(4);
+            if (value.length > 9) value = value.slice(0, 9) + '-' + value.slice(9);
             e.target.value = value.slice(0, 14);
         });
 
-        // Handle login form submission
+        // Handle login form
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!client) {
-                showError('Convex not configured. Please refresh and enter your deployment URL.');
-                return;
-            }
-
             const code = accessCodeInput.value.trim();
-            
             if (!code) {
                 showError('Please enter your access code');
                 return;
             }
 
-            // Show loading state
             setLoading(true);
             hideError();
 
             try {
-                const result = await client.mutation('auth:validateAccessCode', { code });
-                
+                const result = await client.mutation(api.auth.validateAccessCode, { code });
+
                 if (result.success) {
-                    // Store session
                     localStorage.setItem('quiz_user_id', result.userId);
                     localStorage.setItem('quiz_user_email', result.email);
                     
-                    // Redirect to dashboard
-                    window.location.href = '/quizzes/dashboard.html';
+                    if (selectedQuizId) {
+                        window.location.href = `/quizzes/quiz.html?id=${selectedQuizId}`;
+                    } else {
+                        window.location.href = '/quizzes/dashboard.html';
+                    }
                 } else {
                     showError(result.error || 'Invalid access code');
                     setLoading(false);
                 }
             } catch (err) {
                 console.error('Login error:', err);
-                showError('Something went wrong. Please try again.');
+                showError('Connection error. Please try again.');
                 setLoading(false);
             }
         });
 
-        // Helper functions
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.hidden = false;
@@ -243,12 +409,17 @@
 
         function setLoading(loading) {
             loginButton.disabled = loading;
-            buttonText.hidden = loading;
-            buttonLoading.hidden = !loading;
+            loginButton.querySelector('.button-text').hidden = loading;
+            loginButton.querySelector('.button-loading').hidden = !loading;
+        }
+
+        function formatCategoryName(category) {
+            return category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         }
 
         // Initialize
-        checkSession();
+        updateLoginCta();
+        loadQuizzes();
     </script>
 </body>
 </html>

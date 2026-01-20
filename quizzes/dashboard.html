@@ -92,14 +92,18 @@
     </footer>
 
     <script type="module">
-        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
-        
+        import { ConvexHttpClient, anyApi } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL, DEV_MODE, DEV_ACCESS_CODE } from "./config.js";
+
         // Initialize Convex client
-        const CONVEX_URL = localStorage.getItem('convex_url') || '';
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
         if (!CONVEX_URL) {
             window.location.href = '/quizzes/';
         }
         const client = new ConvexHttpClient(CONVEX_URL);
+
+        // Create API references for Convex functions
+        const api = anyApi;
 
         // DOM Elements
         const loadingSection = document.getElementById('loading-section');
@@ -113,10 +117,42 @@
         const progressBars = document.getElementById('progress-bars');
         const quizGrid = document.getElementById('quiz-grid');
 
+        // DEV MODE banner
+        if (DEV_MODE) {
+            const devBanner = document.createElement('div');
+            devBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f85f00;color:#fff;text-align:center;padding:8px;font-size:14px;z-index:99999;';
+            devBanner.innerHTML = 'DEV MODE ENABLED';
+            document.body.prepend(devBanner);
+            document.body.style.paddingTop = '36px';
+        }
+
         // Check session and load data
         async function init() {
-            const userId = localStorage.getItem('quiz_user_id');
-            const userEmail = localStorage.getItem('quiz_user_email');
+            let userId = localStorage.getItem('quiz_user_id');
+            let userEmail = localStorage.getItem('quiz_user_email');
+
+            // DEV MODE: Auto-login if no session
+            if (DEV_MODE && !userId) {
+                console.log('[DEV MODE] Auto-logging in with test code...');
+                try {
+                    const result = await client.mutation(api.auth.validateAccessCode, { code: DEV_ACCESS_CODE });
+                    if (result.success) {
+                        userId = result.userId;
+                        userEmail = result.email;
+                        localStorage.setItem('quiz_user_id', userId);
+                        localStorage.setItem('quiz_user_email', userEmail);
+                        console.log('[DEV MODE] Auto-login successful:', userEmail);
+                    } else {
+                        console.error('[DEV MODE] Auto-login failed:', result.error);
+                        alert('Dev mode login failed: ' + result.error);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('[DEV MODE] Auto-login error:', err);
+                    alert('Dev mode login error. Make sure npx convex dev is running.');
+                    return;
+                }
+            }
 
             if (!userId) {
                 window.location.href = '/quizzes/';
@@ -124,24 +160,45 @@
             }
 
             try {
-                // Validate session
-                const session = await client.query('auth:validateSession', { userId });
-                if (!session.valid) {
-                    localStorage.removeItem('quiz_user_id');
-                    localStorage.removeItem('quiz_user_email');
-                    window.location.href = '/quizzes/';
-                    return;
+                console.log('[Dashboard] Loading data for userId:', userId);
+                
+                // In dev mode, skip session validation
+                if (!DEV_MODE) {
+                    console.log('[Dashboard] Validating session...');
+                    const session = await client.query(api.auth.validateSession, { userId });
+                    if (!session.valid) {
+                        localStorage.removeItem('quiz_user_id');
+                        localStorage.removeItem('quiz_user_email');
+                        window.location.href = '/quizzes/';
+                        return;
+                    }
                 }
 
                 // Load user progress
-                const progress = await client.query('quizzes:getUserProgress', { userId });
+                console.log('[Dashboard] Loading user progress...');
+                let progress;
+                try {
+                    progress = await client.query(api.quizzes.getUserProgress, { userId });
+                    console.log('[Dashboard] Progress loaded:', progress);
+                } catch (progressErr) {
+                    console.error('[Dashboard] Failed to load progress:', progressErr);
+                    // Show dashboard anyway with empty progress
+                    progress = { quizzes: [], categories: [], totalQuizzes: 0, completedQuizzes: 0 };
+                }
                 
                 // Load available resources
-                const resources = await client.query('resources:getAvailableResources', { userId });
+                console.log('[Dashboard] Loading resources...');
+                let resources = [];
+                try {
+                    resources = await client.query(api.resources.getAvailableResources, { userId });
+                    console.log('[Dashboard] Resources loaded:', resources);
+                } catch (resourceErr) {
+                    console.error('[Dashboard] Failed to load resources:', resourceErr);
+                }
                 const unlockedCount = resources.filter(r => r.isUnlocked).length;
 
                 // Update UI
-                userEmailEl.textContent = userEmail || session.user.email;
+                userEmailEl.textContent = userEmail || 'User';
                 
                 // Stats
                 statsCompleted.textContent = progress.completedQuizzes;
@@ -169,9 +226,14 @@
 
             } catch (err) {
                 console.error('Error loading dashboard:', err);
-                alert('Error loading dashboard. Please try logging in again.');
-                localStorage.removeItem('quiz_user_id');
-                window.location.href = '/quizzes/';
+                loadingSection.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <p style="color: #ef4444; font-size: 1.2rem; margin-bottom: 1rem;">Error Loading Dashboard</p>
+                        <p style="color: #9aa0aa; margin-bottom: 0.5rem;">${err.message || 'Unknown error'}</p>
+                        <p style="color: #666; font-size: 0.85rem; margin-bottom: 1.5rem;">Check browser console for details</p>
+                        <a href="/quizzes/" class="primary-button">Back to Quizzes</a>
+                    </div>
+                `;
             }
         }
 
