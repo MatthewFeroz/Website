@@ -89,14 +89,14 @@
             <div class="quiz-container-inner">
                 <div class="quiz-header">
                     <h1>Review Your Answers</h1>
-                    <p style="color: #9aa0aa;">See what you got right and wrong</p>
+                    <p class="text-muted">See what you got right and wrong</p>
                 </div>
-                
+
                 <div id="review-questions">
                     <!-- Dynamically populated -->
                 </div>
 
-                <div class="quiz-actions" style="justify-content: center;">
+                <div class="quiz-actions quiz-actions-centered">
                     <a href="/quizzes/dashboard.html" class="primary-button">Back to Dashboard</a>
                 </div>
             </div>
@@ -392,10 +392,10 @@
                 ` : '';
 
                 return `
-                    <div class="question-card" style="margin-bottom: 1.5rem;">
+                    <div class="question-card review-question-card">
                         <div class="question-number">Question ${index + 1} ${result.isCorrect ? '✓' : '✗'}</div>
                         <div class="question-text">${result.question}</div>
-                        <div class="answer-options" style="pointer-events: none;">
+                        <div class="answer-options answer-options-disabled">
                             ${optionsHtml}
                         </div>
                         ${explanationHtml}

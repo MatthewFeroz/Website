@@ -190,7 +190,9 @@ export const getUserProgress = query({
         category,
         total: categoryQuizzes.length,
         passed: passedCount,
-        percentage: Math.round((passedCount / categoryQuizzes.length) * 100),
+        percentage: categoryQuizzes.length > 0
+          ? Math.round((passedCount / categoryQuizzes.length) * 100)
+          : 0,
       };
     });
 

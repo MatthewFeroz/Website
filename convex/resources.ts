@@ -1,6 +1,14 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+function validateAdminSecret(adminSecret: string | undefined): boolean {
+  const expectedSecret = process.env.ADMIN_SECRET;
+  if (!expectedSecret) {
+    return false;
+  }
+  return adminSecret === expectedSecret;
+}
+
 /**
  * Get all resources available to a user (based on passed quizzes)
  */
@@ -16,32 +24,36 @@ export const getAvailableResources = query({
 
     const passedQuizIds = [...new Set(passedAttempts.map((a) => a.quizId))];
 
-    // Get all resources
-    const allResources = await ctx.db.query("resources").collect();
+    // Get all resources and quizzes in parallel (avoiding N+1 query problem)
+    const [allResources, allQuizzes] = await Promise.all([
+      ctx.db.query("resources").collect(),
+      ctx.db.query("quizzes").collect(),
+    ]);
+
+    // Create a map of quizzes for O(1) lookup
+    const quizMap = new Map(allQuizzes.map((quiz) => [quiz._id.toString(), quiz]));
 
     // Mark which resources are unlocked
-    const resourcesWithAccess = await Promise.all(
-      allResources.map(async (resource) => {
-        const isUnlocked = passedQuizIds.some(
-          (id) => id.toString() === resource.quizId.toString()
-        );
+    const resourcesWithAccess = allResources.map((resource) => {
+      const isUnlocked = passedQuizIds.some(
+        (id) => id.toString() === resource.quizId.toString()
+      );
 
-        // Get quiz info for this resource
-        const quiz = await ctx.db.get(resource.quizId);
+      // Get quiz info from map (O(1) lookup instead of database query)
+      const quiz = quizMap.get(resource.quizId.toString());
 
-        return {
-          _id: resource._id,
-          title: resource.title,
-          description: resource.description,
-          fileName: resource.fileName,
-          fileSize: resource.fileSize,
-          updatedAt: resource.updatedAt,
-          quizTitle: quiz?.title ?? "Unknown Quiz",
-          quizCategory: quiz?.category ?? "Unknown",
-          isUnlocked,
-        };
-      })
-    );
+      return {
+        _id: resource._id,
+        title: resource.title,
+        description: resource.description,
+        fileName: resource.fileName,
+        fileSize: resource.fileSize,
+        updatedAt: resource.updatedAt,
+        quizTitle: quiz?.title ?? "Unknown Quiz",
+        quizCategory: quiz?.category ?? "Unknown",
+        isUnlocked,
+      };
+    });
 
     return resourcesWithAccess;
   },
@@ -113,16 +125,23 @@ export const recordDownload = mutation({
 
 /**
  * Generate upload URL for adding new resources (admin use)
+ * Protected by admin secret
  */
 export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    adminSecret: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
     return await ctx.storage.generateUploadUrl();
   },
 });
 
 /**
  * Create a new resource after file upload (admin use)
+ * Protected by admin secret
  */
 export const createResource = mutation({
   args: {
@@ -132,16 +151,21 @@ export const createResource = mutation({
     fileId: v.id("_storage"),
     fileName: v.string(),
     fileSize: v.string(),
+    adminSecret: v.string(),
   },
   handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
+
+    if (!args.title.trim() || args.title.length > 200) {
+      throw new Error("Title must be between 1 and 200 characters");
+    }
+
     const now = Date.now();
+    const { adminSecret, ...resourceData } = args;
     const resourceId = await ctx.db.insert("resources", {
-      quizId: args.quizId,
-      title: args.title,
-      description: args.description,
-      fileId: args.fileId,
-      fileName: args.fileName,
-      fileSize: args.fileSize,
+      ...resourceData,
       createdAt: now,
       updatedAt: now,
     });

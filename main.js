@@ -34,6 +34,27 @@
     });
   }
 
+  // Hide navbar on scroll down, show on scroll up
+  let lastScrollTop = 0;
+  const navbar = document.querySelector('.navbar');
+  const scrollThreshold = 50;
+
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (currentScroll > scrollThreshold) {
+      if (currentScroll > lastScrollTop) {
+        navbar.classList.add('navbar-hidden');
+      } else {
+        navbar.classList.remove('navbar-hidden');
+      }
+    } else {
+      navbar.classList.remove('navbar-hidden');
+    }
+
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+  });
+
   // Typeform lazy loading functionality
   const typeformPlaceholder = document.getElementById('typeform-placeholder');
   const typeformIframe = document.getElementById('typeform-iframe');

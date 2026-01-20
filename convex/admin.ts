@@ -1,16 +1,45 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
+
+// Email validation regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateEmail(email: string): boolean {
+  return EMAIL_REGEX.test(email) && email.length <= 255;
+}
+
+function validateAdminSecret(adminSecret: string | undefined): boolean {
+  const expectedSecret = process.env.ADMIN_SECRET;
+  if (!expectedSecret) {
+    // In development without ADMIN_SECRET set, block all admin access for safety
+    return false;
+  }
+  return adminSecret === expectedSecret;
+}
 
 /**
  * Create an access code (admin use - after Stripe payment or manual creation)
+ * Protected by admin secret
  */
 export const createAccessCode = mutation({
   args: {
     email: v.string(),
     expiresInDays: v.optional(v.number()),
     stripePaymentId: v.optional(v.string()),
+    adminSecret: v.string(),
   },
   handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
+
+    if (!validateEmail(args.email)) {
+      throw new Error("Invalid email format");
+    }
+
+    if (args.expiresInDays !== undefined && (args.expiresInDays < 1 || args.expiresInDays > 365)) {
+      throw new Error("expiresInDays must be between 1 and 365");
+    }
     // Generate a unique code (format: XXXX-XXXX-XXXX)
     const generateCode = () => {
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Removed confusing chars: I, O, 0, 1
@@ -46,6 +75,7 @@ export const createAccessCode = mutation({
 
 /**
  * Create a quiz (admin use)
+ * Protected by admin secret
  */
 export const createQuiz = mutation({
   args: {
@@ -64,10 +94,24 @@ export const createQuiz = mutation({
     ),
     passingScore: v.number(),
     estimatedMinutes: v.optional(v.number()),
+    adminSecret: v.string(),
   },
   handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
+
+    if (!args.title.trim() || args.title.length > 200) {
+      throw new Error("Title must be between 1 and 200 characters");
+    }
+
+    if (!args.category.trim() || args.category.length > 100) {
+      throw new Error("Category must be between 1 and 100 characters");
+    }
+
+    const { adminSecret, ...quizData } = args;
     const quizId = await ctx.db.insert("quizzes", {
-      ...args,
+      ...quizData,
       isActive: true,
     });
     return quizId;
@@ -76,30 +120,49 @@ export const createQuiz = mutation({
 
 /**
  * List all access codes (admin use)
+ * Protected by admin secret
  */
 export const listAccessCodes = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    adminSecret: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
     return await ctx.db.query("accessCodes").collect();
   },
 });
 
 /**
  * List all quizzes including inactive ones (admin use)
+ * Protected by admin secret
  */
 export const listAllQuizzes = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    adminSecret: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
     return await ctx.db.query("quizzes").collect();
   },
 });
 
 /**
  * Toggle quiz active status (admin use)
+ * Protected by admin secret
  */
 export const toggleQuizActive = mutation({
-  args: { quizId: v.id("quizzes") },
+  args: {
+    quizId: v.id("quizzes"),
+    adminSecret: v.string(),
+  },
   handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
     const quiz = await ctx.db.get(args.quizId);
     if (!quiz) return { success: false };
     await ctx.db.patch(args.quizId, { isActive: !quiz.isActive });
@@ -109,10 +172,16 @@ export const toggleQuizActive = mutation({
 
 /**
  * Get download analytics (admin use)
+ * Protected by admin secret
  */
 export const getDownloadStats = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    adminSecret: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!validateAdminSecret(args.adminSecret)) {
+      throw new Error("Unauthorized: Invalid admin credentials");
+    }
     const downloads = await ctx.db.query("resourceDownloads").collect();
     const resources = await ctx.db.query("resources").collect();
 

@@ -13,13 +13,22 @@
     <header class="navbar">
         <div class="nav-inner">
             <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
             <nav class="nav-menu">
                 <a href="/coaching/" class="nav-link">Coaching</a>
                 <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
                 <a href="/quizzes/" class="nav-link nav-link-active">Quizzes</a>
                 <a href="/contact/" class="nav-link">Contact</a>
             </nav>
-            <a href="#" class="nav-cta" id="login-cta">MEMBER LOGIN</a>
+            <a href="#" class="nav-cta" id="login-cta"><span class="cta-full">MEMBER LOGIN</span><span class="cta-short">LOGIN</span></a>
+        </div>
+        <div id="mobile-menu" class="mobile-menu" hidden>
+            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <a href="/coaching/" class="mobile-link">Coaching</a>
+            <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
+            <a href="/quizzes/" class="mobile-link">Quizzes</a>
+            <a href="/contact/" class="mobile-link">Contact</a>
+            <a href="#" class="mobile-cta" id="mobile-login-cta">MEMBER LOGIN</a>
         </div>
     </header>
 
@@ -144,8 +153,10 @@
             <a href="/" class="footer-logo">MATT FEROZ</a>
             <nav class="footer-menu">
                 <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
-                <a href="https://www.instagram.com/alivecomp/" target="_blank" class="footer-link">Instagram</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
                 <a href="/contact/" class="footer-link">Contact</a>
+                <a href="#terms" class="footer-link">Terms &amp; Conditions</a>
+                <a href="#privacy" class="footer-link">Privacy Policy</a>
             </nav>
         </div>
     </footer>
@@ -232,17 +243,31 @@
         const isLoggedIn = () => !!localStorage.getItem('quiz_user_id');
 
         // Update login CTA based on auth state
+        const mobileLoginCta = document.getElementById('mobile-login-cta');
+
         function updateLoginCta() {
             if (isLoggedIn()) {
-                loginCta.textContent = 'MY DASHBOARD';
+                loginCta.innerHTML = '<span class="cta-full">MY DASHBOARD</span><span class="cta-short">DASHBOARD</span>';
                 loginCta.href = '/quizzes/dashboard.html';
+                if (mobileLoginCta) {
+                    mobileLoginCta.textContent = 'MY DASHBOARD';
+                    mobileLoginCta.href = '/quizzes/dashboard.html';
+                }
             } else {
-                loginCta.textContent = 'MEMBER LOGIN';
+                loginCta.innerHTML = '<span class="cta-full">MEMBER LOGIN</span><span class="cta-short">LOGIN</span>';
                 loginCta.href = '#';
                 loginCta.addEventListener('click', (e) => {
                     e.preventDefault();
                     openModal();
                 });
+                if (mobileLoginCta) {
+                    mobileLoginCta.textContent = 'MEMBER LOGIN';
+                    mobileLoginCta.href = '#';
+                    mobileLoginCta.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openModal();
+                    });
+                }
             }
         }
 

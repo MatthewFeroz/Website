@@ -10,7 +10,9 @@ export const CONVEX_URL = "https://grateful-pony-674.convex.cloud";
 
 // DEV MODE: Set to true to bypass authentication during development
 // This will auto-login with the test code and skip session validation
-export const DEV_MODE = true;
+// WARNING: Must be false in production!
+export const DEV_MODE = process.env.NODE_ENV === "development";
 
-// Test access code for dev mode (from seed data)
-export const DEV_ACCESS_CODE = "TEST-CODE-1234";
+// Test access code for dev mode - only works when DEV_MODE is true
+// In production, this code will not work as DEV_MODE will be false
+export const DEV_ACCESS_CODE = process.env.DEV_ACCESS_CODE || "";
