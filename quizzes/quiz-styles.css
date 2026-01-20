@@ -206,6 +206,10 @@
   gap: 1rem;
 }
 
+.loading-section[hidden] {
+  display: none;
+}
+
 .loading-spinner {
   width: 48px;
   height: 48px;
