@@ -2,12 +2,25 @@
 
 /* Base Styles */
 :root {
+  /* Brand Colors */
   --brand: #f85f00;
   --brand-rgb: 248, 95, 0;
   --brand-dark: #c74b00;
   --bg-dark: #171719;
   --text-light: #dbdbdb;
+  --text-muted: #9aa0aa;
   --white: #ffffff;
+
+  /* Spacing Scale */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+
+  /* Layout */
   --navbar-margin-x: 5%;
   --navbar-offset-y: 0.5rem;
   --navbar-height: 64px;
@@ -17,6 +30,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  padding-top: var(--navbar-height);
   font-family: "Poppins", sans-serif;
   font-size: 1rem;
   background: var(--bg-dark);
@@ -43,22 +57,36 @@ p {
 
 /* Navbar */
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1000;
   isolation: isolate; /* keep navbar content above backdrop/composited layers */
   backdrop-filter: blur(20px);
   background: rgba(36, 37, 40, 0.8);
-  border: 1px solid #3a3a3a;
-  border-radius: 1rem;
-  margin: var(--navbar-offset-y) var(--navbar-margin-x);
-  padding: 0.5rem 1rem;
+  border: none;
+  border-bottom: 1px solid #3a3a3a;
+  border-radius: 0;
+  margin: 0;
+  padding: 0.5rem var(--space-lg);
+  transition: transform 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
 }
 
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
 }
 
 .nav-logo {
@@ -84,7 +112,7 @@ p {
 
 .nav-menu {
   display: none;
-  gap: 1.25rem;
+  gap: var(--space-lg);
 }
 
 .nav-link {
@@ -125,6 +153,9 @@ p {
   padding: 0.4rem 0.6rem;
   font-size: 1.2rem;
   cursor: pointer;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @media (min-width: 900px) {
@@ -143,23 +174,24 @@ p {
   align-items: center;      /* Center items horizontally */
   justify-content: flex-start; /* Align items to the top vertically */
   text-align: center;       /* Center text inside items */
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: var(--space-lg);
+  padding: var(--space-3xl) var(--space-lg) var(--space-xl);
   border: none;
-  border-radius: 1rem;
+  border-radius: 0;
   background: rgba(24, 28, 34, 0.97);
   backdrop-filter: blur(18px) saturate(1.2);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
 
   position: fixed;
-  top: calc(var(--navbar-height) + var(--navbar-offset-y)); /* below navbar */
-  left: var(--navbar-margin-x);                /* same as navbar margin */
-  right: var(--navbar-margin-x);               /* align right edge with navbar */
-  width: calc(100% - 2 * var(--navbar-margin-x) - 70px); /* 100% minus left/right margins, minus 10px */
+  top: var(--navbar-height); /* below navbar */
+  left: 0;
+  right: 0;
+  width: 100%;
   height: auto;            /* let content define height */
   overflow-y: auto;
   z-index: 60;
-  transition:  width 0.5s, height 0.5s, transform 400ms;
+  transition: width 0.5s, height 0.5s, transform 400ms;
+  box-sizing: border-box;
 }
 
 /* Lock page scroll when mobile menu is open (site-wide) */
@@ -168,7 +200,9 @@ body.menu-open {
 }
 
 .mobile-close {
-  align-self: flex-end;
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-lg);
   background: transparent;
   border: none;
   color: var(--white);
@@ -201,7 +235,7 @@ body.menu-open {
 
 /* Hero */
 .hero {
-  padding: 2rem 1.5rem 2rem;
+  padding: var(--space-xl) var(--space-lg);
   position: relative;
 }
 
@@ -210,7 +244,7 @@ body.menu-open {
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: var(--space-xl);
   align-items: center;
 }
 
@@ -254,16 +288,16 @@ body.menu-open {
 }
 
 .button-row {
-  margin-top: 1.25rem;
+  margin-top: var(--space-lg);
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--space-md);
 }
 
 /* Buttons */
 .primary-button {
   display: inline-block;
-  padding: 0.9rem 1.5rem;
+  padding: 0.875rem var(--space-lg);
   border: 1px solid var(--brand);
   background: rgba(var(--brand-rgb), 0.18);
   color: var(--white);
@@ -283,7 +317,7 @@ body.menu-open {
 
 /* Help Section */
 .help {
-  padding: 4rem 1.5rem;
+  padding: var(--space-3xl) var(--space-lg);
 }
 
 .help-inner {
@@ -299,7 +333,7 @@ body.menu-open {
 .help-cards {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-lg);
 }
 
 .help-card {
@@ -347,7 +381,7 @@ body.menu-open {
 
 /* About Section */
 .about {
-  padding: 2.5rem 1rem;
+  padding: var(--space-xl) var(--space-md);
 }
 
 .about-inner {
@@ -355,7 +389,7 @@ body.menu-open {
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: var(--space-xl);
   align-items: center;
 }
 
@@ -387,7 +421,7 @@ body.menu-open {
 }
 
 .videos {
-  padding: 2rem 1rem;
+  padding: var(--space-xl) var(--space-md);
 }
 
 .videos-inner {
@@ -443,9 +477,8 @@ body.menu-open {
 /* Footer */
 .site-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 2rem 1rem;
-  margin-top: 3rem;
-  margin-top: auto;
+  padding: var(--space-xl) var(--space-md);
+  margin-top: auto; /* Push footer to bottom when content is short */
 }
 
 .footer-inner {
@@ -473,7 +506,7 @@ body.menu-open {
 
 .footer-menu {
   display: flex;
-  gap: 1.25rem;
+  gap: var(--space-lg);
   flex-wrap: wrap;
   justify-content: center;
   align-self: auto;
@@ -481,11 +514,11 @@ body.menu-open {
 }
 
 /* Footer: stack on small screens */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .footer-inner {
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-sm);
   }
   .footer-logo {
     align-self: center;
@@ -566,13 +599,13 @@ body.menu-open {
 @media (max-width: 768px) {
   /* Hero section mobile adjustments */
   .hero {
-    padding: 1.5rem 1rem 2rem;
+    padding: var(--space-lg) var(--space-md) var(--space-xl);
   }
   
   .hero-inner {
     flex-direction: column;
     text-align: center;
-    gap: 1.5rem;
+    gap: var(--space-lg);
     align-items: center;
   }
   
@@ -620,7 +653,7 @@ body.menu-open {
   .button-row {
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-sm);
     width: 100%;
     justify-content: center;
   }
@@ -683,12 +716,12 @@ body.menu-open {
   
   /* Company logos mobile adjustments */
   .company-logos-grid {
-    padding: 1.5rem 0;
+    padding: var(--space-lg) 0;
   }
-  
+
   .logo-row {
-    gap: 2rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-xl);
+    margin-bottom: var(--space-lg);
   }
   
   .company-logo {
@@ -707,7 +740,7 @@ body.menu-open {
   
   /* What you get section mobile adjustments */
   .what-you-get {
-    padding: 3rem 1rem;
+    padding: var(--space-2xl) var(--space-md);
   }
   
   .what-header h1 {
@@ -737,7 +770,7 @@ body.menu-open {
   
   /* Help section mobile adjustments */
   .help {
-    padding: 3rem 1rem;
+    padding: var(--space-2xl) var(--space-md);
   }
   
 .help-header h1 {
@@ -768,7 +801,7 @@ body.menu-open {
   
   /* FAQ mobile adjustments */
   .faq {
-    padding: 3rem 1rem;
+    padding: var(--space-2xl) var(--space-md);
   }
   
   .faq-header h1 {
@@ -795,8 +828,8 @@ body.menu-open {
 
 /* FAQ Section */
 .faq {
-  padding: 4rem 1.5rem;
-  background: #141518;
+  padding: var(--space-3xl) var(--space-lg);
+  background: var(--bg-dark);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -813,7 +846,7 @@ body.menu-open {
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .faq-item {
@@ -896,7 +929,7 @@ body.menu-open {
 
 .secondary-button {
   display: inline-block;
-  padding: 0.85rem 1.5rem;
+  padding: 0.875rem var(--space-lg);
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
@@ -1229,10 +1262,10 @@ body.menu-open {
   }
 }
 
-/* What You’ll Get Section */
+/* What You'll Get Section */
 .what-you-get {
-  padding: 4rem 1.5rem;
-  background: #141518; /* dark background to match site */
+  padding: var(--space-3xl) var(--space-lg);
+  background: var(--bg-dark);
 }
 
 .what-inner {
@@ -1268,14 +1301,14 @@ body.menu-open {
 .what-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: var(--space-xl);
 }
 
 /* Responsive layout for What You'll Get section */
 @media (max-width: 900px) {
   .what-cards {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: var(--space-lg);
   }
 }
 
@@ -1472,4 +1505,14 @@ body.menu-open {
     max-width: 240px;
     flex: 1;
   }
+}
+
+/* Hero CTA Section (coaching page final CTA) */
+.hero-cta-section {
+  text-align: center;
+}
+
+.hero-cta-inner {
+  flex-direction: column;
+  align-items: center;
 }

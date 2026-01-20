@@ -1,0 +1,26 @@
+{
+  "name": "matthewferoz-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "npx convex dev",
+    "deploy": "npx convex deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatthewFeroz/Website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MatthewFeroz/Website/issues"
+  },
+  "homepage": "https://github.com/MatthewFeroz/Website#readme",
+  "dependencies": {
+    "convex": "^1.31.5"
+  }
+}

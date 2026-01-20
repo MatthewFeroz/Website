@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Convex
+.env.local
+.env
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+*.swp
+*.swo
