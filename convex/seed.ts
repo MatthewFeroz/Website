@@ -185,3 +185,197 @@ export const seedSampleData = mutation({
     };
   },
 });
+
+/**
+ * Seed the diagnostic quiz (free, no auth required)
+ * Run this via the Convex dashboard or CLI
+ */
+export const seedDiagnosticQuiz = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Check if already seeded
+    const existingDiagnostics = await ctx.db.query("diagnosticQuizzes").collect();
+    if (existingDiagnostics.length > 0) {
+      return { message: "Diagnostic quiz already exists. Skipping seed." };
+    }
+
+    // Create the diagnostic quiz
+    await ctx.db.insert("diagnosticQuizzes", {
+      title: "Skill Assessment",
+      description: "Assess your Python and LeetCode skills to get personalized recommendations.",
+      version: 1,
+      estimatedMinutes: 25,
+      isActive: true,
+      sections: [
+        {
+          category: "python-basics",
+          categoryDisplayName: "Python Fundamentals",
+          questions: [
+            {
+              id: "diag-py-1",
+              question: "What is the output of print(type([]))?",
+              options: ["<class 'list'>", "<class 'array'>", "<class 'tuple'>", "<class 'dict'>"],
+              correctOptionIndex: 0,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-py-2",
+              question: "Which keyword is used to define a function in Python?",
+              options: ["function", "func", "def", "define"],
+              correctOptionIndex: 2,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-py-3",
+              question: "What does the 'len()' function return for the string 'Hello'?",
+              options: ["4", "5", "6", "Error"],
+              correctOptionIndex: 1,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-py-4",
+              question: "What is the result of 3 ** 2 in Python?",
+              options: ["6", "9", "5", "Error"],
+              correctOptionIndex: 1,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-py-5",
+              question: "How do you create an empty dictionary in Python?",
+              options: ["[]", "{}", "()", "dict[]"],
+              correctOptionIndex: 1,
+              difficulty: "easy",
+            },
+          ],
+        },
+        {
+          category: "data-structures",
+          categoryDisplayName: "Data Structures",
+          questions: [
+            {
+              id: "diag-ds-1",
+              question: "What is the time complexity of accessing an element in an array by index?",
+              options: ["O(n)", "O(1)", "O(log n)", "O(n²)"],
+              correctOptionIndex: 1,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-ds-2",
+              question: "Which data structure uses LIFO (Last In, First Out) principle?",
+              options: ["Queue", "Stack", "Linked List", "Tree"],
+              correctOptionIndex: 1,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-ds-3",
+              question: "What is the time complexity of searching in a hash table (average case)?",
+              options: ["O(n)", "O(1)", "O(log n)", "O(n²)"],
+              correctOptionIndex: 1,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-ds-4",
+              question: "Which data structure is best for implementing a priority queue?",
+              options: ["Array", "Linked List", "Heap", "Stack"],
+              correctOptionIndex: 2,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-ds-5",
+              question: "What is the space complexity of a recursive function that makes n recursive calls?",
+              options: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
+              correctOptionIndex: 1,
+              difficulty: "medium",
+            },
+          ],
+        },
+        {
+          category: "algorithms",
+          categoryDisplayName: "Algorithms",
+          questions: [
+            {
+              id: "diag-alg-1",
+              question: "What is the time complexity of binary search?",
+              options: ["O(n)", "O(1)", "O(log n)", "O(n log n)"],
+              correctOptionIndex: 2,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-alg-2",
+              question: "Which sorting algorithm has O(n log n) average time complexity?",
+              options: ["Bubble Sort", "Selection Sort", "Merge Sort", "Insertion Sort"],
+              correctOptionIndex: 2,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-alg-3",
+              question: "In the two-pointer technique, what typically needs to be true about the input array?",
+              options: ["It must be empty", "It must be sorted", "It must have even length", "It must contain only positive numbers"],
+              correctOptionIndex: 1,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-alg-4",
+              question: "What is the time complexity of BFS and DFS for a graph with V vertices and E edges?",
+              options: ["O(V)", "O(E)", "O(V + E)", "O(V × E)"],
+              correctOptionIndex: 2,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-alg-5",
+              question: "Which technique is best for solving the 'Maximum Subarray Sum' problem optimally?",
+              options: ["Brute Force", "Two Pointers", "Kadane's Algorithm", "Binary Search"],
+              correctOptionIndex: 2,
+              difficulty: "medium",
+            },
+          ],
+        },
+        {
+          category: "problem-solving",
+          categoryDisplayName: "Problem Solving Patterns",
+          questions: [
+            {
+              id: "diag-ps-1",
+              question: "The sliding window technique is most useful for problems involving:",
+              options: ["Searching in trees", "Contiguous subarrays/substrings", "Graph traversal", "Sorting"],
+              correctOptionIndex: 1,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-ps-2",
+              question: "When should you use dynamic programming?",
+              options: ["When the problem has no pattern", "When there are overlapping subproblems", "When the input is unsorted", "When recursion is not allowed"],
+              correctOptionIndex: 1,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-ps-3",
+              question: "What pattern is typically used for 'Find all pairs that sum to X' in a sorted array?",
+              options: ["Sliding Window", "Two Pointers", "Binary Search Tree", "Backtracking"],
+              correctOptionIndex: 1,
+              difficulty: "easy",
+            },
+            {
+              id: "diag-ps-4",
+              question: "Which approach is best for generating all permutations of a set?",
+              options: ["Dynamic Programming", "Greedy", "Backtracking", "Divide and Conquer"],
+              correctOptionIndex: 2,
+              difficulty: "medium",
+            },
+            {
+              id: "diag-ps-5",
+              question: "For problems asking 'minimum/maximum in k window', which pattern is most efficient?",
+              options: ["Two Pointers", "Sliding Window with Deque", "Binary Search", "Hash Map"],
+              correctOptionIndex: 1,
+              difficulty: "hard",
+            },
+          ],
+        },
+      ],
+    });
+
+    return {
+      message: "Seeded diagnostic quiz with 4 sections and 20 questions",
+    };
+  },
+});

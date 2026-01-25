@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Results | Diagnostic Quiz | Matt Feroz</title>
+    <meta name="description" content="View your diagnostic quiz results and personalized recommendations" />
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <nav class="nav-menu">
+                <a href="/guide/" class="nav-link">Learning</a>
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="/contact/" class="nav-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Loading State -->
+        <section id="loading-section" class="loading-section">
+            <div class="loading-spinner"></div>
+            <p>Loading your results...</p>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="diagnostic-results" hidden>
+            <div class="results-container">
+                <!-- Overall Score Section -->
+                <div class="overall-score-section">
+                    <div class="score-circle" id="score-circle">
+                        <div class="score-value" id="overall-score">0%</div>
+                        <div class="score-label">Overall Score</div>
+                    </div>
+                    <div class="level-badge-container">
+                        <div class="level-badge" id="level-badge">BEGINNER</div>
+                        <p class="level-description" id="level-description">You're just getting started on your coding journey.</p>
+                    </div>
+                </div>
+
+                <!-- Category Breakdown -->
+                <div class="category-breakdown">
+                    <h2>Category Breakdown</h2>
+                    <div class="category-results" id="category-results">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="recommendations-section">
+                    <h2>Your Learning Path</h2>
+                    <div class="recommendations-list" id="recommendations-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- CTA Section -->
+                <div class="results-cta" id="results-cta">
+                    <div class="cta-card cta-card-primary">
+                        <h3>Save Your Results</h3>
+                        <p>Enter an access code to save your results to your account and unlock the full platform.</p>
+                        <button class="primary-button" id="save-results-btn">Enter Access Code</button>
+                    </div>
+                    <div class="cta-card">
+                        <h3>Retake Assessment</h3>
+                        <p>Want to try again? You can retake the diagnostic quiz anytime.</p>
+                        <button class="secondary-button" id="retake-btn">Retake Quiz</button>
+                    </div>
+                </div>
+
+                <!-- Dashboard CTA (shown when logged in) -->
+                <div class="results-cta" id="dashboard-cta" hidden>
+                    <div class="cta-card cta-card-primary">
+                        <h3>Results Saved!</h3>
+                        <p>Your diagnostic results have been saved to your account.</p>
+                        <a href="/quizzes/dashboard.html" class="primary-button">Go to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Access Code Modal -->
+    <div id="access-modal" class="modal" hidden>
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <h2>Enter Your Access Code</h2>
+            <p>Enter the code you received when you joined the Academy to save your results.</p>
+
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <input
+                        type="text"
+                        id="access-code"
+                        name="access-code"
+                        placeholder="XXXX-XXXX-XXXX"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
+                    >
+                    <p id="error-message" class="error-message" hidden></p>
+                </div>
+                <button type="submit" class="primary-button login-button" id="login-button" style="width: 100%;">
+                    <span class="button-text">Save Results</span>
+                    <span class="button-loading" hidden>
+                        <span class="spinner"></span>
+                        Saving...
+                    </span>
+                </button>
+            </form>
+
+            <div class="login-footer" style="margin-top: 1.5rem;">
+                <p>Don't have an access code?</p>
+                <a href="/coaching/" class="text-link">Join the Academy</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
+                <a href="/contact/" class="footer-link">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL } from "./config.js";
+
+        // Initialize Convex client
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
+        if (!CONVEX_URL) {
+            window.location.href = '/quizzes/diagnostic.html';
+        }
+        const client = new ConvexHttpClient(CONVEX_URL);
+
+        // API proxy
+        const createApi = () => new Proxy({}, {
+            get: (_, module) => new Proxy({}, {
+                get: (_, func) => `${module}:${func}`
+            })
+        });
+        const api = createApi();
+
+        // DOM Elements
+        const loadingSection = document.getElementById('loading-section');
+        const resultsSection = document.getElementById('results-section');
+        const overallScoreEl = document.getElementById('overall-score');
+        const scoreCircle = document.getElementById('score-circle');
+        const levelBadge = document.getElementById('level-badge');
+        const levelDescription = document.getElementById('level-description');
+        const categoryResults = document.getElementById('category-results');
+        const recommendationsList = document.getElementById('recommendations-list');
+        const resultsCta = document.getElementById('results-cta');
+        const dashboardCta = document.getElementById('dashboard-cta');
+        const saveResultsBtn = document.getElementById('save-results-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        const accessModal = document.getElementById('access-modal');
+        const modalClose = document.getElementById('modal-close');
+        const modalBackdrop = accessModal.querySelector('.modal-backdrop');
+        const loginForm = document.getElementById('login-form');
+        const accessCodeInput = document.getElementById('access-code');
+        const errorMessage = document.getElementById('error-message');
+        const loginButton = document.getElementById('login-button');
+
+        // Level descriptions
+        const levelDescriptions = {
+            beginner: "You're just getting started on your coding journey. Focus on building strong fundamentals.",
+            intermediate: "You have a solid foundation. Keep practicing to advance your skills further.",
+            advanced: "Excellent work! You have strong skills. Continue challenging yourself with complex problems."
+        };
+
+        // Level colors
+        const levelColors = {
+            beginner: '#ef4444',
+            intermediate: '#eab308',
+            advanced: '#22c55e'
+        };
+
+        let results = null;
+
+        // Load results
+        async function loadResults() {
+            const userId = localStorage.getItem('quiz_user_id');
+            const guestId = localStorage.getItem('diagnostic_guest_id');
+
+            // Try to get results from localStorage first (just completed)
+            const localResults = localStorage.getItem('diagnostic_results');
+            if (localResults) {
+                results = JSON.parse(localResults);
+                displayResults(results);
+                return;
+            }
+
+            // Otherwise fetch from database
+            try {
+                const dbResults = await client.query(api.diagnostic.getDiagnosticResults, {
+                    userId: userId || undefined,
+                    guestId: guestId || undefined
+                });
+
+                if (!dbResults) {
+                    // No results found, redirect to diagnostic start
+                    window.location.href = '/quizzes/diagnostic.html';
+                    return;
+                }
+
+                results = dbResults;
+                displayResults(results);
+
+            } catch (err) {
+                console.error('Error loading results:', err);
+                // Try localStorage backup
+                if (localResults) {
+                    results = JSON.parse(localResults);
+                    displayResults(results);
+                } else {
+                    window.location.href = '/quizzes/diagnostic.html';
+                }
+            }
+        }
+
+        function displayResults(results) {
+            const userId = localStorage.getItem('quiz_user_id');
+
+            // Overall score
+            overallScoreEl.textContent = results.overallScore + '%';
+            scoreCircle.style.setProperty('--score-color', levelColors[results.overallLevel]);
+
+            // Level badge
+            levelBadge.textContent = results.overallLevel.toUpperCase();
+            levelBadge.className = `level-badge level-${results.overallLevel}`;
+            levelDescription.textContent = levelDescriptions[results.overallLevel];
+
+            // Category breakdown
+            categoryResults.innerHTML = results.categoryResults.map(cat => `
+                <div class="category-result-item">
+                    <div class="category-info">
+                        <span class="category-name">${formatCategoryName(cat.category)}</span>
+                        <span class="category-score">${cat.score}%</span>
+                    </div>
+                    <div class="category-bar">
+                        <div class="category-bar-fill level-${cat.level}" style="width: ${cat.score}%"></div>
+                    </div>
+                    <div class="category-level">
+                        <span class="level-tag level-tag-${cat.level}">${cat.level}</span>
+                        <span class="category-detail">${cat.correctCount}/${cat.totalQuestions} correct</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Recommendations
+            recommendationsList.innerHTML = results.recommendations.map(rec => `
+                <div class="recommendation-item priority-${rec.priority}">
+                    <div class="recommendation-priority">${rec.priority.toUpperCase()} PRIORITY</div>
+                    <div class="recommendation-category">${formatCategoryName(rec.category)}</div>
+                    <p class="recommendation-message">${rec.message}</p>
+                </div>
+            `).join('');
+
+            // Show/hide CTAs based on auth state
+            if (userId) {
+                resultsCta.hidden = true;
+                dashboardCta.hidden = false;
+            } else {
+                resultsCta.hidden = false;
+                dashboardCta.hidden = true;
+            }
+
+            // Show results
+            loadingSection.hidden = true;
+            resultsSection.hidden = false;
+        }
+
+        function formatCategoryName(category) {
+            return category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        // Modal functions
+        function openModal() {
+            accessModal.hidden = false;
+            document.body.style.overflow = 'hidden';
+            accessCodeInput.focus();
+        }
+
+        function closeModal() {
+            accessModal.hidden = true;
+            document.body.style.overflow = '';
+            accessCodeInput.value = '';
+            hideError();
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.hidden = false;
+            accessCodeInput.classList.add('input-error');
+        }
+
+        function hideError() {
+            errorMessage.hidden = true;
+            accessCodeInput.classList.remove('input-error');
+        }
+
+        function setLoading(loading) {
+            loginButton.disabled = loading;
+            loginButton.querySelector('.button-text').hidden = loading;
+            loginButton.querySelector('.button-loading').hidden = !loading;
+        }
+
+        // Event handlers
+        saveResultsBtn.addEventListener('click', openModal);
+
+        retakeBtn.addEventListener('click', () => {
+            localStorage.removeItem('diagnostic_completed');
+            localStorage.removeItem('diagnostic_results');
+            window.location.href = '/quizzes/diagnostic.html';
+        });
+
+        modalClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !accessModal.hidden) {
+                closeModal();
+            }
+        });
+
+        // Format access code as user types
+        accessCodeInput.addEventListener('input', (e) => {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (value.length > 4) value = value.slice(0, 4) + '-' + value.slice(4);
+            if (value.length > 9) value = value.slice(0, 9) + '-' + value.slice(9);
+            e.target.value = value.slice(0, 14);
+        });
+
+        // Login form handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const code = accessCodeInput.value.trim();
+            if (!code) {
+                showError('Please enter your access code');
+                return;
+            }
+
+            setLoading(true);
+            hideError();
+
+            try {
+                // Validate access code
+                const result = await client.mutation(api.auth.validateAccessCode, { code });
+
+                if (result.success) {
+                    // Save user info
+                    localStorage.setItem('quiz_user_id', result.userId);
+                    localStorage.setItem('quiz_user_email', result.email);
+
+                    // Migrate guest diagnostic
+                    const guestId = localStorage.getItem('diagnostic_guest_id');
+                    if (guestId) {
+                        await client.mutation(api.diagnostic.migrateGuestDiagnostic, {
+                            guestId,
+                            userId: result.userId
+                        });
+
+                        // Clear guest data
+                        localStorage.removeItem('diagnostic_guest_id');
+                    }
+
+                    // Clear local diagnostic data
+                    localStorage.removeItem('diagnostic_completed');
+                    localStorage.removeItem('diagnostic_results');
+                    localStorage.removeItem('diagnostic_quiz_id');
+
+                    // Redirect to dashboard
+                    window.location.href = '/quizzes/dashboard.html';
+                } else {
+                    showError(result.error || 'Invalid access code');
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                showError('Connection error. Please try again.');
+                setLoading(false);
+            }
+        });
+
+        // Initialize
+        loadResults();
+    </script>
+</body>
+</html>

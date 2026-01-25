@@ -61,6 +61,11 @@
                     </div>
                 </div>
 
+                <!-- Diagnostic Status Banner -->
+                <div class="diagnostic-banner" id="diagnostic-banner" hidden>
+                    <!-- Content set dynamically -->
+                </div>
+
                 <!-- Category Progress -->
                 <div class="category-progress" id="category-progress">
                     <h2>Progress by Category</h2>
@@ -121,6 +126,7 @@
         const statsResources = document.getElementById('stat-resources');
         const progressBars = document.getElementById('progress-bars');
         const quizGrid = document.getElementById('quiz-grid');
+        const diagnosticBanner = document.getElementById('diagnostic-banner');
 
         // DEV MODE banner
         if (DEV_MODE) {
@@ -201,6 +207,17 @@
                     console.error('[Dashboard] Failed to load resources:', resourceErr);
                 }
                 const unlockedCount = resources.filter(r => r.isUnlocked).length;
+
+                // Load diagnostic results
+                console.log('[Dashboard] Loading diagnostic results...');
+                let diagnosticResults = null;
+                try {
+                    diagnosticResults = await client.query(api.diagnostic.getDiagnosticResults, { userId });
+                    console.log('[Dashboard] Diagnostic results loaded:', diagnosticResults);
+                } catch (diagnosticErr) {
+                    console.error('[Dashboard] Failed to load diagnostic results:', diagnosticErr);
+                }
+                renderDiagnosticBanner(diagnosticResults);
 
                 // Update UI
                 userEmailEl.textContent = userEmail || 'User';
@@ -305,6 +322,46 @@
                 .split('-')
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ');
+        }
+
+        // Render diagnostic banner
+        function renderDiagnosticBanner(results) {
+            if (!results) {
+                // No diagnostic taken yet - show prompt
+                diagnosticBanner.innerHTML = `
+                    <div class="diagnostic-banner-content diagnostic-banner-prompt">
+                        <div class="diagnostic-banner-text">
+                            <h3>Discover Your Skill Level</h3>
+                            <p>Take our free diagnostic quiz to assess your strengths and get personalized recommendations.</p>
+                        </div>
+                        <a href="/quizzes/diagnostic.html" class="primary-button">Take Diagnostic</a>
+                    </div>
+                `;
+            } else {
+                // Show skill level
+                const levelColors = {
+                    beginner: '#ef4444',
+                    intermediate: '#eab308',
+                    advanced: '#22c55e'
+                };
+                diagnosticBanner.innerHTML = `
+                    <div class="diagnostic-banner-content diagnostic-banner-results">
+                        <div class="diagnostic-banner-level">
+                            <span class="level-indicator" style="background: ${levelColors[results.overallLevel]}"></span>
+                            <div>
+                                <span class="level-label">Your Skill Level</span>
+                                <span class="level-value">${results.overallLevel.charAt(0).toUpperCase() + results.overallLevel.slice(1)}</span>
+                            </div>
+                        </div>
+                        <div class="diagnostic-banner-score">
+                            <span class="score-value">${results.overallScore}%</span>
+                            <span class="score-label">Overall Score</span>
+                        </div>
+                        <a href="/quizzes/diagnostic-results.html" class="secondary-button">View Details</a>
+                    </div>
+                `;
+            }
+            diagnosticBanner.hidden = false;
         }
 
         // Logout handler

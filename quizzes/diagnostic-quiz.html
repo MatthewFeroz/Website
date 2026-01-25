@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Quiz | Matt Feroz</title>
+    <meta name="description" content="Complete the diagnostic quiz to assess your skills" />
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <nav class="nav-menu">
+                <a href="/quizzes/diagnostic.html" class="nav-link">Back to Overview</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Loading State -->
+        <section id="loading-section" class="loading-section">
+            <div class="loading-spinner"></div>
+            <p>Loading diagnostic quiz...</p>
+        </section>
+
+        <!-- Quiz Content -->
+        <section id="quiz-section" class="quiz-container" hidden>
+            <div class="quiz-container-inner">
+                <!-- Quiz Header -->
+                <div class="quiz-header">
+                    <h1 id="quiz-title">Diagnostic Assessment</h1>
+                    <div class="quiz-meta">
+                        <span id="quiz-category">Loading section...</span>
+                    </div>
+                </div>
+
+                <!-- Section Banner -->
+                <div class="section-banner" id="section-banner">
+                    <div class="section-badge">SECTION</div>
+                    <h2 id="section-name">Python Fundamentals</h2>
+                    <p id="section-questions">Questions 1-5 of 20</p>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="quiz-progress-text">
+                        <span>Question <span id="current-question">1</span> of <span id="total-questions">0</span></span>
+                        <span id="answered-count">0 answered</span>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="question-card" id="question-card">
+                    <div class="question-header">
+                        <div class="question-number" id="question-number">Question 1</div>
+                        <div class="difficulty-badge" id="question-difficulty">easy</div>
+                    </div>
+                    <div class="question-text" id="question-text"></div>
+                    <div class="answer-options" id="answer-options">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Quiz Actions -->
+                <div class="quiz-actions">
+                    <button class="prev-button" id="prev-button" disabled>Previous</button>
+                    <button class="next-button" id="next-button">Next</button>
+                    <button class="submit-button" id="submit-button" hidden>Submit Quiz</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="/contact/" class="footer-link">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL } from "./config.js";
+
+        // Initialize Convex client
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
+        if (!CONVEX_URL) {
+            window.location.href = '/quizzes/diagnostic.html';
+        }
+        const client = new ConvexHttpClient(CONVEX_URL);
+
+        // API proxy
+        const createApi = () => new Proxy({}, {
+            get: (_, module) => new Proxy({}, {
+                get: (_, func) => `${module}:${func}`
+            })
+        });
+        const api = createApi();
+
+        // State
+        let diagnostic = null;
+        let flatQuestions = []; // Flattened list of all questions with category info
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // { questionId: { category, selectedOptionIndex } }
+        let startTime = Date.now();
+
+        // DOM Elements
+        const loadingSection = document.getElementById('loading-section');
+        const quizSection = document.getElementById('quiz-section');
+        const quizTitle = document.getElementById('quiz-title');
+        const quizCategory = document.getElementById('quiz-category');
+        const sectionBanner = document.getElementById('section-banner');
+        const sectionName = document.getElementById('section-name');
+        const sectionQuestions = document.getElementById('section-questions');
+        const progressFill = document.getElementById('progress-fill');
+        const currentQuestionEl = document.getElementById('current-question');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const answeredCountEl = document.getElementById('answered-count');
+        const questionNumber = document.getElementById('question-number');
+        const questionDifficulty = document.getElementById('question-difficulty');
+        const questionText = document.getElementById('question-text');
+        const answerOptions = document.getElementById('answer-options');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const submitButton = document.getElementById('submit-button');
+
+        // Get diagnostic quiz ID from localStorage
+        const diagnosticQuizId = localStorage.getItem('diagnostic_quiz_id');
+        const guestId = localStorage.getItem('diagnostic_guest_id');
+        const userId = localStorage.getItem('quiz_user_id');
+
+        if (!diagnosticQuizId) {
+            window.location.href = '/quizzes/diagnostic.html';
+            throw new Error('No diagnostic quiz ID');
+        }
+
+        // Initialize
+        async function init() {
+            try {
+                // Load diagnostic
+                diagnostic = await client.query(api.diagnostic.getActiveDiagnostic, {});
+
+                if (!diagnostic || diagnostic._id !== diagnosticQuizId) {
+                    alert('Diagnostic quiz not found');
+                    window.location.href = '/quizzes/diagnostic.html';
+                    return;
+                }
+
+                // Flatten questions with category info
+                diagnostic.sections.forEach((section, sectionIndex) => {
+                    section.questions.forEach((question, qIndex) => {
+                        flatQuestions.push({
+                            ...question,
+                            category: section.category,
+                            categoryDisplayName: section.categoryDisplayName,
+                            sectionIndex,
+                            questionIndexInSection: qIndex,
+                            totalInSection: section.questions.length
+                        });
+                    });
+                });
+
+                // Update UI
+                quizTitle.textContent = diagnostic.title;
+                totalQuestionsEl.textContent = flatQuestions.length;
+
+                // Start timer
+                startTime = Date.now();
+
+                // Render first question
+                renderQuestion();
+
+                // Show quiz
+                loadingSection.hidden = true;
+                quizSection.hidden = false;
+
+            } catch (err) {
+                console.error('Error loading diagnostic:', err);
+                alert('Error loading diagnostic. Please try again.');
+                window.location.href = '/quizzes/diagnostic.html';
+            }
+        }
+
+        function renderQuestion() {
+            const question = flatQuestions[currentQuestionIndex];
+            const totalQuestions = flatQuestions.length;
+
+            // Update section banner
+            const currentSection = diagnostic.sections[question.sectionIndex];
+            sectionName.textContent = question.categoryDisplayName;
+
+            const sectionStartIndex = flatQuestions.findIndex(q => q.sectionIndex === question.sectionIndex);
+            const sectionEndIndex = sectionStartIndex + currentSection.questions.length - 1;
+            sectionQuestions.textContent = `Questions ${sectionStartIndex + 1}-${sectionEndIndex + 1} of ${totalQuestions}`;
+
+            // Show section banner when entering a new section
+            if (question.questionIndexInSection === 0) {
+                sectionBanner.classList.add('section-banner-visible');
+            } else {
+                sectionBanner.classList.remove('section-banner-visible');
+            }
+
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            progressFill.style.width = progress + '%';
+            currentQuestionEl.textContent = currentQuestionIndex + 1;
+
+            const answeredCount = Object.keys(userAnswers).length;
+            answeredCountEl.textContent = answeredCount + ' answered';
+
+            // Update category display
+            quizCategory.textContent = question.categoryDisplayName;
+
+            // Update question
+            questionNumber.textContent = `Question ${currentQuestionIndex + 1}`;
+            questionDifficulty.textContent = question.difficulty;
+            questionDifficulty.className = `difficulty-badge difficulty-${question.difficulty}`;
+            questionText.textContent = question.question;
+
+            // Render options
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            answerOptions.innerHTML = question.options.map((option, index) => {
+                const isSelected = userAnswers[question.id]?.selectedOptionIndex === index;
+                return `
+                    <div class="answer-option ${isSelected ? 'selected' : ''}" data-index="${index}">
+                        <span class="option-letter">${letters[index]}</span>
+                        <span class="option-text">${option}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.answer-option').forEach(option => {
+                option.addEventListener('click', () => selectAnswer(parseInt(option.dataset.index)));
+            });
+
+            // Update buttons
+            prevButton.disabled = currentQuestionIndex === 0;
+
+            if (currentQuestionIndex === totalQuestions - 1) {
+                nextButton.hidden = true;
+                submitButton.hidden = false;
+            } else {
+                nextButton.hidden = false;
+                submitButton.hidden = true;
+            }
+        }
+
+        function selectAnswer(optionIndex) {
+            const question = flatQuestions[currentQuestionIndex];
+            userAnswers[question.id] = {
+                category: question.category,
+                selectedOptionIndex: optionIndex
+            };
+            renderQuestion();
+        }
+
+        // Navigation handlers
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < flatQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        });
+
+        // Submit handler
+        submitButton.addEventListener('click', async () => {
+            const answeredCount = Object.keys(userAnswers).length;
+            const totalQuestions = flatQuestions.length;
+
+            if (answeredCount < totalQuestions) {
+                const proceed = confirm(`You've only answered ${answeredCount} of ${totalQuestions} questions. Submit anyway?`);
+                if (!proceed) return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            try {
+                const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+                // Format answers for submission
+                const answers = Object.entries(userAnswers).map(([questionId, data]) => ({
+                    questionId,
+                    category: data.category,
+                    selectedOptionIndex: data.selectedOptionIndex
+                }));
+
+                const results = await client.mutation(api.diagnostic.submitDiagnostic, {
+                    diagnosticQuizId,
+                    guestId: userId ? undefined : guestId,
+                    userId: userId || undefined,
+                    answers,
+                    timeSpentSeconds: timeSpent
+                });
+
+                if (results.success) {
+                    // Save results to localStorage
+                    localStorage.setItem('diagnostic_completed', 'true');
+                    localStorage.setItem('diagnostic_results', JSON.stringify(results));
+
+                    // Navigate to results page
+                    window.location.href = '/quizzes/diagnostic-results.html';
+                } else {
+                    alert(results.error || 'Error submitting diagnostic');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Quiz';
+                }
+
+            } catch (err) {
+                console.error('Error submitting diagnostic:', err);
+                alert('Error submitting diagnostic. Please try again.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Quiz';
+            }
+        });
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
