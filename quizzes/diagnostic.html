@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Diagnostic Quiz | Matt Feroz</title>
+    <meta name="description" content="Take our free diagnostic quiz to assess your coding skills and get personalized recommendations" />
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <nav class="nav-menu">
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="/guide/" class="nav-link">Learning</a>
+                <a href="/contact/" class="nav-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="diagnostic-hero">
+            <div class="diagnostic-hero-inner">
+                <div class="diagnostic-badge">FREE ASSESSMENT</div>
+                <h1>Discover Your Skill Level</h1>
+                <p>Take our comprehensive diagnostic quiz to assess your Python and LeetCode skills. Get personalized recommendations based on your results.</p>
+
+                <div class="diagnostic-features">
+                    <div class="diagnostic-feature">
+                        <span class="feature-icon-small">~25</span>
+                        <span>Minutes</span>
+                    </div>
+                    <div class="diagnostic-feature">
+                        <span class="feature-icon-small" id="question-count">--</span>
+                        <span>Questions</span>
+                    </div>
+                    <div class="diagnostic-feature">
+                        <span class="feature-icon-small" id="category-count">--</span>
+                        <span>Categories</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preview Carousel Section -->
+        <section class="preview-carousel-section">
+            <h3>Try a few questions</h3>
+            <div class="carousel-container">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Question Card 1: Python Fundamentals -->
+                    <div class="carousel-card preview-question">
+                        <div class="preview-question-header">
+                            <span class="preview-category">Python Fundamentals</span>
+                            <span class="difficulty-badge difficulty-easy">Easy</span>
+                        </div>
+                        <p class="preview-question-text">What is the output of <code>type([])</code> in Python?</p>
+                        <div class="preview-options">
+                            <button class="preview-option" data-option="a">
+                                <span class="preview-option-letter">A</span>
+                                <span class="preview-option-text">&lt;class 'array'&gt;</span>
+                            </button>
+                            <button class="preview-option" data-option="b">
+                                <span class="preview-option-letter">B</span>
+                                <span class="preview-option-text">&lt;class 'list'&gt;</span>
+                            </button>
+                            <button class="preview-option" data-option="c">
+                                <span class="preview-option-letter">C</span>
+                                <span class="preview-option-text">&lt;class 'tuple'&gt;</span>
+                            </button>
+                            <button class="preview-option" data-option="d">
+                                <span class="preview-option-letter">D</span>
+                                <span class="preview-option-text">&lt;class 'set'&gt;</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Question Card 2: Data Structures -->
+                    <div class="carousel-card preview-question">
+                        <div class="preview-question-header">
+                            <span class="preview-category">Data Structures</span>
+                            <span class="difficulty-badge difficulty-easy">Easy</span>
+                        </div>
+                        <p class="preview-question-text">Which data structure follows the Last-In-First-Out (LIFO) principle?</p>
+                        <div class="preview-options">
+                            <button class="preview-option" data-option="a">
+                                <span class="preview-option-letter">A</span>
+                                <span class="preview-option-text">Queue</span>
+                            </button>
+                            <button class="preview-option" data-option="b">
+                                <span class="preview-option-letter">B</span>
+                                <span class="preview-option-text">Stack</span>
+                            </button>
+                            <button class="preview-option" data-option="c">
+                                <span class="preview-option-letter">C</span>
+                                <span class="preview-option-text">Linked List</span>
+                            </button>
+                            <button class="preview-option" data-option="d">
+                                <span class="preview-option-letter">D</span>
+                                <span class="preview-option-text">Tree</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Question Card 3: Algorithms -->
+                    <div class="carousel-card preview-question">
+                        <div class="preview-question-header">
+                            <span class="preview-category">Algorithms</span>
+                            <span class="difficulty-badge difficulty-medium">Medium</span>
+                        </div>
+                        <p class="preview-question-text">What is the time complexity of binary search?</p>
+                        <div class="preview-options">
+                            <button class="preview-option" data-option="a">
+                                <span class="preview-option-letter">A</span>
+                                <span class="preview-option-text">O(n)</span>
+                            </button>
+                            <button class="preview-option" data-option="b">
+                                <span class="preview-option-letter">B</span>
+                                <span class="preview-option-text">O(n log n)</span>
+                            </button>
+                            <button class="preview-option" data-option="c">
+                                <span class="preview-option-letter">C</span>
+                                <span class="preview-option-text">O(log n)</span>
+                            </button>
+                            <button class="preview-option" data-option="d">
+                                <span class="preview-option-letter">D</span>
+                                <span class="preview-option-text">O(1)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Final CTA Card -->
+                    <div class="carousel-card cta-card">
+                        <div class="cta-card-content">
+                            <span class="cta-icon">🎯</span>
+                            <h4>Ready for the full assessment?</h4>
+                            <p>Continue with 17 more questions to discover your skill level</p>
+                            <button class="primary-button carousel-start-btn" id="carousel-start-btn">
+                                Start Free Assessment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Navigation -->
+            <div class="carousel-nav">
+                <button class="carousel-btn carousel-prev" aria-label="Previous" id="carousel-prev">
+                    <span>←</span>
+                </button>
+                <div class="carousel-dots" id="carousel-dots">
+                    <button class="carousel-dot active" data-index="0" aria-label="Go to slide 1"></button>
+                    <button class="carousel-dot" data-index="1" aria-label="Go to slide 2"></button>
+                    <button class="carousel-dot" data-index="2" aria-label="Go to slide 3"></button>
+                    <button class="carousel-dot" data-index="3" aria-label="Go to slide 4"></button>
+                </div>
+                <button class="carousel-btn carousel-next" aria-label="Next" id="carousel-next">
+                    <span>→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Start Section -->
+        <section class="diagnostic-cta-section" id="start-section">
+            <button class="primary-button diagnostic-start-btn" id="start-diagnostic">
+                Start Free Assessment
+            </button>
+            <p class="diagnostic-note">No account required. Results saved locally.</p>
+        </section>
+
+        <!-- What You'll Learn Section -->
+        <section class="diagnostic-info">
+            <div class="diagnostic-info-inner">
+                <h2>What You'll Learn</h2>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="info-icon">1</div>
+                        <h3>Your Skill Level</h3>
+                        <p>Get an overall assessment: Beginner, Intermediate, or Advanced based on your performance.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">2</div>
+                        <h3>Category Breakdown</h3>
+                        <p>See how you perform in each area: Python basics, data structures, algorithms, and more.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">3</div>
+                        <h3>Personalized Path</h3>
+                        <p>Receive recommendations on what to study next based on your weak areas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loading-section" class="loading-section" style="min-height: 100px;" hidden>
+            <div class="loading-spinner"></div>
+            <p>Loading diagnostic...</p>
+        </section>
+
+        <!-- Error State -->
+        <section id="error-section" hidden>
+            <div class="diagnostic-info-inner" style="text-align: center;">
+                <p style="color: #ef4444;" id="error-message">No diagnostic quiz available at this time.</p>
+                <a href="/quizzes/" class="secondary-button" style="margin-top: 1rem;">Browse Quizzes</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
+                <a href="/contact/" class="footer-link">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL } from "./config.js";
+
+        // Initialize Convex client
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
+        if (!CONVEX_URL) {
+            document.getElementById('error-section').hidden = false;
+            document.getElementById('error-message').textContent = 'Configuration required. Please set CONVEX_URL in config.js';
+            throw new Error('Convex URL not configured');
+        }
+        localStorage.setItem('convex_url', CONVEX_URL);
+        const client = new ConvexHttpClient(CONVEX_URL);
+
+        // API proxy
+        const createApi = () => new Proxy({}, {
+            get: (_, module) => new Proxy({}, {
+                get: (_, func) => `${module}:${func}`
+            })
+        });
+        const api = createApi();
+
+        // DOM Elements
+        const loadingSection = document.getElementById('loading-section');
+        const errorSection = document.getElementById('error-section');
+        const startButton = document.getElementById('start-diagnostic');
+        const questionCount = document.getElementById('question-count');
+        const categoryCount = document.getElementById('category-count');
+
+        let diagnostic = null;
+
+        // Generate UUID for guest tracking
+        function generateGuestId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Check for existing results
+        function checkExistingResults() {
+            const completed = localStorage.getItem('diagnostic_completed');
+            const results = localStorage.getItem('diagnostic_results');
+            if (completed === 'true' && results) {
+                // Redirect to results page
+                window.location.href = '/quizzes/diagnostic-results.html';
+                return true;
+            }
+            return false;
+        }
+
+        // Load diagnostic quiz info
+        async function loadDiagnostic() {
+            loadingSection.hidden = false;
+
+            try {
+                diagnostic = await client.query(api.diagnostic.getActiveDiagnostic, {});
+
+                if (!diagnostic) {
+                    loadingSection.hidden = true;
+                    errorSection.hidden = false;
+                    startButton.disabled = true;
+                    startButton.textContent = 'Coming Soon';
+                    return;
+                }
+
+                // Update UI with diagnostic info
+                questionCount.textContent = diagnostic.totalQuestions;
+                categoryCount.textContent = diagnostic.sections.length;
+
+                loadingSection.hidden = true;
+                startButton.disabled = false;
+
+            } catch (err) {
+                console.error('Error loading diagnostic:', err);
+                loadingSection.hidden = true;
+                errorSection.hidden = false;
+                document.getElementById('error-message').textContent = 'Failed to load diagnostic. Please try again later.';
+            }
+        }
+
+        // Start diagnostic handler
+        function startDiagnostic() {
+            if (!diagnostic) return;
+
+            // Generate or retrieve guest ID
+            let guestId = localStorage.getItem('diagnostic_guest_id');
+            if (!guestId) {
+                guestId = generateGuestId();
+                localStorage.setItem('diagnostic_guest_id', guestId);
+            }
+
+            // Clear any previous completion status
+            localStorage.removeItem('diagnostic_completed');
+            localStorage.removeItem('diagnostic_results');
+
+            // Store diagnostic ID and navigate
+            localStorage.setItem('diagnostic_quiz_id', diagnostic._id);
+            window.location.href = '/quizzes/diagnostic-quiz.html';
+        }
+
+        startButton.addEventListener('click', startDiagnostic);
+
+        // Carousel start button also triggers the diagnostic
+        const carouselStartBtn = document.getElementById('carousel-start-btn');
+        if (carouselStartBtn) {
+            carouselStartBtn.addEventListener('click', startDiagnostic);
+        }
+
+        // ==========================================
+        // Preview Carousel Functionality
+        // ==========================================
+
+        const carouselTrack = document.getElementById('carousel-track');
+        const prevBtn = document.getElementById('carousel-prev');
+        const nextBtn = document.getElementById('carousel-next');
+        const dotsContainer = document.getElementById('carousel-dots');
+        const dots = dotsContainer.querySelectorAll('.carousel-dot');
+        const cards = carouselTrack.querySelectorAll('.carousel-card');
+        const totalSlides = cards.length;
+
+        let currentIndex = 0;
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        // Update carousel position
+        function updateCarousel(animate = true) {
+            if (!animate) {
+                carouselTrack.style.transition = 'none';
+            } else {
+                carouselTrack.style.transition = 'transform 0.3s ease-out';
+            }
+            carouselTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+
+            // Update button states
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === totalSlides - 1;
+        }
+
+        // Go to specific slide
+        function goToSlide(index) {
+            currentIndex = Math.max(0, Math.min(index, totalSlides - 1));
+            updateCarousel();
+        }
+
+        // Button navigation
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                goToSlide(currentIndex - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) {
+                goToSlide(currentIndex + 1);
+            }
+        });
+
+        // Dot navigation
+        dots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.dataset.index, 10);
+                goToSlide(index);
+            });
+        });
+
+        // Touch/Swipe handling
+        const carouselContainer = document.querySelector('.carousel-container');
+
+        function handleDragStart(e) {
+            isDragging = true;
+            startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            carouselTrack.style.transition = 'none';
+        }
+
+        function handleDragMove(e) {
+            if (!isDragging) return;
+
+            currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const diff = currentX - startX;
+            const containerWidth = carouselContainer.offsetWidth;
+            const percentMove = (diff / containerWidth) * 100;
+
+            // Apply live transform during drag
+            const baseTransform = -currentIndex * 100;
+            carouselTrack.style.transform = `translateX(${baseTransform + percentMove}%)`;
+        }
+
+        function handleDragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const diff = currentX - startX;
+            const threshold = 50; // Minimum swipe distance in pixels
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0 && currentIndex > 0) {
+                    // Swiped right - go to previous
+                    goToSlide(currentIndex - 1);
+                } else if (diff < 0 && currentIndex < totalSlides - 1) {
+                    // Swiped left - go to next
+                    goToSlide(currentIndex + 1);
+                } else {
+                    // Snap back if at boundaries
+                    updateCarousel();
+                }
+            } else {
+                // Snap back to current position
+                updateCarousel();
+            }
+
+            startX = 0;
+            currentX = 0;
+        }
+
+        // Touch events
+        carouselContainer.addEventListener('touchstart', handleDragStart, { passive: true });
+        carouselContainer.addEventListener('touchmove', handleDragMove, { passive: true });
+        carouselContainer.addEventListener('touchend', handleDragEnd);
+
+        // Mouse events for desktop dragging
+        carouselContainer.addEventListener('mousedown', handleDragStart);
+        carouselContainer.addEventListener('mousemove', handleDragMove);
+        carouselContainer.addEventListener('mouseup', handleDragEnd);
+        carouselContainer.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                handleDragEnd();
+            }
+        });
+
+        // Prevent default drag behavior on images/text
+        carouselContainer.addEventListener('dragstart', (e) => e.preventDefault());
+
+        // Preview option selection (visual only)
+        const previewOptions = document.querySelectorAll('.preview-option');
+        previewOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Find parent question card
+                const questionCard = option.closest('.preview-question');
+                // Remove selected from siblings
+                questionCard.querySelectorAll('.preview-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                // Add selected to clicked option
+                option.classList.add('selected');
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            // Only handle if carousel section is in view
+            const carouselSection = document.querySelector('.preview-carousel-section');
+            const rect = carouselSection.getBoundingClientRect();
+            const isInView = rect.top < window.innerHeight && rect.bottom > 0;
+
+            if (isInView) {
+                if (e.key === 'ArrowLeft') {
+                    goToSlide(currentIndex - 1);
+                } else if (e.key === 'ArrowRight') {
+                    goToSlide(currentIndex + 1);
+                }
+            }
+        });
+
+        // Initialize carousel state
+        updateCarousel(false);
+
+        // Initialize
+        if (!checkExistingResults()) {
+            loadDiagnostic();
+        }
+    </script>
+</body>
+</html>

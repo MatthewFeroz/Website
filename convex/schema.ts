@@ -86,4 +86,83 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_resourceId", ["resourceId"]),
+
+  // Diagnostic quiz definitions (multi-category assessment)
+  diagnosticQuizzes: defineTable({
+    title: v.string(),
+    description: v.string(),
+    isActive: v.boolean(),
+    version: v.number(),
+    estimatedMinutes: v.number(),
+    sections: v.array(
+      v.object({
+        category: v.string(),
+        categoryDisplayName: v.string(),
+        questions: v.array(
+          v.object({
+            id: v.string(),
+            question: v.string(),
+            options: v.array(v.string()),
+            correctOptionIndex: v.number(),
+            difficulty: v.union(
+              v.literal("easy"),
+              v.literal("medium"),
+              v.literal("hard")
+            ),
+            explanation: v.optional(v.string()),
+          })
+        ),
+      })
+    ),
+  }).index("by_isActive", ["isActive"]),
+
+  // Diagnostic attempts (supports both guests and authenticated users)
+  diagnosticAttempts: defineTable({
+    userId: v.optional(v.id("users")),
+    guestId: v.optional(v.string()),
+    diagnosticQuizId: v.id("diagnosticQuizzes"),
+    version: v.number(),
+    completedAt: v.number(),
+    timeSpentSeconds: v.optional(v.number()),
+    overallScore: v.number(),
+    overallLevel: v.union(
+      v.literal("beginner"),
+      v.literal("intermediate"),
+      v.literal("advanced")
+    ),
+    categoryResults: v.array(
+      v.object({
+        category: v.string(),
+        score: v.number(),
+        level: v.union(
+          v.literal("beginner"),
+          v.literal("intermediate"),
+          v.literal("advanced")
+        ),
+        correctCount: v.number(),
+        totalQuestions: v.number(),
+      })
+    ),
+    answers: v.array(
+      v.object({
+        questionId: v.string(),
+        category: v.string(),
+        selectedOptionIndex: v.number(),
+        isCorrect: v.boolean(),
+      })
+    ),
+    recommendations: v.array(
+      v.object({
+        category: v.string(),
+        priority: v.union(
+          v.literal("high"),
+          v.literal("medium"),
+          v.literal("low")
+        ),
+        message: v.string(),
+      })
+    ),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_guestId", ["guestId"]),
 });

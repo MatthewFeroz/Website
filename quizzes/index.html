@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Platform | Matt Feroz</title>
-    <meta name="description" content="Practice LeetCode patterns and Python fundamentals with interactive quizzes" />
+    <title>Learning | Matt Feroz</title>
+    <meta name="description" content="Discover your skill level with our free diagnostic assessment and master technical interviews with interactive quizzes" />
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="quiz-styles.css">
     <link rel="icon" href="../favicon.ico">
@@ -17,7 +17,7 @@
             <nav class="nav-menu">
                 <a href="/coaching/" class="nav-link">Coaching</a>
                 <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
-                <a href="/quizzes/" class="nav-link nav-link-active">Quizzes</a>
+                <a href="/guide/" class="nav-link">Learning</a>
                 <a href="/contact/" class="nav-link">Contact</a>
             </nav>
             <a href="#" class="nav-cta" id="login-cta"><span class="cta-full">MEMBER LOGIN</span><span class="cta-short">LOGIN</span></a>
@@ -26,36 +26,64 @@
             <button class="mobile-close" aria-label="Close menu">✕</button>
             <a href="/coaching/" class="mobile-link">Coaching</a>
             <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
-            <a href="/quizzes/" class="mobile-link">Quizzes</a>
+            <a href="/guide/" class="mobile-link">Learning</a>
             <a href="/contact/" class="mobile-link">Contact</a>
             <a href="#" class="mobile-cta" id="mobile-login-cta">MEMBER LOGIN</a>
         </div>
     </header>
 
     <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-inner">
-                <div class="hero-image-wrapper">
-                    <span class="hero-glow"></span>
-                    <img src="../profilepicture.png" alt="Matt Feroz" class="hero-image">
+        <!-- Hero Section - Diagnostic Focused -->
+        <section class="learning-hero">
+            <div class="learning-hero-inner">
+                <div class="learning-hero-content">
+                    <h1>Discover Your Skill Level</h1>
+                    <p>Take our free diagnostic assessment to find out where you stand with <strong>Python</strong> and <strong>LeetCode patterns</strong>. Get personalized recommendations based on your results.</p>
                 </div>
-                <div class="hero-content">
-                    <h1>Master Technical Interviews</h1>
-                    <p>Interactive quizzes to help you <strong>understand LeetCode patterns</strong> and <strong>solidify your Python fundamentals</strong>. Track your progress, unlock resources, and get interview-ready.</p>
-                    <div class="button-row">
-                        <a href="#quizzes" class="primary-button">EXPLORE QUIZZES</a>
-                        <a href="/coaching/" class="secondary-button">GET FULL ACCESS</a>
+
+                <!-- Quiz Preview Mockup -->
+                <div class="quiz-preview-mockup">
+                    <div class="mockup-header">
+                        <span class="mockup-badge">PREVIEW</span>
                     </div>
+                    <div class="mockup-question-card">
+                        <div class="mockup-progress">Question 3 of 20</div>
+                        <div class="mockup-question-text">What is the time complexity of binary search?</div>
+                        <div class="mockup-options">
+                            <div class="mockup-option">
+                                <span class="mockup-radio"></span>
+                                <span>O(n)</span>
+                            </div>
+                            <div class="mockup-option mockup-option-selected">
+                                <span class="mockup-radio mockup-radio-selected"></span>
+                                <span>O(log n)</span>
+                            </div>
+                            <div class="mockup-option">
+                                <span class="mockup-radio"></span>
+                                <span>O(n²)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/quizzes/diagnostic.html" class="primary-button diagnostic-cta-btn">START FREE ASSESSMENT</a>
+
+                <!-- Feature Pills -->
+                <div class="feature-pills">
+                    <span class="feature-pill">~25 minutes</span>
+                    <span class="feature-pill-divider">•</span>
+                    <span class="feature-pill">Multiple categories</span>
+                    <span class="feature-pill-divider">•</span>
+                    <span class="feature-pill">No signup required</span>
                 </div>
             </div>
         </section>
 
-        <!-- What You Get Section -->
+        <!-- What You'll Learn Section -->
         <section class="what-you-get">
             <div class="what-inner">
                 <div class="what-header">
-                    <h1>What's Included</h1>
+                    <h1>What You'll Learn</h1>
                     <p>Everything you need to prepare for technical interviews</p>
                 </div>
                 <div class="what-cards">
@@ -109,6 +137,11 @@
                 <a href="/coaching/" class="primary-button">LEARN ABOUT THE ACADEMY</a>
             </div>
         </section>
+
+        <!-- Returning User Login -->
+        <div class="returning-user-section">
+            <p>Already a member? <a href="#" id="returning-login-link">Sign in here</a></p>
+        </div>
     </main>
 
     <!-- Access Code Modal -->
@@ -168,20 +201,23 @@
             const modalClose = document.getElementById('modal-close');
             const modalBackdrop = accessModal ? accessModal.querySelector('.modal-backdrop') : null;
 
-            function closeModalAndNavigate() {
-                window.location.href = '/guide/';
+            function closeModal() {
+                if (accessModal) {
+                    accessModal.hidden = true;
+                    document.body.style.overflow = '';
+                }
             }
 
             if (modalClose) {
-                modalClose.addEventListener('click', closeModalAndNavigate);
+                modalClose.addEventListener('click', closeModal);
             }
             if (modalBackdrop) {
-                modalBackdrop.addEventListener('click', closeModalAndNavigate);
+                modalBackdrop.addEventListener('click', closeModal);
             }
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && accessModal && !accessModal.hidden) {
-                    closeModalAndNavigate();
+                    closeModal();
                 }
             });
         });
@@ -369,7 +405,6 @@
             selectedQuizId = null;
             accessCodeInput.value = '';
             hideError();
-            window.location.href = '/guide/';
         }
 
         modalClose.addEventListener('click', closeModal);
@@ -409,7 +444,25 @@
                 if (result.success) {
                     localStorage.setItem('quiz_user_id', result.userId);
                     localStorage.setItem('quiz_user_email', result.email);
-                    
+
+                    // Migrate guest diagnostic if exists
+                    const guestId = localStorage.getItem('diagnostic_guest_id');
+                    if (guestId) {
+                        try {
+                            await client.mutation(api.diagnostic.migrateGuestDiagnostic, {
+                                guestId,
+                                userId: result.userId
+                            });
+                            // Clear guest data
+                            localStorage.removeItem('diagnostic_guest_id');
+                            localStorage.removeItem('diagnostic_completed');
+                            localStorage.removeItem('diagnostic_results');
+                            localStorage.removeItem('diagnostic_quiz_id');
+                        } catch (migrationErr) {
+                            console.warn('Could not migrate guest diagnostic:', migrationErr);
+                        }
+                    }
+
                     if (selectedQuizId) {
                         window.location.href = `/quizzes/quiz.html?id=${selectedQuizId}`;
                     } else {
@@ -445,6 +498,19 @@
 
         function formatCategoryName(category) {
             return category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        // Returning user login link
+        const returningLoginLink = document.getElementById('returning-login-link');
+        if (returningLoginLink) {
+            returningLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (isLoggedIn()) {
+                    window.location.href = '/quizzes/dashboard.html';
+                } else {
+                    openModal();
+                }
+            });
         }
 
         // Initialize
