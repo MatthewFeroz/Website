@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"C:\\\\Users\\\\Matthew Feroz\\\\Desktop\\\\Website\\\\Website\\\\coaching\\\\|head -20\")"
+    ]
+  }
+}
