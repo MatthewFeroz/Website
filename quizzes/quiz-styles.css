@@ -1550,6 +1550,11 @@ section[hidden],
 /* Learning Page Hero   */
 /* ==================== */
 
+/* Match body background to learning-hero gradient to eliminate color mismatch at top */
+body {
+  background: linear-gradient(180deg, #1b1d22 0%, #141518 100%);
+}
+
 .learning-hero {
   padding: var(--space-lg) var(--space-lg) var(--space-xl);
   text-align: center;

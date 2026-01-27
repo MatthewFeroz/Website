@@ -7,12 +7,129 @@
     <meta name="description" content="Thank you for your purchase! Access your quiz platform here." />
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .access-code-container {
+            background: linear-gradient(135deg, #252528 0%, #1e1e21 100%);
+            border: 2px solid #f85f00;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 500px;
+            text-align: center;
+        }
+        .access-code-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+        .access-code {
+            color: #f85f00;
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+            margin: 1rem 0;
+            word-break: break-all;
+        }
+        .copy-button {
+            background: transparent;
+            border: 1px solid #f85f00;
+            color: #f85f00;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .copy-button:hover {
+            background: #f85f00;
+            color: #fff;
+        }
+        .copy-button.copied {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: #fff;
+        }
+        .email-confirmation {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-top: 1.5rem;
+        }
+        .email-confirmation strong {
+            color: #fff;
+        }
+        .loading-container {
+            text-align: center;
+            padding: 3rem;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #252528;
+            border-top-color: #f85f00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+        .error-container {
+            background: #2d1f1f;
+            border: 1px solid #ef4444;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 500px;
+            text-align: center;
+        }
+        .error-icon {
+            color: #ef4444;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .error-title {
+            color: #fff;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .error-message {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        .retry-button {
+            background: #ef4444;
+            border: none;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            transition: background 0.2s ease;
+        }
+        .retry-button:hover {
+            background: #dc2626;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
     <header class="navbar">
         <div class="nav-inner">
             <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
-            <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+            <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"></button>
             <nav class="nav-menu">
                 <a href="/coaching/" class="nav-link">Coaching</a>
                 <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
@@ -22,7 +139,7 @@
             <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="nav-cta" data-tf-popup="T2ZPmUED" data-tf-medium="site-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
         </div>
         <div id="mobile-menu" class="mobile-menu" hidden>
-            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <button class="mobile-close" aria-label="Close menu"></button>
             <a href="/coaching/" class="mobile-link">Coaching</a>
             <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
             <a href="https://www.instagram.com/alivecomp/" target="_blank" class="mobile-link">Instagram</a>
@@ -34,14 +151,58 @@
     <section class="hero" style="min-height: 60vh; display: flex; align-items: center;">
         <div class="hero-inner" style="width: 100%;">
             <div class="hero-content" style="flex: 1 1 100%; text-align: center;">
-                <div style="margin-bottom: 2rem;">
-                    <i class="fas fa-check-circle" style="font-size: 5rem; color: #22c55e;"></i>
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Processing your purchase...</p>
                 </div>
-                <h1>Thank You for Your Purchase!</h1>
-                <p>Your payment was successful. You now have access to the quiz platform.</p>
-                <div class="button-row" style="justify-content: center; margin-top: 2rem;">
-                    <!-- Replace YOUR_PLATFORM_ACCESS_LINK with the actual link to your quiz platform -->
-                    <a href="YOUR_PLATFORM_ACCESS_LINK" class="primary-button">ACCESS THE PLATFORM</a>
+
+                <!-- Success State -->
+                <div id="success-state" class="hidden">
+                    <div style="margin-bottom: 2rem;">
+                        <i class="fas fa-check-circle" style="font-size: 5rem; color: #22c55e;"></i>
+                    </div>
+                    <h1>Thank You for Your Purchase!</h1>
+                    <p>Your payment was successful. Here's your access code:</p>
+
+                    <div class="access-code-container">
+                        <p class="access-code-label">Your Access Code</p>
+                        <p class="access-code" id="access-code">----</p>
+                        <button class="copy-button" id="copy-button" onclick="copyAccessCode()">
+                            <i class="fas fa-copy"></i>
+                            <span id="copy-text">Copy Code</span>
+                        </button>
+                        <p class="email-confirmation" id="email-confirmation"></p>
+                    </div>
+
+                    <div class="button-row" style="justify-content: center; margin-top: 2rem;">
+                        <a href="/quizzes/" class="primary-button">ACCESS THE PLATFORM</a>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="hidden">
+                    <div class="error-container">
+                        <i class="fas fa-exclamation-circle error-icon"></i>
+                        <h2 class="error-title">Something Went Wrong</h2>
+                        <p class="error-message" id="error-message">We couldn't retrieve your access code. Please check your email or contact support.</p>
+                        <button class="retry-button" onclick="fetchPurchase()">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                </div>
+
+                <!-- No Session State -->
+                <div id="no-session-state" class="hidden">
+                    <div style="margin-bottom: 2rem;">
+                        <i class="fas fa-info-circle" style="font-size: 5rem; color: #f85f00;"></i>
+                    </div>
+                    <h1>Access Code Required</h1>
+                    <p>If you've completed a purchase, please check your email for your access code.</p>
+                    <div class="button-row" style="justify-content: center; margin-top: 2rem;">
+                        <a href="/platform/" class="primary-button">PURCHASE ACCESS</a>
+                        <a href="/quizzes/" class="secondary-button" style="margin-left: 1rem;">I HAVE A CODE</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,7 +219,7 @@
                         <i class="fas fa-envelope" style="font-size: 3rem; color: var(--brand);"></i>
                     </div>
                     <h3>Check Your Email</h3>
-                    <p>You'll receive a confirmation email with your receipt and login details.</p>
+                    <p>You'll receive a confirmation email with your receipt and access code.</p>
                 </article>
                 <article class="what-card">
                     <div class="what-image-wrapper">
@@ -115,6 +276,127 @@
             api_host: 'https://us.i.posthog.com',
             person_profiles: 'identified_only'
         })
+    </script>
+
+    <!-- Access Code Retrieval Script -->
+    <script>
+        // Convex HTTP endpoint URL - Update this to your actual Convex deployment URL
+        const CONVEX_HTTP_URL = 'https://grateful-pony-674.convex.site';
+
+        // Get session_id from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        // State management
+        let pollAttempts = 0;
+        const MAX_POLL_ATTEMPTS = 10;
+        const POLL_INTERVAL = 2000; // 2 seconds
+
+        // DOM elements
+        const loadingState = document.getElementById('loading-state');
+        const successState = document.getElementById('success-state');
+        const errorState = document.getElementById('error-state');
+        const noSessionState = document.getElementById('no-session-state');
+        const accessCodeEl = document.getElementById('access-code');
+        const emailConfirmationEl = document.getElementById('email-confirmation');
+        const errorMessageEl = document.getElementById('error-message');
+
+        // Initialize page
+        function init() {
+            if (!sessionId) {
+                showState('no-session');
+                return;
+            }
+            fetchPurchase();
+        }
+
+        // Show specific state
+        function showState(state) {
+            loadingState.classList.add('hidden');
+            successState.classList.add('hidden');
+            errorState.classList.add('hidden');
+            noSessionState.classList.add('hidden');
+
+            switch(state) {
+                case 'loading':
+                    loadingState.classList.remove('hidden');
+                    break;
+                case 'success':
+                    successState.classList.remove('hidden');
+                    break;
+                case 'error':
+                    errorState.classList.remove('hidden');
+                    break;
+                case 'no-session':
+                    noSessionState.classList.remove('hidden');
+                    break;
+            }
+        }
+
+        // Fetch purchase from Convex
+        async function fetchPurchase() {
+            showState('loading');
+            pollAttempts++;
+
+            try {
+                const response = await fetch(`${CONVEX_HTTP_URL}/get-purchase?session_id=${encodeURIComponent(sessionId)}`);
+                const data = await response.json();
+
+                if (response.ok && data.accessCode) {
+                    // Success - show the access code
+                    accessCodeEl.textContent = data.accessCode;
+                    if (data.email) {
+                        emailConfirmationEl.innerHTML = `A confirmation email has been sent to <strong>${data.email}</strong>`;
+                    }
+                    showState('success');
+
+                    // Track successful purchase in PostHog
+                    if (typeof posthog !== 'undefined') {
+                        posthog.capture('purchase_completed', {
+                            session_id: sessionId
+                        });
+                    }
+                } else if (data.pending && pollAttempts < MAX_POLL_ATTEMPTS) {
+                    // Purchase not yet processed, poll again
+                    setTimeout(fetchPurchase, POLL_INTERVAL);
+                } else {
+                    // Error or max attempts reached
+                    errorMessageEl.textContent = data.error || 'We couldn\'t retrieve your access code. Please check your email or contact support.';
+                    showState('error');
+                }
+            } catch (error) {
+                console.error('Error fetching purchase:', error);
+                if (pollAttempts < MAX_POLL_ATTEMPTS) {
+                    // Network error, try again
+                    setTimeout(fetchPurchase, POLL_INTERVAL);
+                } else {
+                    errorMessageEl.textContent = 'Network error. Please check your connection and try again.';
+                    showState('error');
+                }
+            }
+        }
+
+        // Copy access code to clipboard
+        function copyAccessCode() {
+            const code = accessCodeEl.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const copyButton = document.getElementById('copy-button');
+                const copyText = document.getElementById('copy-text');
+
+                copyButton.classList.add('copied');
+                copyText.textContent = 'Copied!';
+
+                setTimeout(() => {
+                    copyButton.classList.remove('copied');
+                    copyText.textContent = 'Copy Code';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Start on page load
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

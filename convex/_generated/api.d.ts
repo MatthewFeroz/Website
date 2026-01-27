@@ -11,9 +11,11 @@
 import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as diagnostic from "../diagnostic.js";
+import type * as http from "../http.js";
 import type * as quizzes from "../quizzes.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
+import type * as stripe from "../stripe.js";
 
 import type {
   ApiFromModules,
@@ -25,9 +27,11 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   auth: typeof auth;
   diagnostic: typeof diagnostic;
+  http: typeof http;
   quizzes: typeof quizzes;
   resources: typeof resources;
   seed: typeof seed;
+  stripe: typeof stripe;
 }>;
 
 /**
