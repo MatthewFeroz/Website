@@ -14,6 +14,19 @@ export default defineSchema({
     .index("by_code", ["code"])
     .index("by_email", ["email"]),
 
+  // Purchases from Stripe
+  purchases: defineTable({
+    email: v.string(),
+    accessCode: v.string(),
+    sessionId: v.string(),
+    paymentIntentId: v.optional(v.string()),
+    amountTotal: v.number(),
+    currency: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_sessionId", ["sessionId"])
+    .index("by_email", ["email"]),
+
   // Users who have redeemed an access code
   users: defineTable({
     email: v.string(),
@@ -115,6 +128,21 @@ export default defineSchema({
       })
     ),
   }).index("by_isActive", ["isActive"]),
+
+  // Cached blog feed from Substack RSS
+  blogCache: defineTable({
+    posts: v.array(
+      v.object({
+        title: v.string(),
+        link: v.string(),
+        pubDate: v.string(),
+        description: v.string(),
+        thumbnail: v.string(),
+        author: v.string(),
+      })
+    ),
+    fetchedAt: v.number(),
+  }),
 
   // Diagnostic attempts (supports both guests and authenticated users)
   diagnosticAttempts: defineTable({

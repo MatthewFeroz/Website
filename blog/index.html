@@ -107,8 +107,11 @@
     <script type="module">
         // Use local proxy in development, Convex in production
         const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-        const CONVEX_URL = "https://grateful-pony-674.convex.cloud";
-        const FEED_ENDPOINT = isLocal ? "/blog/feed" : `${CONVEX_URL}/blog/feed`;
+        const CONVEX_SITE_URL = "https://grateful-pony-674.convex.site";
+        const FEED_ENDPOINT = isLocal ? "/blog/feed" : `${CONVEX_SITE_URL}/blog/feed`;
+
+        const CACHE_KEY = "blog_cache";
+        const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
         const loadingEl = document.getElementById("blog-loading");
         const postsEl = document.getElementById("blog-posts");
@@ -116,44 +119,95 @@
         const emptyEl = document.getElementById("blog-empty");
         const retryBtn = document.getElementById("blog-retry");
 
-        async function fetchPosts() {
-            loadingEl.style.display = "";
-            postsEl.style.display = "none";
-            errorEl.style.display = "none";
-            emptyEl.style.display = "none";
+        function getCachedPosts() {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                const cached = JSON.parse(raw);
+                if (Date.now() - cached.timestamp < CACHE_TTL && cached.posts && cached.posts.length > 0) {
+                    return cached;
+                }
+            } catch (e) { /* ignore corrupt cache */ }
+            return null;
+        }
 
+        function saveCachedPosts(posts) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ posts, timestamp: Date.now() }));
+            } catch (e) { /* storage full or unavailable */ }
+        }
+
+        async function fetchFresh() {
             try {
                 const res = await fetch(FEED_ENDPOINT);
                 if (!res.ok) throw new Error("Feed fetch failed");
                 const data = await res.json();
-
-                if (!data.posts || data.posts.length === 0) {
-                    loadingEl.style.display = "none";
-                    emptyEl.style.display = "";
-                    return;
+                if (data.posts && data.posts.length > 0) {
+                    saveCachedPosts(data.posts);
+                    return data.posts;
                 }
-
-                postsEl.innerHTML = "";
-                data.posts.forEach((post) => {
-                    const card = createPostCard(post);
-                    postsEl.appendChild(card);
-                });
-
-                loadingEl.style.display = "none";
-                postsEl.style.display = "";
-
-                // Animate cards with GSAP if available
-                if (window.gsap) {
-                    window.gsap.from(".blog-card", {
-                        opacity: 0,
-                        y: 24,
-                        duration: 0.5,
-                        ease: "power2.out",
-                        stagger: 0.08,
-                    });
-                }
+                return null;
             } catch (err) {
                 console.error("Blog fetch error:", err);
+                return null;
+            }
+        }
+
+        function renderPosts(posts, animate) {
+            if (!posts || posts.length === 0) {
+                loadingEl.style.display = "none";
+                postsEl.style.display = "none";
+                emptyEl.style.display = "";
+                return;
+            }
+
+            postsEl.innerHTML = "";
+            posts.forEach((post) => {
+                const card = createPostCard(post);
+                postsEl.appendChild(card);
+            });
+
+            loadingEl.style.display = "none";
+            errorEl.style.display = "none";
+            emptyEl.style.display = "none";
+            postsEl.style.display = "";
+
+            if (animate && window.gsap) {
+                window.gsap.from(".blog-card", {
+                    opacity: 0,
+                    y: 24,
+                    duration: 0.5,
+                    ease: "power2.out",
+                    stagger: 0.08,
+                });
+            }
+        }
+
+        async function fetchPosts() {
+            errorEl.style.display = "none";
+            emptyEl.style.display = "none";
+
+            // Try cache first for instant render
+            const cached = getCachedPosts();
+            if (cached) {
+                renderPosts(cached.posts, true);
+                // Background refresh — only re-render if data actually changed
+                fetchFresh().then(freshPosts => {
+                    if (freshPosts && JSON.stringify(freshPosts) !== JSON.stringify(cached.posts)) {
+                        renderPosts(freshPosts, false);
+                    }
+                });
+                return;
+            }
+
+            // No cache — show loading skeleton, fetch fresh
+            loadingEl.style.display = "";
+            postsEl.style.display = "none";
+
+            const posts = await fetchFresh();
+            if (posts) {
+                renderPosts(posts, true);
+            } else {
                 loadingEl.style.display = "none";
                 errorEl.style.display = "";
             }
@@ -196,7 +250,10 @@
             return article;
         }
 
-        retryBtn.addEventListener("click", fetchPosts);
+        retryBtn.addEventListener("click", () => {
+            localStorage.removeItem(CACHE_KEY); // force fresh fetch on retry
+            fetchPosts();
+        });
         fetchPosts();
     </script>
 </body>

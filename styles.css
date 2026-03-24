@@ -1764,7 +1764,7 @@ body.menu-open {
 }
 
 .hero-vsl-inner {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -1776,7 +1776,11 @@ body.menu-open {
   flex: none;
   width: 100%;
   max-width: 900px;
+  margin: 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hero-vsl-content h1 {
@@ -1784,6 +1788,8 @@ body.menu-open {
   font-weight: 800;
   margin-bottom: 1.25rem;
   line-height: 1.1;
+  text-align: center;
+  width: 100%;
 }
 
 .hero-vsl-content p {
