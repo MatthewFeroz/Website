@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Matt Feroz</title>
+    <meta name="description" content="Articles and insights from Matt Feroz on software engineering careers, interview prep, and breaking into tech." />
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+            <nav class="nav-menu">
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
+                <a href="/guide/" class="nav-link">Learning</a>
+                <a href="/blog/" class="nav-link">Blog</a>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="nav-link">Community</a>
+            </nav>
+            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="nav-cta" data-tf-popup="T2ZPmUED" data-tf-medium="site-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
+        </div>
+        <div id="mobile-menu" class="mobile-menu" hidden>
+            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <a href="/coaching/" class="mobile-link">Coaching</a>
+            <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
+            <a href="/guide/" class="mobile-link">Learning</a>
+            <a href="/blog/" class="mobile-link">Blog</a>
+            <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="mobile-link">Community</a>
+            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="mobile-cta" data-tf-popup="T2ZPmUED" data-tf-medium="site-cta-mobile" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>BOOK A FREE CALL</a>
+        </div>
+    </header>
+    <main>
+        <section class="blog-hero">
+            <div class="blog-hero-inner">
+                <h1 class="blog-hero-title">Blog</h1>
+                <p class="blog-hero-subtitle">Thoughts on software engineering careers, interview prep, and breaking into tech.</p>
+                <a href="https://matthewferoz.substack.com" target="_blank" rel="noopener" class="primary-button blog-subscribe-btn">
+                    <i class="fa-solid fa-envelope"></i> Subscribe on Substack
+                </a>
+            </div>
+        </section>
+
+        <section class="blog-posts-section">
+            <div class="blog-posts-inner">
+                <!-- Loading state -->
+                <div id="blog-loading" class="blog-loading">
+                    <div class="blog-skeleton-card"></div>
+                    <div class="blog-skeleton-card"></div>
+                    <div class="blog-skeleton-card"></div>
+                </div>
+
+                <!-- Posts grid (populated by JS) -->
+                <div id="blog-posts" class="blog-grid" style="display:none;"></div>
+
+                <!-- Error state -->
+                <div id="blog-error" class="blog-error" style="display:none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3>Couldn't load posts</h3>
+                    <p>There was an issue fetching articles. Please try again.</p>
+                    <button class="primary-button" id="blog-retry">Try Again</button>
+                </div>
+
+                <!-- Empty state -->
+                <div id="blog-empty" class="blog-empty" style="display:none;">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <h3>Articles Coming Soon</h3>
+                    <p>Subscribe on Substack to be the first to know when new articles drop.</p>
+                    <a href="https://matthewferoz.substack.com" target="_blank" rel="noopener" class="primary-button">
+                        Subscribe on Substack
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
+                <a href="/blog/" class="footer-link">Blog</a>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="footer-link">Community</a>
+                <a href="#terms" class="footer-link">Terms &amp; Conditions</a>
+                <a href="#privacy" class="footer-link">Privacy Policy</a>
+            </nav>
+        </div>
+    </footer>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script src="https://embed.typeform.com/next/embed.js" defer></script>
+
+    <!-- PostHog Analytics -->
+    <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
+    <script>
+        posthog.init('phc_NYfQd50P3VMosArZ6rMnOUWB4RDO7nfFG4XJFCOpSog', {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'identified_only'
+        })
+    </script>
+
+    <!-- Blog fetch logic -->
+    <script type="module">
+        // Use local proxy in development, Convex in production
+        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const CONVEX_URL = "https://grateful-pony-674.convex.cloud";
+        const FEED_ENDPOINT = isLocal ? "/blog/feed" : `${CONVEX_URL}/blog/feed`;
+
+        const loadingEl = document.getElementById("blog-loading");
+        const postsEl = document.getElementById("blog-posts");
+        const errorEl = document.getElementById("blog-error");
+        const emptyEl = document.getElementById("blog-empty");
+        const retryBtn = document.getElementById("blog-retry");
+
+        async function fetchPosts() {
+            loadingEl.style.display = "";
+            postsEl.style.display = "none";
+            errorEl.style.display = "none";
+            emptyEl.style.display = "none";
+
+            try {
+                const res = await fetch(FEED_ENDPOINT);
+                if (!res.ok) throw new Error("Feed fetch failed");
+                const data = await res.json();
+
+                if (!data.posts || data.posts.length === 0) {
+                    loadingEl.style.display = "none";
+                    emptyEl.style.display = "";
+                    return;
+                }
+
+                postsEl.innerHTML = "";
+                data.posts.forEach((post) => {
+                    const card = createPostCard(post);
+                    postsEl.appendChild(card);
+                });
+
+                loadingEl.style.display = "none";
+                postsEl.style.display = "";
+
+                // Animate cards with GSAP if available
+                if (window.gsap) {
+                    window.gsap.from(".blog-card", {
+                        opacity: 0,
+                        y: 24,
+                        duration: 0.5,
+                        ease: "power2.out",
+                        stagger: 0.08,
+                    });
+                }
+            } catch (err) {
+                console.error("Blog fetch error:", err);
+                loadingEl.style.display = "none";
+                errorEl.style.display = "";
+            }
+        }
+
+        function createPostCard(post) {
+            const article = document.createElement("article");
+            article.className = "blog-card";
+
+            const formattedDate = new Date(post.pubDate).toLocaleDateString(
+                "en-US",
+                { month: "short", day: "numeric", year: "numeric" }
+            );
+
+            const excerpt =
+                post.description.length > 160
+                    ? post.description.slice(0, 160).trim() + "…"
+                    : post.description;
+
+            const thumbnailHTML = post.thumbnail
+                ? `<div class="blog-card-image-wrapper">
+                     <img class="blog-card-image" src="${post.thumbnail}" alt="${post.title}" loading="lazy" onerror="this.parentElement.classList.add('blog-card-no-image')">
+                   </div>`
+                : `<div class="blog-card-image-wrapper blog-card-no-image">
+                     <i class="fa-solid fa-newspaper"></i>
+                   </div>`;
+
+            article.innerHTML = `
+                <a href="${post.link}" target="_blank" rel="noopener" class="blog-card-link-wrapper">
+                    ${thumbnailHTML}
+                    <div class="blog-card-content">
+                        <span class="blog-card-date">${formattedDate}</span>
+                        <h3 class="blog-card-title">${post.title}</h3>
+                        <p class="blog-card-excerpt">${excerpt}</p>
+                        <span class="blog-card-read">Read on Substack &rarr;</span>
+                    </div>
+                </a>
+            `;
+
+            return article;
+        }
+
+        retryBtn.addEventListener("click", fetchPosts);
+        fetchPosts();
+    </script>
+</body>
+</html>

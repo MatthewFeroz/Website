@@ -102,25 +102,58 @@
     });
   }
 
+  const heroShell = document.querySelector('.hero-shell');
+  const heroShowcase = document.querySelector('.hero-showcase');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const supportsFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+  if (heroShell && heroShowcase && !prefersReducedMotion && supportsFinePointer) {
+    const setHeroPointer = (event) => {
+      const rect = heroShell.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      const tiltX = ((x - 50) / 50) * 4;
+      const tiltY = ((y - 50) / 50) * 4;
+
+      heroShell.style.setProperty('--hero-spotlight-x', `${x}%`);
+      heroShell.style.setProperty('--hero-spotlight-y', `${y}%`);
+      heroShowcase.style.setProperty('--hero-tilt-x', tiltX.toFixed(2));
+      heroShowcase.style.setProperty('--hero-tilt-y', tiltY.toFixed(2));
+    };
+
+    const resetHeroPointer = () => {
+      heroShell.style.setProperty('--hero-spotlight-x', '50%');
+      heroShell.style.setProperty('--hero-spotlight-y', '50%');
+      heroShowcase.style.setProperty('--hero-tilt-x', '0');
+      heroShowcase.style.setProperty('--hero-tilt-y', '0');
+    };
+
+    heroShell.addEventListener('pointermove', setHeroPointer);
+    heroShell.addEventListener('pointerleave', resetHeroPointer);
+    resetHeroPointer();
+  }
+
   // GSAP-powered animations below — safe to skip if GSAP failed to load
   if (!window.gsap) return;
   const gsap = window.gsap;
   if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
   // Entrance animation for hero
-  gsap.set([".hero-image", ".hero-content h1", ".hero-content p", ".primary-button", ".secondary-button"], { opacity: 0, y: 24 });
-  gsap.to(".hero-image", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.05 });
-  gsap.to(".hero-content h1", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: 0.15 });
-  gsap.to(".hero-content p", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: 0.28 });
-  gsap.to([".primary-button", ".secondary-button"], { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.42 });
+  gsap.set([".hero-kicker", ".hero-title", ".hero-description", ".hero-proof-pill", ".hero-actions .primary-button", ".hero-actions .secondary-button", ".hero-stat-card", ".hero-showcase", ".hero-path-card"], { opacity: 0, y: 24 });
+  gsap.to(".hero-kicker", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", delay: 0.08 });
+  gsap.to(".hero-title", { opacity: 1, y: 0, duration: 0.72, ease: "power3.out", delay: 0.16 });
+  gsap.to(".hero-description", { opacity: 1, y: 0, duration: 0.65, ease: "power3.out", delay: 0.26 });
+  gsap.to(".hero-proof-pill", { opacity: 1, y: 0, duration: 0.48, ease: "power2.out", stagger: 0.08, delay: 0.34 });
+  gsap.to([".hero-actions .primary-button", ".hero-actions .secondary-button"], { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.08, delay: 0.42 });
+  gsap.to(".hero-stat-card", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.1, delay: 0.5 });
+  gsap.to(".hero-showcase", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.18 });
+  gsap.to(".hero-path-card", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.08, delay: 0.54 });
   
   // Ensure elements are visible on mobile (override any GSAP hiding)
   if (window.innerWidth <= 768) {
-    gsap.set([".hero-content h1", ".hero-content p", ".audience-callout", ".audience-callout h2"], { 
+    gsap.set([".hero-kicker", ".hero-title", ".hero-description", ".hero-proof-pill", ".hero-actions .primary-button", ".hero-actions .secondary-button", ".hero-stat-card", ".hero-showcase", ".hero-path-card"], { 
       opacity: 1, 
-      y: 0, 
-      display: "block",
-      visibility: "visible"
+      y: 0
     });
   }
 
