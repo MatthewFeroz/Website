@@ -105,10 +105,11 @@
 
     <!-- Blog fetch logic -->
     <script type="module">
-        // Use local proxy in development, Convex in production
-        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
         const CONVEX_SITE_URL = "https://grateful-pony-674.convex.site";
-        const FEED_ENDPOINT = isLocal ? "/blog/feed" : `${CONVEX_SITE_URL}/blog/feed`;
+        const FEED_ENDPOINTS = [
+            `${window.location.origin}/blog/feed`,
+            `${CONVEX_SITE_URL}/blog/feed`,
+        ];
 
         const CACHE_KEY = "blog_cache";
         const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
@@ -137,20 +138,33 @@
             } catch (e) { /* storage full or unavailable */ }
         }
 
-        async function fetchFresh() {
-            try {
-                const res = await fetch(FEED_ENDPOINT);
-                if (!res.ok) throw new Error("Feed fetch failed");
-                const data = await res.json();
-                if (data.posts && data.posts.length > 0) {
-                    saveCachedPosts(data.posts);
-                    return data.posts;
-                }
-                return null;
-            } catch (err) {
-                console.error("Blog fetch error:", err);
-                return null;
+        async function fetchFeed(endpoint) {
+            const res = await fetch(endpoint);
+            if (!res.ok) {
+                throw new Error(`Feed fetch failed with status ${res.status}`);
             }
+
+            const data = await res.json();
+            return Array.isArray(data.posts) ? data.posts : [];
+        }
+
+        async function fetchFresh() {
+            let lastError = null;
+
+            for (const endpoint of FEED_ENDPOINTS) {
+                try {
+                    const posts = await fetchFeed(endpoint);
+                    if (posts.length > 0) {
+                        saveCachedPosts(posts);
+                    }
+                    return posts;
+                } catch (err) {
+                    lastError = err;
+                }
+            }
+
+            console.error("Blog fetch error:", lastError);
+            return null;
         }
 
         function renderPosts(posts, animate) {
