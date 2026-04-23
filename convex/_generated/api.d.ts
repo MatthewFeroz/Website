@@ -10,8 +10,10 @@
 
 import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
+import type * as blog from "../blog.js";
 import type * as diagnostic from "../diagnostic.js";
 import type * as http from "../http.js";
+import type * as leads from "../leads.js";
 import type * as quizzes from "../quizzes.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
@@ -26,8 +28,10 @@ import type {
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   auth: typeof auth;
+  blog: typeof blog;
   diagnostic: typeof diagnostic;
   http: typeof http;
+  leads: typeof leads;
   quizzes: typeof quizzes;
   resources: typeof resources;
   seed: typeof seed;

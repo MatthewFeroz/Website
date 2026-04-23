@@ -919,7 +919,8 @@ body.menu-open {
 /* Footer */
 .site-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: var(--space-xl) var(--space-md);
+  padding: 3rem 1.5rem;
+  background: #0f1012;
   margin-top: auto; /* Push footer to bottom when content is short */
 }
 
@@ -929,16 +930,17 @@ body.menu-open {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
   gap: 1.25rem;
+  flex-wrap: wrap;
 }
 
 .footer-logo {
   display: inline-block;
-  align-self: flex-start;
   font-weight: 1000;
   color: var(--white);
   text-decoration: none;
+  letter-spacing: -0.01em;
+  font-size: 0.95rem;
 }
 
 .footer-logo:hover,
@@ -948,11 +950,28 @@ body.menu-open {
 
 .footer-menu {
   display: flex;
-  gap: var(--space-lg);
+  gap: 1.5rem;
   flex-wrap: wrap;
-  justify-content: center;
-  align-self: auto;
-  margin: 0 auto;
+  margin-left: auto;
+}
+
+.footer-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.88rem;
+}
+
+.footer-link:hover {
+  color: var(--white);
+}
+
+.footer-disclaimer {
+  max-width: 1100px;
+  margin: 1.5rem auto 0;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  line-height: 1.6;
 }
 
 /* Footer: stack on small screens */
@@ -962,23 +981,13 @@ body.menu-open {
     align-items: center;
     gap: var(--space-sm);
   }
-  .footer-logo {
-    align-self: center;
-  }
   .footer-menu {
     justify-content: center;
-    margin: 0; /* center via justify */
+    margin-left: 0; /* center via parent align-items */
   }
-}
-
-.footer-link {
-  color: #cbd5e1;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.footer-link:hover {
-  color: var(--white);
+  .footer-disclaimer {
+    text-align: center;
+  }
 }
 
 /* Audience Callout */

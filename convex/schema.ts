@@ -129,6 +129,32 @@ export default defineSchema({
     ),
   }).index("by_isActive", ["isActive"]),
 
+  // Leads captured from the AI Proficiency Roadmap lead magnet
+  roadmapLeads: defineTable({
+    firstName: v.string(),
+    lastName: v.optional(v.string()),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    phoneCountryCode: v.optional(v.string()),
+    shippingStreet: v.optional(v.string()),
+    shippingCity: v.optional(v.string()),
+    shippingState: v.optional(v.string()),
+    shippingCountry: v.optional(v.string()),
+    shippingZip: v.optional(v.string()),
+    // AI journey
+    aiLevel: v.optional(v.string()), // curious | dabbler | builder | shipper
+    primaryGoal: v.optional(v.string()), // automate | product | career | agency
+    weeklyHours: v.optional(v.string()), // light | balanced | heavy | obsessed
+    stage: v.optional(v.string()), // e.g., "Stage 1: Monetize"
+    // Attribution
+    source: v.optional(v.string()), // e.g., "ai-proficiency-roadmap"
+    referrer: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_createdAt", ["createdAt"]),
+
   // Cached blog feed from Substack RSS
   blogCache: defineTable({
     posts: v.array(

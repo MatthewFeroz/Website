@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Roadmap</title>
+    <meta name="description" content="Get your free, personalized AI proficiency roadmap in under 30 seconds." />
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      /* ——————————————————————————————————————————————
+         Lead magnet page — scoped styles.
+         Reuses site-wide navbar/footer + CSS vars from /styles.css.
+         —————————————————————————————————————————————— */
+
+      :root {
+        --rm-fg-2: #cbd5e1;           /* body text on dark */
+        --rm-fg-kicker: #ffd8bf;
+        --rm-surface: rgba(255,255,255,.03);
+        --rm-border: rgba(255,255,255,.10);
+        --rm-border-soft: rgba(255,255,255,.08);
+        --rm-border-softer: rgba(255,255,255,.06);
+        --rm-bg-deep: #0f1012;
+      }
+
+      body.roadmap-page {
+        overflow-x: hidden;
+      }
+
+      main.rm-main {
+        flex: 1;
+      }
+
+      /* ========================= STAGE ========================= */
+      .stage {
+        min-height: calc(100vh - var(--navbar-height));
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 3rem 1.5rem 4rem;
+        gap: 1.25rem;
+      }
+
+      /* Persistent page header (visible on intro + all form steps) */
+      .page-head {
+        width: 100%;
+        max-width: 880px;
+        margin: 0 auto 1rem;
+        text-align: center;
+      }
+      .page-h1 {
+        font-size: clamp(2rem, 4.5vw, 3.25rem);
+        line-height: 1.05;
+        letter-spacing: -.03em;
+        margin: 0 auto;
+        color: var(--white);
+        font-weight: 800;
+        max-width: 22ch;
+      }
+      body.step-thankyou .page-head { display: none; }
+
+      /* Flat mock roadmap preview — lives in .page-head so it stays visible on every input step */
+      .mock-preview {
+        position: relative;
+        width: min(520px, 88%);
+        margin: 1.5rem auto 0;
+        display: flex;
+        justify-content: center;
+        isolation: isolate;
+      }
+      .mock-preview .sheet {
+        border-radius: 6px;
+        overflow: hidden;
+        background: #f4f4f0;
+        color: #0b0b0e;
+        border: 1px solid rgba(255,255,255,.1);
+        width: 100%;
+        max-width: 460px;
+      }
+      .mock-preview .m-head {
+        background: var(--bg-dark);
+        color: #fff;
+        padding: .55rem .75rem;
+        font-size: .7rem;
+        letter-spacing: .18em;
+        font-weight: 800;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: .45rem;
+      }
+      .mock-preview .m-head::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--brand);
+      }
+      .mock-preview .m-body {
+        padding: .7rem .75rem 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: .5rem;
+      }
+      .mock-preview .m-col { display: flex; flex-direction: column; gap: .35rem; }
+      .mock-preview .m-row { height: 6px; border-radius: 2px; background: #d0d0ca; }
+      .mock-preview .m-row.accent { background: var(--brand); }
+      .mock-preview .m-row.short { width: 60%; }
+      .mock-preview .m-row.med { width: 80%; }
+      .mock-preview .m-title {
+        height: 8px;
+        border-radius: 2px;
+        background: var(--bg-dark);
+        width: 55%;
+        margin-bottom: .4rem;
+      }
+
+      /* Persistent footer (intro bullets + secondary note) — visible on every input step */
+      .stage-footer {
+        width: 100%;
+        max-width: 640px;
+        margin: 1rem auto 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      body.step-thankyou .stage-footer { display: none; }
+      .intro-bullets {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .55rem;
+        margin: 0 auto;
+        max-width: 30rem;
+      }
+      .intro-bullets .b {
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+        color: var(--white);
+        font-size: .92rem;
+        font-weight: 600;
+      }
+      .intro-bullets .b::before {
+        content: "";
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        background: var(--brand);
+        box-shadow: 0 0 0 3px rgba(248,95,0,.2);
+        flex-shrink: 0;
+      }
+      .intro-bullets .b b { color: var(--white); font-weight: 800; }
+      .secondary-note {
+        color: var(--text-muted);
+        font-size: .72rem;
+        margin: 1.5rem auto 0;
+        max-width: 42rem;
+        line-height: 1.6;
+      }
+      .secondary-note a {
+        color: var(--rm-fg-2);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      /* Each "screen" is a swappable chunk below the H1 — left-aligned, consistent width */
+      .screen {
+        width: 100%;
+        max-width: 640px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+      }
+      .screen.active { display: flex; }
+
+      /* Unified step heading — the only thing that changes from step to step (besides the input) */
+      .step-q {
+        font-size: clamp(1.6rem, 3vw, 2.1rem);
+        color: var(--white);
+        font-weight: 600;
+        letter-spacing: -.02em;
+        line-height: 1.2;
+        margin: 0 0 1.5rem;
+        text-align: left;
+      }
+      .step-q b { color: var(--white); font-weight: 800; }
+
+      /* Name fields (side-by-side on intro) */
+      .name-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .85rem;
+        width: 100%;
+        margin: 0;
+      }
+      @media (max-width: 520px) {
+        .name-fields { grid-template-columns: 1fr; }
+      }
+      .name-fields input {
+        background: rgba(255,255,255,.04);
+        border: 1.5px solid rgba(255,255,255,.14);
+        border-radius: 8px;
+        padding: 1rem 1.1rem;
+        font-family: inherit;
+        font-size: 1rem;
+        color: var(--white);
+        outline: none;
+        transition: border-color .2s, background .2s, box-shadow .2s;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .name-fields input::placeholder { color: rgba(255,255,255,.4); }
+      .name-fields input:focus {
+        border-color: var(--brand);
+        background: rgba(248,95,0,.06);
+        box-shadow: 0 0 0 4px rgba(248,95,0,.12);
+      }
+
+      /* ———————— Primary + ghost buttons (page-local variants) ———————— */
+      .rm-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .55rem;
+        padding: 1.1rem 2.25rem;
+        border: 2.5px solid var(--brand);
+        background: var(--brand);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: .95rem;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        transition: transform .2s ease-out, background-color .2s linear, box-shadow .2s, color .2s;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .rm-primary:hover,
+      .rm-primary:focus {
+        background: #fff;
+        color: var(--brand);
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 6px rgba(248,95,0,.18), 0 12px 40px rgba(248,95,0,.45);
+      }
+      .rm-primary:disabled {
+        opacity: .35;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+        background: var(--brand);
+        color: #fff;
+      }
+      .rm-primary .arrow { transition: transform .2s ease; }
+      .rm-primary:hover .arrow { transform: translateX(4px); }
+
+      /* Simple text-link "previous" — replaces the old pill ghost button */
+      .rm-back {
+        background: none;
+        border: none;
+        padding: .25rem .5rem;
+        color: var(--rm-fg-2);
+        font-family: inherit;
+        font-size: .95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color .2s;
+      }
+      .rm-back:hover { color: var(--white); }
+
+      /* ———————— Step nav (primary button + text-link back) ———————— */
+      .step-nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .85rem;
+        margin-top: 1.75rem;
+      }
+      .step-nav .rm-primary { padding: 1rem 2.5rem; font-size: .9rem; letter-spacing: .08em; }
+
+      /* Form fields */
+      .form-field {
+        position: relative;
+        margin: 0 0 1.15rem;
+        width: 100%;
+        text-align: left;
+        box-sizing: border-box;
+      }
+      .form-field:last-child { margin-bottom: 0; }
+      .form-field input,
+      .form-field select { box-sizing: border-box; }
+      .form-field label {
+        display: block;
+        color: var(--rm-fg-2);
+        font-size: .92rem;
+        font-weight: 500;
+        margin-bottom: .55rem;
+      }
+      .form-field .req { color: var(--brand); margin-left: .15rem; }
+      .form-field input[type="text"],
+      .form-field input[type="email"],
+      .form-field input[type="tel"] {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        background: rgba(255,255,255,.04);
+        border: 1.5px solid rgba(255,255,255,.14);
+        padding: 1rem 1.1rem;
+        font-family: inherit;
+        font-size: 1rem;
+        color: var(--white);
+        border-radius: 8px;
+        outline: none;
+        transition: border-color .2s, background-color .2s, box-shadow .2s;
+      }
+      .form-field input::placeholder { color: rgba(255,255,255,.4); }
+      .form-field input:focus {
+        border-color: var(--brand);
+        background: rgba(248,95,0,.06);
+        box-shadow: 0 0 0 4px rgba(248,95,0,.12);
+      }
+      .form-field input.invalid {
+        border-color: #ff5a4a;
+        background: rgba(255,90,74,.06);
+      }
+      .form-field .err {
+        display: none;
+        color: #ff8577;
+        font-size: .82rem;
+        margin-top: .5rem;
+        font-weight: 600;
+      }
+      .form-field input.invalid ~ .err { display: block; }
+
+      .phone-row { display: flex; gap: .55rem; align-items: stretch; }
+      .phone-cc {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        padding: 0 .9rem;
+        background: rgba(255,255,255,.04);
+        border: 1.5px solid rgba(255,255,255,.14);
+        border-radius: 8px;
+        color: var(--white);
+        font-weight: 600;
+        font-size: .95rem;
+        flex-shrink: 0;
+      }
+      .phone-cc .cc-caret { color: var(--brand); font-size: .75rem; }
+      .phone-row input { flex: 1; }
+
+      .ship-grid {
+        width: 100%;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1rem;
+        row-gap: 1.15rem;
+      }
+      .ship-grid .form-field { margin: 0; min-width: 0; }
+      .ship-grid .span-2 { grid-column: span 2; }
+      @media (max-width: 560px) {
+        .ship-grid { grid-template-columns: 1fr; }
+        .ship-grid .span-2 { grid-column: span 1; }
+      }
+
+      .dd-grid {
+        width: 100%;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.35rem;
+      }
+      .dd-grid .form-field { margin: 0; min-width: 0; }
+      .select-wrap { position: relative; }
+      .select-wrap::after {
+        content: "▾";
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--rm-fg-2);
+        pointer-events: none;
+        font-size: .85rem;
+      }
+      .select-wrap select {
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+        background: rgba(255,255,255,.04);
+        border: 1.5px solid rgba(255,255,255,.14);
+        padding: 1rem 2.5rem 1rem 1.1rem;
+        font-family: inherit;
+        font-size: 1rem;
+        color: var(--white);
+        border-radius: 8px;
+        outline: none;
+        cursor: pointer;
+        transition: border-color .2s, background-color .2s, box-shadow .2s;
+      }
+      .select-wrap select:focus {
+        border-color: var(--brand);
+        background: rgba(248,95,0,.06);
+        box-shadow: 0 0 0 4px rgba(248,95,0,.12);
+      }
+      .select-wrap select option { background: #242528; color: var(--white); }
+
+      .legal {
+        color: var(--text-muted);
+        font-size: .72rem;
+        line-height: 1.55;
+        max-width: 520px;
+        margin: 1.5rem auto 0;
+        text-align: center;
+      }
+      .legal a { color: var(--rm-fg-2); text-decoration: underline; text-underline-offset: 2px; }
+
+      /* ———————— Thank you ———————— */
+      .thankyou { max-width: 780px; text-align: center; }
+      .ty-card {
+        background: var(--rm-surface);
+        border: 1px solid var(--rm-border-soft);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        backdrop-filter: blur(8px);
+        text-align: center;
+        width: 100%;
+      }
+      .ty-check {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: var(--brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.75rem;
+        box-shadow: 0 0 0 10px rgba(248,95,0,.14), 0 12px 40px rgba(248,95,0,.35);
+      }
+      .ty-title {
+        font-size: clamp(2rem, 4.5vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -.03em;
+        color: var(--white);
+        font-weight: 800;
+        margin: 0 auto 1rem;
+        max-width: 22ch;
+      }
+      .ty-congrats {
+        color: var(--rm-fg-2);
+        font-size: 1.1rem;
+        line-height: 1.55;
+        margin: 0 auto 2.5rem;
+        max-width: 38rem;
+      }
+      .ty-congrats b { color: var(--white); }
+      .ty-stage { color: var(--brand); font-weight: 800; }
+      .ty-inbetween {
+        color: var(--rm-fg-2);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 2rem auto 1.5rem;
+        max-width: 36rem;
+      }
+      .ty-cta { margin: 0 auto; }
+      .ty-reset { display: inline-flex; margin-top: 1.5rem; }
+
+      /* 4-rung stage dial */
+      .stage-dial {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: .75rem;
+        max-width: 540px;
+        margin: 0 auto;
+      }
+      .stage-dial .rung {
+        padding: .9rem .5rem;
+        border: 1.5px solid rgba(255,255,255,.12);
+        border-radius: 12px;
+        background: rgba(255,255,255,.02);
+        text-align: center;
+      }
+      .stage-dial .rung .n {
+        display: block;
+        color: var(--text-muted);
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        margin-bottom: .35rem;
+      }
+      .stage-dial .rung .l {
+        display: block;
+        color: var(--white);
+        font-size: .95rem;
+        font-weight: 700;
+        letter-spacing: -.01em;
+      }
+      .stage-dial .rung.active {
+        border-color: var(--brand);
+        background: rgba(248,95,0,.12);
+        box-shadow: 0 0 0 4px rgba(248,95,0,.12), 0 10px 30px rgba(248,95,0,.25);
+      }
+      .stage-dial .rung.active .n { color: var(--brand); }
+      .stage-dial .rung.done { opacity: .55; }
+      @media (max-width: 540px) {
+        .stage-dial { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      /* Submit spinner */
+      .rm-primary.loading { position: relative; color: transparent; pointer-events: none; }
+      .rm-primary.loading::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 50%;
+        top: 50%;
+        margin: -9px 0 0 -9px;
+        border-radius: 50%;
+        border: 2.5px solid rgba(255,255,255,.35);
+        border-top-color: #fff;
+        animation: rm-spin .8s linear infinite;
+      }
+      @keyframes rm-spin { to { transform: rotate(360deg); } }
+
+      /* Inline submission error */
+      .submit-err {
+        display: none;
+        color: #ff8577;
+        font-size: .85rem;
+        margin: .75rem auto 0;
+        font-weight: 600;
+        text-align: center;
+      }
+      .submit-err.show { display: block; }
+    </style>
+</head>
+<body class="roadmap-page step-intro">
+
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+            <nav class="nav-menu">
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
+                <a href="/guide/" class="nav-link">Learning</a>
+                <a href="/blog/" class="nav-link">Blog</a>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="nav-link">Community</a>
+            </nav>
+            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="nav-cta" data-tf-popup="T2ZPmUED" data-tf-medium="roadmap-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
+        </div>
+        <div id="mobile-menu" class="mobile-menu" hidden>
+            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <a href="/coaching/" class="mobile-link">Coaching</a>
+            <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
+            <a href="/guide/" class="mobile-link">Learning</a>
+            <a href="/blog/" class="mobile-link">Blog</a>
+            <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="mobile-link">Community</a>
+            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="mobile-cta" data-tf-popup="T2ZPmUED" data-tf-medium="roadmap-cta-mobile" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>BOOK A FREE CALL</a>
+        </div>
+    </header>
+
+    <main class="rm-main">
+    <section class="stage" id="stage">
+
+        <!-- Persistent header: H1 + roadmap preview stay visible across every input step -->
+        <div class="page-head" id="pageHead">
+            <h1 class="page-h1" id="pageH1">Get your free personalized AI proficiency roadmap&hellip;in under 30 seconds.</h1>
+            <div class="mock-preview" aria-hidden="true">
+                <div class="sheet front">
+                    <div class="m-head">Your AI Proficiency Roadmap &mdash; 4 Phases</div>
+                    <div class="m-body">
+                        <div class="m-col">
+                            <div class="m-title"></div>
+                            <div class="m-row accent short"></div>
+                            <div class="m-row med"></div>
+                            <div class="m-row short"></div>
+                            <div class="m-row med"></div>
+                            <div class="m-row accent short"></div>
+                        </div>
+                        <div class="m-col">
+                            <div class="m-title"></div>
+                            <div class="m-row med"></div>
+                            <div class="m-row short"></div>
+                            <div class="m-row accent med"></div>
+                            <div class="m-row short"></div>
+                            <div class="m-row med"></div>
+                        </div>
+                        <div class="m-col">
+                            <div class="m-title"></div>
+                            <div class="m-row short"></div>
+                            <div class="m-row med"></div>
+                            <div class="m-row accent short"></div>
+                            <div class="m-row med"></div>
+                            <div class="m-row short"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ SCREEN 0 — INTRO (name) ============ -->
+        <section class="screen intro active" data-screen="intro">
+            <h2 class="step-q">What's your <b>name?</b></h2>
+            <div class="name-fields">
+                <input type="text" id="in-first" autocomplete="given-name" placeholder="First Name" aria-label="First name" />
+                <input type="text" id="in-last" autocomplete="family-name" placeholder="Last Name" aria-label="Last name" />
+            </div>
+            <div class="step-nav">
+                <button class="rm-primary" id="btn-start" type="button" disabled>LET'S START <span class="arrow">&rarr;</span></button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 1 — Email ============ -->
+        <section class="screen form-step" data-screen="q-email">
+            <h2 class="step-q" id="h-email">Where should I <b>email</b> it to?</h2>
+            <div class="form-field">
+                <input type="email" id="in-email" autocomplete="email" placeholder="BUSINESS EMAIL ADDRESS" aria-label="Email address" />
+                <div class="err">Please enter a valid email address.</div>
+            </div>
+            <div class="step-nav">
+                <button class="rm-primary" type="button" onclick="nextFromEmail()">Continue <span class="arrow">&rarr;</span></button>
+                <button class="rm-back" type="button" onclick="goTo(0)">&larr; Previous</button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 2 — Phone ============ -->
+        <section class="screen form-step" data-screen="q-phone">
+            <h2 class="step-q">What is your <b>phone number?</b></h2>
+            <div class="form-field">
+                <div class="phone-row">
+                    <div class="phone-cc">
+                        <span>CA</span>
+                        <span class="cc-caret">&#9662;</span>
+                    </div>
+                    <input type="tel" id="in-phone" autocomplete="tel" placeholder="+1" aria-label="Phone number" />
+                </div>
+                <div class="err">This phone number is either invalid or in the wrong format.</div>
+            </div>
+            <div class="step-nav">
+                <button class="rm-primary" type="button" onclick="nextFromPhone()">Continue <span class="arrow">&rarr;</span></button>
+                <button class="rm-back" type="button" onclick="goTo(1)">&larr; Previous</button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 3 — Shipping ============ -->
+        <section class="screen form-step" data-screen="q-ship">
+            <h2 class="step-q">What's your <b>shipping address?</b></h2>
+            <div class="ship-grid">
+                <div class="form-field span-2">
+                    <input type="text" id="in-street" placeholder="Street Address" autocomplete="street-address" aria-label="Street address"/>
+                    <div class="err">Please complete this required field.</div>
+                </div>
+                <div class="form-field">
+                    <input type="text" id="in-city" placeholder="City" autocomplete="address-level2" aria-label="City"/>
+                    <div class="err">Please complete this required field.</div>
+                </div>
+                <div class="form-field">
+                    <input type="text" id="in-state" placeholder="State/Region" autocomplete="address-level1" aria-label="State or region"/>
+                    <div class="err">Please complete this required field.</div>
+                </div>
+                <div class="form-field">
+                    <input type="text" id="in-country" placeholder="Country/Region" autocomplete="country-name" aria-label="Country or region"/>
+                    <div class="err">Please complete this required field.</div>
+                </div>
+                <div class="form-field">
+                    <input type="text" id="in-zip" placeholder="Zip Code / Postal" autocomplete="postal-code" aria-label="Zip or postal code"/>
+                    <div class="err">Please complete this required field.</div>
+                </div>
+            </div>
+            <div class="step-nav">
+                <button class="rm-primary" type="button" onclick="nextFromShip()">Continue <span class="arrow">&rarr;</span></button>
+                <button class="rm-back" type="button" onclick="goTo(2)">&larr; Previous</button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 4 — AI journey (3 dropdowns) ============ -->
+        <section class="screen form-step" data-screen="q-ai">
+            <h2 class="step-q">Where are you in your <b>AI journey?</b></h2>
+            <div class="dd-grid">
+                <div class="form-field">
+                    <label>Current AI experience<span class="req">*</span></label>
+                    <div class="select-wrap">
+                        <select id="sel-level" aria-label="Current AI experience">
+                            <option value="">Select one…</option>
+                            <option value="curious">Curious — I've just played with ChatGPT</option>
+                            <option value="dabbler">Dabbler — I use prompts or Cursor regularly</option>
+                            <option value="builder">Builder — shipped 1–2 LLM tools</option>
+                            <option value="shipper">Shipper — I run AI features in production</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Primary goal for the next 90 days<span class="req">*</span></label>
+                    <div class="select-wrap">
+                        <select id="sel-goal" aria-label="Primary goal for the next 90 days">
+                            <option value="">Select one…</option>
+                            <option value="automate">Automate my work (reclaim hours)</option>
+                            <option value="product">Build &amp; ship an AI product</option>
+                            <option value="career">Level up my career / role</option>
+                            <option value="agency">Start an AI agency or offer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Hours per week you'll commit<span class="req">*</span></label>
+                    <div class="select-wrap">
+                        <select id="sel-time" aria-label="Hours per week you will commit">
+                            <option value="">Select one…</option>
+                            <option value="light">1–3 hrs / week — slow &amp; steady</option>
+                            <option value="balanced">4–7 hrs / week — recommended</option>
+                            <option value="heavy">8–12 hrs / week — serious</option>
+                            <option value="obsessed">13+ hrs / week — full-send</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="err" id="err-ai" style="text-align:center;max-width:420px;margin:.5rem auto 0;display:none;">Please complete all required fields.</div>
+            <div class="submit-err" id="submit-err">Something went wrong saving your roadmap. Please try again in a moment.</div>
+            <div class="step-nav">
+                <button class="rm-primary" id="btn-finish" type="button" onclick="finish()">Get my roadmap <span class="arrow">&rarr;</span></button>
+                <button class="rm-back" type="button" onclick="goTo(3)">&larr; Previous</button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 5 — Thank you ============ -->
+        <section class="screen thankyou" data-screen="thankyou">
+            <div class="ty-card">
+                <div class="ty-check" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16.5 L13 23 L26 9"/></svg>
+                </div>
+                <h2 class="ty-title">Check Your Email for Your Customized Roadmap!</h2>
+                <p class="ty-congrats">Congratulations <span id="ty-name">friend</span> — you're at <b class="ty-stage" id="ty-stage">Stage 1: Monetize</b>.</p>
+
+                <div class="stage-dial" id="stageDial"></div>
+
+                <p class="ty-inbetween">In the meantime, you can start watching the video version of the course below.</p>
+                <a class="rm-primary ty-cta" href="https://www.youtube.com/@MattFeroz" target="_blank" rel="noopener">Watch the scaling roadmap course <span class="arrow">&rarr;</span></a>
+
+                <button class="rm-back ty-reset" type="button" onclick="resetFlow()">Start over</button>
+            </div>
+        </section>
+
+        <!-- Persistent footer: bullets + legal note, visible on every input step (hidden on thank-you) -->
+        <div class="stage-footer" id="stageFooter">
+            <div class="intro-bullets">
+                <div class="b"><span>Get your roadmap in <b>less than 30 seconds</b></span></div>
+                <div class="b"><span>Built on 4 years of expereince with AI tools</b></span></div>
+            </div>
+            <p class="secondary-note">By providing your information you consent to Matt Feroz contacting you by email about your roadmap, occasional lessons, and course launches. We don't sell your data. By continuing you agree to our <a href="/privacy/">Privacy Policy</a> and <a href="/terms/">Terms of Service</a>.</p>
+        </div>
+
+    </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
+                <a href="/blog/" class="footer-link">Blog</a>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="footer-link">Community</a>
+                <a href="#terms" class="footer-link">Terms &amp; Conditions</a>
+                <a href="#privacy" class="footer-link">Privacy Policy</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Shared site scripts (mobile nav, navbar hide-on-scroll) -->
+    <script src="/main.js" defer></script>
+    <script src="https://embed.typeform.com/next/embed.js" defer></script>
+
+    <!-- PostHog Analytics -->
+    <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
+    <script>
+        posthog.init('phc_NYfQd50P3VMosArZ6rMnOUWB4RDO7nfFG4XJFCOpSog', {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'identified_only'
+        })
+    </script>
+
+    <!-- Roadmap flow — Convex HTTP client + multi-step logic -->
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
+        import { CONVEX_URL as CONFIG_URL } from "/quizzes/config.js";
+
+        const CONVEX_URL = CONFIG_URL || localStorage.getItem('convex_url') || '';
+        localStorage.setItem('convex_url', CONVEX_URL);
+        const client = CONVEX_URL ? new ConvexHttpClient(CONVEX_URL) : null;
+
+        // Proxy matches the pattern used elsewhere on the site — `api.leads.submitRoadmapLead` → "leads:submitRoadmapLead"
+        const api = new Proxy({}, {
+            get: (_, module) => new Proxy({}, {
+                get: (_, func) => `${module}:${func}`
+            })
+        });
+
+        /* ——— State ——— */
+        const answers = {
+            firstName: '', lastName: '', email: '', phone: '',
+            shippingStreet: '', shippingCity: '', shippingState: '', shippingCountry: '', shippingZip: '',
+            aiLevel: '', primaryGoal: '', weeklyHours: ''
+        };
+        const screens = [...document.querySelectorAll('.screen')];
+        let current = 0;
+
+        /* ——— Nav helpers ——— */
+        function setBodyStep(i){
+            const map = ['intro','email','phone','ship','ai','thankyou'];
+            const body = document.body;
+            ['intro','email','phone','ship','ai','thankyou'].forEach(s => body.classList.remove('step-'+s));
+            body.classList.add('step-' + (map[i] || 'email'));
+        }
+
+        function goTo(i){
+            if(i < 0 || i >= screens.length) return;
+            screens[current].classList.remove('active');
+            screens[i].classList.add('active');
+            current = i;
+            setBodyStep(i);
+
+            // Persistent H1 is fixed — only the step question + inputs change as the user advances.
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+                const input = screens[i].querySelector('input, select');
+                if(input && i !== 0) input.focus();
+            }, 120);
+        }
+        window.goTo = goTo;
+
+        /* ——— Intro: First + Last name ——— */
+        const firstInput = document.getElementById('in-first');
+        const lastInput  = document.getElementById('in-last');
+        const btnStart   = document.getElementById('btn-start');
+        function syncStart(){
+            answers.firstName = firstInput.value.trim();
+            answers.lastName  = lastInput.value.trim();
+            btnStart.disabled = answers.firstName.length < 1;
+        }
+        firstInput.addEventListener('input', syncStart);
+        lastInput.addEventListener('input', syncStart);
+        [firstInput, lastInput].forEach(i => {
+            i.addEventListener('keydown', e => {
+                if(e.key === 'Enter' && !btnStart.disabled) startFromIntro();
+            });
+        });
+        btnStart.addEventListener('click', startFromIntro);
+        function startFromIntro(){
+            if(answers.firstName.length < 1) return;
+            // Step headings are fixed across the flow — don't personalize.
+            goTo(1);
+        }
+        window.startFromIntro = startFromIntro;
+
+        /* ——— Validation helpers ——— */
+        const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        const phoneRx = /^[0-9\s()\-+.]{7,}$/;
+        function markInvalid(el, bad){ el.classList.toggle('invalid', !!bad); }
+
+        // clear invalid as user types; Enter advances to the primary button
+        document.querySelectorAll('.form-field input').forEach(inp => {
+            inp.addEventListener('input', () => markInvalid(inp, false));
+            inp.addEventListener('keydown', e => {
+                if(e.key === 'Enter'){
+                    const btn = inp.closest('.screen')?.querySelector('.rm-primary');
+                    if(btn){ e.preventDefault(); btn.click(); }
+                }
+            });
+        });
+
+        /* Step 1 — email */
+        const emailInput = document.getElementById('in-email');
+        function nextFromEmail(){
+            const v = emailInput.value.trim();
+            if(!emailRx.test(v)){ markInvalid(emailInput, true); return; }
+            answers.email = v;
+            goTo(2);
+        }
+        window.nextFromEmail = nextFromEmail;
+
+        /* Step 2 — phone */
+        const phoneInput = document.getElementById('in-phone');
+        function nextFromPhone(){
+            const v = phoneInput.value.trim();
+            if(!phoneRx.test(v)){ markInvalid(phoneInput, true); return; }
+            answers.phone = v;
+            goTo(3);
+        }
+        window.nextFromPhone = nextFromPhone;
+
+        /* Step 3 — shipping */
+        const shipMap = {
+            'in-street':  'shippingStreet',
+            'in-city':    'shippingCity',
+            'in-state':   'shippingState',
+            'in-country': 'shippingCountry',
+            'in-zip':     'shippingZip'
+        };
+        function nextFromShip(){
+            let ok = true;
+            Object.entries(shipMap).forEach(([id, key]) => {
+                const el = document.getElementById(id);
+                const v = el.value.trim();
+                if(!v){ markInvalid(el, true); ok = false; }
+                else { answers[key] = v; markInvalid(el, false); }
+            });
+            if(ok) goTo(4);
+        }
+        window.nextFromShip = nextFromShip;
+
+        /* Step 4 — dropdowns */
+        const selLevel = document.getElementById('sel-level');
+        const selGoal  = document.getElementById('sel-goal');
+        const selTime  = document.getElementById('sel-time');
+        const errAi    = document.getElementById('err-ai');
+        [selLevel, selGoal, selTime].forEach(s => {
+            s.addEventListener('change', () => {
+                if(selLevel.value && selGoal.value && selTime.value && errAi){
+                    errAi.style.display = 'none';
+                }
+            });
+        });
+
+        /* Stage mapping — AI experience level → Hormozi-style business stage */
+        const STAGE = {
+            curious:  { idx: 0, label: 'Stage 1: Monetize',  rungs: ['Monetize','Scale','Systemize','Exit'] },
+            dabbler:  { idx: 1, label: 'Stage 2: Scale',     rungs: ['Monetize','Scale','Systemize','Exit'] },
+            builder:  { idx: 2, label: 'Stage 3: Systemize', rungs: ['Monetize','Scale','Systemize','Exit'] },
+            shipper:  { idx: 3, label: 'Stage 4: Exit',      rungs: ['Monetize','Scale','Systemize','Exit'] }
+        };
+
+        async function finish(){
+            answers.aiLevel     = selLevel.value;
+            answers.primaryGoal = selGoal.value;
+            answers.weeklyHours = selTime.value;
+
+            if(!answers.aiLevel || !answers.primaryGoal || !answers.weeklyHours){
+                if(errAi) errAi.style.display = 'block';
+                return;
+            }
+
+            const s = STAGE[answers.aiLevel] || STAGE.curious;
+            const submitErr = document.getElementById('submit-err');
+            const btn = document.getElementById('btn-finish');
+            submitErr.classList.remove('show');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            // Send to Convex. If Convex is unavailable we still let the user see the thank-you,
+            // but we log the failure so Matt can follow up.
+            try {
+                if(client){
+                    await client.action(api.leads.submitRoadmapLead, {
+                        firstName: answers.firstName,
+                        lastName: answers.lastName || undefined,
+                        email: answers.email,
+                        phone: answers.phone || undefined,
+                        phoneCountryCode: '+1',
+                        shippingStreet: answers.shippingStreet || undefined,
+                        shippingCity: answers.shippingCity || undefined,
+                        shippingState: answers.shippingState || undefined,
+                        shippingCountry: answers.shippingCountry || undefined,
+                        shippingZip: answers.shippingZip || undefined,
+                        aiLevel: answers.aiLevel,
+                        primaryGoal: answers.primaryGoal,
+                        weeklyHours: answers.weeklyHours,
+                        stage: s.label,
+                        source: 'ai-proficiency-roadmap',
+                        referrer: document.referrer || undefined,
+                        userAgent: navigator.userAgent || undefined
+                    });
+                } else {
+                    console.warn('[roadmap] Convex client unavailable — lead not persisted', answers);
+                }
+
+                // Identify the user in PostHog so their event stream is linked to their email
+                if(window.posthog){
+                    try {
+                        window.posthog.identify(answers.email, {
+                            email: answers.email,
+                            first_name: answers.firstName,
+                            last_name: answers.lastName || undefined,
+                            ai_level: answers.aiLevel,
+                            primary_goal: answers.primaryGoal,
+                            weekly_hours: answers.weeklyHours,
+                            stage: s.label
+                        });
+                        window.posthog.capture('roadmap_lead_submitted', {
+                            source: 'ai-proficiency-roadmap',
+                            stage: s.label
+                        });
+                    } catch (_) { /* non-fatal */ }
+                }
+
+                renderResult(s);
+                goTo(5);
+            } catch (err) {
+                console.error('[roadmap] submit failed', err);
+                submitErr.classList.add('show');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+        window.finish = finish;
+
+        function renderResult(s){
+            const tyName = document.getElementById('ty-name');
+            if(tyName) tyName.textContent = answers.firstName || 'friend';
+            const tyStage = document.getElementById('ty-stage');
+            if(tyStage) tyStage.textContent = s.label;
+            const dial = document.getElementById('stageDial');
+            if(dial){
+                dial.innerHTML = '';
+                s.rungs.forEach((label, i) => {
+                    const d = document.createElement('div');
+                    d.className = 'rung' + (i === s.idx ? ' active' : '') + (i < s.idx ? ' done' : '');
+                    d.innerHTML = `<span class="n">0${i+1}</span><span class="l">${label}</span>`;
+                    dial.appendChild(d);
+                });
+            }
+        }
+
+        function resetFlow(){
+            // keep name on the intro; just clear everything downstream
+            answers.email = ''; answers.phone = '';
+            answers.shippingStreet = answers.shippingCity = answers.shippingState = answers.shippingCountry = answers.shippingZip = '';
+            answers.aiLevel = answers.primaryGoal = answers.weeklyHours = '';
+            ['in-email','in-phone','in-street','in-city','in-state','in-country','in-zip'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el){ el.value = ''; el.classList.remove('invalid'); }
+            });
+            [selLevel, selGoal, selTime].forEach(s => { if(s) s.value = ''; });
+            goTo(0);
+        }
+        window.resetFlow = resetFlow;
+
+        /* initial body step class */
+        setBodyStep(0);
+    </script>
+</body>
+</html>
