@@ -338,20 +338,35 @@
       .form-field input.invalid ~ .err { display: block; }
 
       .phone-row { display: flex; gap: .55rem; align-items: stretch; }
-      .phone-cc {
-        display: flex;
-        align-items: center;
-        gap: .35rem;
-        padding: 0 .9rem;
-        background: rgba(255,255,255,.04);
-        border: 1.5px solid rgba(255,255,255,.14);
-        border-radius: 8px;
-        color: var(--white);
-        font-weight: 600;
-        font-size: .95rem;
+      .phone-row .select-wrap {
+        width: fit-content;
+        min-width: 0;
         flex-shrink: 0;
       }
-      .phone-cc .cc-caret { color: var(--brand); font-size: .75rem; }
+      .phone-row .select-wrap::after { color: var(--brand); }
+      .phone-row select,
+      .phone-row input { height: 100%; }
+      .phone-row select {
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+        background: rgba(255,255,255,.04);
+        border: 1.5px solid rgba(255,255,255,.14);
+        padding: 1rem 2.25rem 1rem .95rem;
+        font-family: inherit;
+        font-size: .95rem;
+        color: var(--white);
+        border-radius: 8px;
+        outline: none;
+        cursor: pointer;
+      }
+      .phone-row select:focus {
+        border-color: var(--brand);
+        background: rgba(248,95,0,.06);
+        box-shadow: 0 0 0 4px rgba(248,95,0,.12);
+      }
+      .phone-row select option { background: #242528; color: var(--white); }
       .phone-row input { flex: 1; }
 
       .ship-grid {
@@ -637,11 +652,18 @@
             <h2 class="step-q">What is your <b>phone number?</b></h2>
             <div class="form-field">
                 <div class="phone-row">
-                    <div class="phone-cc">
-                        <span>CA</span>
-                        <span class="cc-caret">&#9662;</span>
+                    <div class="select-wrap">
+                        <select id="sel-phone-country" autocomplete="tel-country-code" aria-label="Phone country code">
+                            <option value="+1" selected>US/CA +1</option>
+                            <option value="+44">UK +44</option>
+                            <option value="+61">AU +61</option>
+                            <option value="+64">NZ +64</option>
+                            <option value="+353">IE +353</option>
+                            <option value="+971">UAE +971</option>
+                            <option value="+91">IN +91</option>
+                        </select>
                     </div>
-                    <input type="tel" id="in-phone" autocomplete="tel" placeholder="+1" aria-label="Phone number" />
+                    <input type="tel" id="in-phone" autocomplete="tel-national" inputmode="tel" placeholder="Phone number" aria-label="Phone number" />
                 </div>
                 <div class="err">This phone number is either invalid or in the wrong format.</div>
             </div>
@@ -806,7 +828,7 @@
 
         /* ——— State ——— */
         const answers = {
-            firstName: '', lastName: '', email: '', phone: '',
+            firstName: '', lastName: '', email: '', phone: '', phoneCountryCode: '+1',
             shippingStreet: '', shippingCity: '', shippingState: '', shippingCountry: '', shippingZip: '',
             aiLevel: '', primaryGoal: '', weeklyHours: ''
         };
@@ -889,10 +911,12 @@
 
         /* Step 2 — phone */
         const phoneInput = document.getElementById('in-phone');
+        const phoneCountrySelect = document.getElementById('sel-phone-country');
         function nextFromPhone(){
             const v = phoneInput.value.trim();
             if(!phoneRx.test(v)){ markInvalid(phoneInput, true); return; }
             answers.phone = v;
+            answers.phoneCountryCode = phoneCountrySelect?.value || '+1';
             goTo(3);
         }
         window.nextFromPhone = nextFromPhone;
@@ -964,7 +988,7 @@
                         lastName: answers.lastName || undefined,
                         email: answers.email,
                         phone: answers.phone || undefined,
-                        phoneCountryCode: '+1',
+                        phoneCountryCode: answers.phoneCountryCode || '+1',
                         shippingStreet: answers.shippingStreet || undefined,
                         shippingCity: answers.shippingCity || undefined,
                         shippingState: answers.shippingState || undefined,
@@ -1032,13 +1056,14 @@
 
         function resetFlow(){
             // keep name on the intro; just clear everything downstream
-            answers.email = ''; answers.phone = '';
+            answers.email = ''; answers.phone = ''; answers.phoneCountryCode = '+1';
             answers.shippingStreet = answers.shippingCity = answers.shippingState = answers.shippingCountry = answers.shippingZip = '';
             answers.aiLevel = answers.primaryGoal = answers.weeklyHours = '';
             ['in-email','in-phone','in-street','in-city','in-state','in-country','in-zip'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el){ el.value = ''; el.classList.remove('invalid'); }
             });
+            if(phoneCountrySelect) phoneCountrySelect.value = '+1';
             [selLevel, selGoal, selTime].forEach(s => { if(s) s.value = ''; });
             goTo(0);
         }
