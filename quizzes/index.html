@@ -329,7 +329,7 @@
                 console.error('Error loading quizzes:', err);
                 quizzesLoading.innerHTML = `
                     <p style="color: #ef4444;">Failed to load quizzes. Make sure Convex is running.</p>
-                    <p style="color: #9aa0aa; font-size: 0.85rem;">Run: npx convex dev</p>
+                    <p style="color: #9aa0aa; font-size: 0.85rem;">Run: bunx convex dev</p>
                 `;
             }
         }
@@ -391,7 +391,7 @@
                 }
             } catch (err) {
                 console.error('[DEV MODE] Auto-login error:', err);
-                alert('[DEV MODE] Connection error. Make sure npx convex dev is running.');
+                alert('[DEV MODE] Connection error. Make sure bunx convex dev is running.');
             }
         }
 

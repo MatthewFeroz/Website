@@ -1,6 +1,6 @@
 // Local development server
 // Serves static files + proxies Substack RSS feed for the blog page
-// Usage: node dev-server.js
+// Usage: bun dev-server.js
 
 const http = require("http");
 const fs = require("fs");

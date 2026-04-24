@@ -12,12 +12,12 @@ Personal portfolio and coaching website for Matt Feroz (matthewferoz.com). Stati
 # Local development - serve static files
 python -m http.server 8000
 # or
-npx http-server -p 8080
+bunx http-server -p 8080
 
 # Then access http://localhost:8000 or http://localhost:8080
 ```
 
-No npm build process - all dependencies are CDN-based. Deployment is automatic via GitHub Pages on push to main.
+No build process - all page dependencies are CDN-based. Use Bun for local scripts and package management. Deployment is automatic via GitHub Pages on push to main.
 
 ## Architecture
 

@@ -437,13 +437,22 @@
       .legal a { color: var(--rm-fg-2); text-decoration: underline; text-underline-offset: 2px; }
 
       /* ———————— Thank you ———————— */
-      .thankyou { max-width: 780px; text-align: center; }
+      .thankyou {
+        max-width: 780px;
+        align-items: center;
+        text-align: center;
+        margin-inline: auto;
+      }
       .ty-card {
         background: var(--rm-surface);
         border: 1px solid var(--rm-border-soft);
         border-radius: 24px;
         padding: 3rem 2.5rem;
         backdrop-filter: blur(8px);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         text-align: center;
         width: 100%;
       }
@@ -526,6 +535,8 @@
       .stage-dial .rung.done { opacity: .55; }
       @media (max-width: 540px) {
         .stage-dial { grid-template-columns: repeat(2, 1fr); }
+        .ty-card { padding: 2.25rem 1.25rem; }
+        .ty-cta { width: 100%; }
       }
 
       /* Submit spinner */
