@@ -134,6 +134,188 @@
   }
 
   // GSAP-powered animations below — safe to skip if GSAP failed to load
+  const CONVEX_SITE_URL = "https://grateful-pony-674.convex.site";
+  const YOUTUBE_ENDPOINTS = [
+    `${window.location.origin}/youtube/videos`,
+    `${CONVEX_SITE_URL}/youtube/videos`,
+  ];
+  const VIDEO_CACHE_KEY = "youtube_videos_cache";
+  const VIDEO_CACHE_TTL = 30 * 60 * 1000;
+  const FALLBACK_VIDEOS = [
+    { title: "This programming language makes you rich?", videoId: "M3vM01-tIa0", link: "https://www.youtube.com/watch?v=M3vM01-tIa0", published: "" },
+    { title: "This $500,000 Kickstarter Is Now DEAD...", videoId: "RqWaNgRw7Uk", link: "https://www.youtube.com/watch?v=RqWaNgRw7Uk", published: "" },
+    { title: "How To Vibe Code The Ultimate Personal Project", videoId: "qABZxiUE9vM", link: "https://www.youtube.com/watch?v=qABZxiUE9vM", published: "" },
+    { title: "How Tripping Out Saved Software Engineering", videoId: "tnbcc17jCiw", link: "https://www.youtube.com/watch?v=tnbcc17jCiw", published: "" },
+    { title: "Why Michael Reeves Is A Better Engineer Than You", videoId: "uL8r0ERxd1c", link: "https://www.youtube.com/watch?v=uL8r0ERxd1c", published: "" },
+    { title: "How William Osman Changed Engineering Forever", videoId: "PtDzwTykJKQ", link: "https://www.youtube.com/watch?v=PtDzwTykJKQ", published: "" },
+    { title: "Watch This BEFORE You Start Engineering!", videoId: "YVRgAmFW0x8", link: "https://www.youtube.com/watch?v=YVRgAmFW0x8", published: "" },
+  ];
+
+  const getCachedVideos = () => {
+    try {
+      const raw = localStorage.getItem(VIDEO_CACHE_KEY);
+      if (!raw) return null;
+      const cached = JSON.parse(raw);
+      if (Date.now() - cached.timestamp < VIDEO_CACHE_TTL && Array.isArray(cached.videos) && cached.videos.length) {
+        return cached.videos;
+      }
+    } catch (e) {
+      // Ignore broken cache data.
+    }
+    return null;
+  };
+
+  const saveCachedVideos = (videos) => {
+    try {
+      localStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify({ videos, timestamp: Date.now() }));
+    } catch (e) {
+      // Storage can be disabled or full.
+    }
+  };
+
+  const getVideoId = (video) => {
+    if (video.videoId) return video.videoId;
+    const match = String(video.link || "").match(/[?&]v=([^&]+)/);
+    return match ? match[1] : "";
+  };
+
+  const formatPublishedDate = (published) => {
+    if (!published) return "Featured video";
+    const date = new Date(published);
+    if (Number.isNaN(date.getTime())) return published;
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  };
+
+  const formatVideoMeta = (video) => {
+    const parts = [formatPublishedDate(video.published)];
+    if (video.views) parts.unshift(video.views);
+    return parts.filter(Boolean).join(" • ");
+  };
+
+  const createVideoCard = (video) => {
+    const videoId = getVideoId(video);
+    const title = video.title || "Watch on YouTube";
+    const link = video.link || `https://www.youtube.com/watch?v=${videoId}`;
+    const thumbnail = video.thumbnail || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    const card = document.createElement("article");
+    card.className = "video-card";
+
+    const thumb = document.createElement("a");
+    thumb.className = "video-thumb";
+    thumb.href = link;
+    thumb.target = "_blank";
+    thumb.rel = "noopener";
+    thumb.setAttribute("aria-label", `Play: ${title}`);
+    thumb.style.backgroundImage = `url("${thumbnail}")`;
+
+    const heading = document.createElement("h4");
+    heading.className = "video-title";
+    heading.textContent = title;
+
+    const meta = document.createElement("p");
+    meta.className = "video-meta";
+    meta.textContent = formatVideoMeta(video);
+
+    card.append(thumb, heading, meta);
+    return card;
+  };
+
+  const animateVideoCards = (cards) => {
+    if (!cards.length || !window.gsap) return;
+    window.gsap.set(cards, { opacity: 0, y: 18 });
+    window.gsap.to(cards, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: "power2.out",
+      stagger: 0.08,
+      delay: 0.05,
+    });
+  };
+
+  const setupVideoControls = () => {
+    const scroller = document.getElementById('videos-scroller');
+    const prevBtn = document.getElementById('videos-prev');
+    const nextBtn = document.getElementById('videos-next');
+    if (!scroller || !prevBtn || !nextBtn || scroller.dataset.controlsReady === "true") return;
+    scroller.dataset.controlsReady = "true";
+
+    const scrollByAmount = () => {
+      const firstCard = scroller.querySelector(".video-card");
+      if (!firstCard) return scroller.clientWidth;
+      const styles = window.getComputedStyle(scroller);
+      const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+      return firstCard.getBoundingClientRect().width + gap;
+    };
+    const updateButtons = () => {
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth - 2;
+      prevBtn.disabled = scroller.scrollLeft <= 2;
+      nextBtn.disabled = scroller.scrollLeft >= maxScroll;
+    };
+
+    prevBtn.addEventListener('click', () => scroller.scrollBy({ left: -scrollByAmount(), behavior: 'smooth' }));
+    nextBtn.addEventListener('click', () => scroller.scrollBy({ left: scrollByAmount(), behavior: 'smooth' }));
+    scroller.addEventListener('scroll', updateButtons, { passive: true });
+    window.addEventListener('resize', updateButtons);
+    requestAnimationFrame(updateButtons);
+  };
+
+  const renderVideos = (videos, statusText) => {
+    const scroller = document.getElementById("videos-scroller");
+    const status = document.getElementById("videos-status");
+    if (!scroller) return;
+
+    scroller.classList.remove("is-loading");
+    scroller.innerHTML = "";
+    videos.forEach((video) => scroller.appendChild(createVideoCard(video)));
+    if (status) status.textContent = statusText || "";
+
+    const cards = Array.from(scroller.querySelectorAll(".video-card"));
+    animateVideoCards(cards);
+    requestAnimationFrame(() => {
+      const nextBtn = document.getElementById('videos-next');
+      if (nextBtn) nextBtn.disabled = scroller.scrollWidth <= scroller.clientWidth + 2;
+    });
+  };
+
+  const fetchYouTubeVideos = async () => {
+    let lastError = null;
+    for (const endpoint of YOUTUBE_ENDPOINTS) {
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error(`YouTube feed failed with ${response.status}`);
+        const data = await response.json();
+        if (Array.isArray(data.videos) && data.videos.length) return data.videos;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    console.error("YouTube videos fetch error:", lastError);
+    return null;
+  };
+
+  const hydrateYouTubeVideos = async () => {
+    const scroller = document.getElementById("videos-scroller");
+    if (!scroller) return;
+
+    const cachedVideos = getCachedVideos();
+    if (cachedVideos) renderVideos(cachedVideos, "Updated from YouTube recently.");
+
+    const freshVideos = await fetchYouTubeVideos();
+    if (freshVideos) {
+      saveCachedVideos(freshVideos);
+      renderVideos(freshVideos, "Latest uploads from Matt's YouTube channel.");
+      return;
+    }
+
+    if (!cachedVideos) {
+      renderVideos(FALLBACK_VIDEOS, "Showing featured videos while YouTube is unavailable.");
+    }
+  };
+
+  hydrateYouTubeVideos();
+  setupVideoControls();
+
   if (!window.gsap) return;
   const gsap = window.gsap;
   if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
@@ -197,24 +379,6 @@
     }
   }
 
-  // Videos scroller reveal
-  const videoCards = document.querySelectorAll(".videos-scroller .video-card");
-  if (videoCards.length) {
-    gsap.set(videoCards, { opacity: 0, y: 18 });
-    if (window.ScrollTrigger) {
-      gsap.to(videoCards, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        stagger: 0.08,
-        scrollTrigger: { trigger: ".videos", start: "top 80%" }
-      });
-    } else {
-      gsap.to(videoCards, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", stagger: 0.08, delay: 0.3 });
-    }
-  }
-
   // Scroll reveal for resource cards
   document.querySelectorAll('.resource-card').forEach((el) => {
     gsap.set(el, { opacity: 0, y: 24 });
@@ -224,16 +388,6 @@
       gsap.to(el, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.2 });
     }
   });
-  // Prev/Next buttons scroll
-  const scroller = document.getElementById('videos-scroller');
-  const prevBtn = document.getElementById('videos-prev');
-  const nextBtn = document.getElementById('videos-next');
-  if (scroller && prevBtn && nextBtn) {
-    const scrollBy = () => Math.min(400, scroller.clientWidth * 0.8);
-    prevBtn.addEventListener('click', () => scroller.scrollBy({ left: -scrollBy(), behavior: 'smooth' }));
-    nextBtn.addEventListener('click', () => scroller.scrollBy({ left: scrollBy(), behavior: 'smooth' }));
-  }
-
   // Parallax on hover removed per request — image stays static
 
   // FAQ Toggle functionality (multiple can be open)

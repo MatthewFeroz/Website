@@ -3,6 +3,7 @@ import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const http = httpRouter();
+const YOUTUBE_VIDEOS_URL = "https://www.youtube.com/@MattFeroz/videos";
 
 // Stripe webhook endpoint
 http.route({
@@ -203,6 +204,71 @@ http.route({
   }),
 });
 
+// YouTube uploads feed proxy
+http.route({
+  path: "/youtube/videos",
+  method: "GET",
+  handler: httpAction(async () => {
+    try {
+      const response = await fetch(YOUTUBE_VIDEOS_URL, {
+        headers: { "User-Agent": "Mozilla/5.0" },
+      });
+      if (!response.ok) {
+        return new Response(
+          JSON.stringify({ videos: [], error: "Failed to fetch YouTube feed" }),
+          {
+            status: 502,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Cache-Control": "public, max-age=60",
+            },
+          }
+        );
+      }
+
+      const xml = await response.text();
+      const videos = parseYouTubeFeed(xml).slice(0, 8);
+
+      return new Response(JSON.stringify({ videos }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "public, max-age=900",
+        },
+      });
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ videos: [], error: "Internal server error" }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+    }
+  }),
+});
+
+// CORS preflight for YouTube videos
+http.route({
+  path: "/youtube/videos",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
+  }),
+});
+
 function parseRSS(xml: string) {
   const posts: Array<{
     title: string;
@@ -270,6 +336,52 @@ function parseRSS(xml: string) {
   return posts;
 }
 
+function parseYouTubeFeed(html: string) {
+  const videos: Array<{
+    title: string;
+    link: string;
+    videoId: string;
+    published: string;
+    views: string;
+    thumbnail: string;
+  }> = [];
+
+  const seen = new Set<string>();
+  const rendererRegex = /"videoRenderer":\{([\s\S]*?)"showActionMenu"/g;
+  let rendererMatch;
+
+  while ((rendererMatch = rendererRegex.exec(html)) !== null) {
+    const block = rendererMatch[1];
+    const videoId = extractJsonString(block, "videoId");
+    if (!videoId || seen.has(videoId)) continue;
+
+    const title =
+      extractJsonString(block, "text") ||
+      extractJsonString(block, "simpleText") ||
+      "Watch on YouTube";
+    const published = extractPublishedTime(block);
+    const views = extractViewCount(block);
+    const thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    const link = `https://www.youtube.com/watch?v=${videoId}`;
+
+    seen.add(videoId);
+    videos.push({
+      title: decodeJsonString(title),
+      link,
+      videoId,
+      published: decodeJsonString(published),
+      views: decodeJsonString(views),
+      thumbnail,
+    });
+
+    if (videos.length >= 12) {
+      break;
+    }
+  }
+
+  return videos;
+}
+
 function extractTag(xml: string, tag: string): string {
   const regex = new RegExp(`<${tag}>([^<]*)</${tag}>`);
   const match = xml.match(regex);
@@ -282,6 +394,48 @@ function extractCDATA(xml: string, tag: string): string {
   );
   const match = xml.match(regex);
   return match ? match[1].trim() : "";
+}
+
+function extractAttribute(xml: string, tag: string, attribute: string): string {
+  const regex = new RegExp(`<${tag}[^>]*\\s${attribute}="([^"]+)"[^>]*>`);
+  const match = xml.match(regex);
+  return match ? match[1].trim() : "";
+}
+
+function decodeEntities(value: string): string {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function extractJsonString(jsonFragment: string, key: string): string {
+  const regex = new RegExp(`"${key}":"((?:\\\\.|[^"\\\\])*)"`);
+  const match = jsonFragment.match(regex);
+  return match ? match[1] : "";
+}
+
+function extractPublishedTime(jsonFragment: string): string {
+  const match = jsonFragment.match(/"publishedTimeText":\{"simpleText":"((?:\\.|[^"\\])*)"/);
+  return match ? match[1] : "";
+}
+
+function extractViewCount(jsonFragment: string): string {
+  const match = jsonFragment.match(/"viewCountText":\{"simpleText":"((?:\\.|[^"\\])*)"/);
+  return match ? match[1] : "";
+}
+
+function decodeJsonString(value: string): string {
+  try {
+    return JSON.parse(`"${value.replace(/"/g, '\\"')}"`);
+  } catch {
+    return value
+      .replace(/\\u0026/g, "&")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, "\\");
+  }
 }
 
 export default http;

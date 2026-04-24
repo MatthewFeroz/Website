@@ -113,13 +113,18 @@
     <section id="videos" class="videos">
         <div class="videos-inner">
             <div class="videos-header">
-                <h2>Some of My Most Popular Videos</h2>
+                <div>
+                    <p class="videos-eyebrow">YouTube</p>
+                    <h2>My Most Recent Videos</h2>
+                </div>
                 <div class="videos-controls">
-                    <button class="vid-btn" id="videos-prev" aria-label="Scroll left">◄</button>
-                    <button class="vid-btn" id="videos-next" aria-label="Scroll right">►</button>
+                    <a class="videos-channel-link" href="https://www.youtube.com/@MattFeroz" target="_blank" rel="noopener">Visit Channel</a>
+                    <button class="vid-btn" id="videos-prev" type="button" aria-label="Scroll left"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                    <button class="vid-btn" id="videos-next" type="button" aria-label="Scroll right"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
                 </div>
             </div>
-            <div class="videos-scroller" id="videos-scroller">
+            <p class="videos-status" id="videos-status">Loading the newest videos from YouTube...</p>
+            <div class="videos-scroller" id="videos-scroller" aria-live="polite">
                 <article class="video-card">
                     <a class="video-thumb" href="https://www.youtube.com/watch?v=M3vM01-tIa0" target="_blank" rel="noopener" aria-label="Play: This programming language makes you rich?" style="background-image:url('https://i.ytimg.com/vi/M3vM01-tIa0/hqdefault.jpg'); background-size:cover; background-position:center;"></a>
                     <h4 class="video-title">This programming language makes you rich?</h4>
