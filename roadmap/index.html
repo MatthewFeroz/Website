@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Roadmap</title>
-    <meta name="description" content="Get your free, personalized AI proficiency roadmap in under 30 seconds." />
+    <title>100 Hours Back AI Roadmap</title>
+    <meta name="description" content="Get your free 100 Hours Back AI Roadmap in under 30 seconds." />
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -38,7 +38,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 3rem 1.5rem 4rem;
+        padding: 3rem 1.5rem 2rem;
         gap: 1.25rem;
       }
 
@@ -159,6 +159,9 @@
         margin: 1.5rem auto 0;
         max-width: 42rem;
         line-height: 1.6;
+      }
+      .secondary-note + .secondary-note {
+        margin-top: .55rem;
       }
       .secondary-note a {
         color: var(--rm-fg-2);
@@ -599,10 +602,10 @@
 
         <!-- Persistent header: H1 + roadmap preview stay visible across every input step -->
         <div class="page-head" id="pageHead">
-            <h1 class="page-h1" id="pageH1">Get your free personalized AI proficiency roadmap&hellip;in under 30 seconds.</h1>
+            <h1 class="page-h1" id="pageH1">Get Your Free 100 Hours Back AI Roadmap In Under 30 Seconds.</h1>
             <div class="mock-preview" aria-hidden="true">
                 <div class="sheet front">
-                    <div class="m-head">Your AI Proficiency Roadmap: 4 Phases</div>
+                    <div class="m-head">Your 100 Hours Back AI Roadmap</div>
                     <div class="m-body">
                         <div class="m-col">
                             <div class="m-title"></div>
@@ -759,7 +762,7 @@
             <div class="err" id="err-ai" style="text-align:center;max-width:420px;margin:.5rem auto 0;display:none;">Please complete all required fields.</div>
             <div class="submit-err" id="submit-err">Something went wrong saving your roadmap. Please try again in a moment.</div>
             <div class="step-nav">
-                <button class="rm-primary" id="btn-finish" type="button" onclick="finish()">Get my roadmap <span class="arrow">&rarr;</span></button>
+                <button class="rm-primary" id="btn-finish" type="button" onclick="finish()">Get my 100 Hours Back AI Roadmap <span class="arrow">&rarr;</span></button>
                 <button class="rm-back" type="button" onclick="goTo(3)">&larr; Previous</button>
             </div>
         </section>
@@ -770,7 +773,7 @@
                 <div class="ty-check" aria-hidden="true">
                     <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16.5 L13 23 L26 9"/></svg>
                 </div>
-                <h2 class="ty-title">Check Your Email for Your Customized Roadmap!</h2>
+                <h2 class="ty-title">Check Your Email for Your 100 Hours Back AI Roadmap!</h2>
                 <p class="ty-congrats">Congratulations <span id="ty-name">friend</span>, you're at <b class="ty-stage" id="ty-stage">Stage 1: Monetize</b>.</p>
 
                 <div class="stage-dial" id="stageDial"></div>
@@ -785,10 +788,11 @@
         <!-- Persistent footer: bullets + legal note, visible on every input step (hidden on thank-you) -->
         <div class="stage-footer" id="stageFooter">
             <div class="intro-bullets">
-                <div class="b"><span>Get your roadmap in <b>less than 30 seconds</b></span></div>
-                <div class="b"><span>Built on 4 years of expereince with AI tools</b></span></div>
+                <div class="b"><span>Get your 100 Hours Back AI Roadmap in <b>less than 30 seconds</b></span></div>
+                <div class="b"><span>Built on 4 years of experience with AI tools</span></div>
             </div>
             <p class="secondary-note">By providing your information you consent to Matt Feroz contacting you by email about your roadmap, occasional lessons, and course launches. We don't sell your data. By continuing you agree to our <a href="/privacy/">Privacy Policy</a> and <a href="/terms/">Terms of Service</a>.</p>
+            <p class="secondary-note">Disclaimer: This roadmap is for educational and informational purposes only. It is not financial, legal, tax, investment, medical, or professional advice, and results are not guaranteed.</p>
         </div>
 
     </section>
