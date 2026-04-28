@@ -357,17 +357,6 @@
     }
   }
 
-  // About reveal
-  const aboutEls = document.querySelectorAll('.about-content, .about-photo');
-  if (aboutEls.length) {
-    gsap.set(aboutEls, { opacity: 0, y: 20 });
-    if (window.ScrollTrigger) {
-      gsap.to(aboutEls, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.08, scrollTrigger: { trigger: '.about', start: 'top 80%' } });
-    } else {
-      gsap.to(aboutEls, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.08, delay: 0.3 });
-    }
-  }
-
   // Help cards reveal
   const helpCards = document.querySelectorAll('.help-card');
   if (helpCards.length) {
