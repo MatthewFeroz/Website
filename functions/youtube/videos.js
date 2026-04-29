@@ -24,6 +24,11 @@ export async function onRequestGet() {
 
     const html = await response.text();
     const videos = parseYouTubeFeed(html).slice(0, 8);
+    if (!videos.length) {
+      return json({ videos: [], error: "No YouTube videos found" }, 502, {
+        "Cache-Control": "public, max-age=60",
+      });
+    }
 
     return json({ videos });
   } catch (error) {
