@@ -147,6 +147,7 @@ p {
   border-radius: 999px;
   font-weight: 700;
   transition: all 0.25s ease;
+  box-sizing: border-box;
 }
 
 .nav-cta:hover {
@@ -166,9 +167,29 @@ p {
   width: 38px;
   height: 38px;
   padding: 0;
-  font-size: 1.2rem;
+  font-size: 0; /* hide native ☰ glyph in the HTML; we render our own via ::before */
   line-height: 1;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.nav-toggle::before {
+  content: "\2630"; /* ☰ */
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 220ms ease;
+}
+
+.nav-toggle[aria-expanded="true"]::before {
+  content: "\2715"; /* ✕ */
+  transform: rotate(90deg);
 }
 
 @media (min-width: 900px) {
@@ -245,31 +266,63 @@ p {
   }
 }
 
-/* Mobile Menu - Dropdown Fullscreen */
+/* Mobile Menu - Dropdown that connects flush to the navbar */
 .mobile-menu {
-  display: none;
+  display: flex;
   flex-direction: column;
-  align-items: center;      /* Center items horizontally */
-  justify-content: flex-start; /* Align items to the top vertically */
-  text-align: center;       /* Center text inside items */
-  gap: var(--space-lg);
-  padding: var(--space-3xl) var(--space-lg) var(--space-xl);
-  border: none;
-  border-radius: 0;
+  align-items: center;      /* center each row in the dropdown */
+  justify-content: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
   background: rgba(24, 28, 34, 0.97);
   backdrop-filter: blur(18px) saturate(1.2);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
 
-  position: fixed;
-  top: var(--navbar-height); /* below navbar */
+  /* Anchor to the bottom of the navbar so there is never a gap, no matter
+     what the navbar's actual rendered height is. */
+  position: absolute;
+  top: 100%;
   left: 0;
   right: 0;
   width: 100%;
-  height: auto;            /* let content define height */
+  /* The navbar's border-bottom already provides the divider — no need for a
+     second one here, which would double-stack visually. */
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+
+  /* Constrain to remaining viewport so long menus scroll instead of overflowing */
+  max-height: calc(100dvh - var(--navbar-height));
   overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 60;
-  transition: width 0.5s, height 0.5s, transform 400ms;
+
+  /* Animation — animate visibility/opacity/transform instead of display so it can transition */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease, visibility 0s linear 220ms;
   box-sizing: border-box;
+}
+
+/* Open state — driven by aria-hidden so JS only flips one attribute */
+.mobile-menu[aria-hidden="false"] {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition: opacity 220ms ease, transform 220ms ease, visibility 0s linear 0s;
+}
+
+/* Pre-JS state: respect the [hidden] attribute to avoid a flash before main.js runs */
+.mobile-menu[hidden] {
+  display: none;
+}
+
+/* Don't render the dropdown at all on desktop — the inline nav-menu is shown instead */
+@media (min-width: 900px) {
+  .mobile-menu {
+    display: none !important;
+  }
 }
 
 /* Lock page scroll when mobile menu is open (site-wide) */
@@ -277,38 +330,47 @@ body.menu-open {
   overflow: hidden;
 }
 
+/* The hamburger button now toggles open/close on its own, so the floating X
+   inside the dropdown is redundant. Hide it but keep it in the DOM for any
+   pages that haven't been updated. */
 .mobile-close {
-  position: absolute;
-  top: var(--space-md);
-  right: var(--space-lg);
-  background: transparent;
-  border: none;
-  color: var(--white);
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
-.mobile-menu[aria-hidden="false"],
-.mobile-menu:not([hidden]) {
-  display: flex;
+  display: none;
 }
 
 .mobile-link,
 .mobile-cta {
+  display: block;
+  width: 100%;
+  max-width: 360px;       /* keep rows readable on wider phones/tablets */
+  box-sizing: border-box;
   text-align: center;
   text-decoration: none;
   font-weight: 600;
   color: var(--white);
-  font-size: 1.125rem; /* larger dropdown text */
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mobile-link:hover,
+.mobile-link:focus-visible {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--white);
 }
 
 .mobile-cta {
   border: 1px solid var(--brand);
   background: rgba(var(--brand-rgb), 0.18);
-  padding: 0.7rem 1rem;
   border-radius: 999px;
   font-weight: 700;
+  /* No margin-top — the flex container's `gap` already spaces items evenly. */
+}
+
+.mobile-cta:hover,
+.mobile-cta:focus-visible {
+  background: var(--brand-dark);
 }
 
 /* Hero */
@@ -817,6 +879,7 @@ body.menu-open {
 /* Buttons */
 .primary-button {
   display: inline-block;
+  box-sizing: border-box;
   padding: 0.875rem var(--space-lg);
   border: 1px solid var(--brand);
   background: rgba(var(--brand-rgb), 0.18);
@@ -864,6 +927,20 @@ body.menu-open {
   background: #15161a;
   border-radius: 12px;
   padding: 1.25rem;
+  overflow: hidden;
+}
+
+.help-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.help-card-content .primary-button,
+.help-card-content .secondary-button {
+  align-self: flex-start;
+  max-width: 100%;
 }
 
 .help-card h3 {
@@ -891,6 +968,13 @@ body.menu-open {
   .help-card {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+  .help-card-content {
+    align-items: center;
+  }
+  .help-card-content .primary-button,
+  .help-card-content .secondary-button {
+    align-self: center;
   }
   .help-card-image-wrapper {
     justify-self: center;
@@ -1353,8 +1437,16 @@ body.menu-open {
   }
   
   /* Button row mobile adjustments */
+  .button-row {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
   .primary-button,
   .secondary-button {
+    display: block;
+    box-sizing: border-box;
     width: 100%;
     max-width: 300px;
     text-align: center;
@@ -1634,6 +1726,7 @@ body.menu-open {
 
 .secondary-button {
   display: inline-block;
+  box-sizing: border-box;
   padding: 0.875rem var(--space-lg);
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.06);
@@ -1698,6 +1791,7 @@ body.menu-open {
 /* Already-have secondary button style for Learn How It Works */
 .secondary-callout {
   display: inline-block;
+  box-sizing: border-box;
   padding: 0.85rem 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.06);
@@ -1905,6 +1999,10 @@ body.menu-open {
   
   .primary-button,
   .secondary-button {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 280px;
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
     margin: 0 auto;
@@ -2024,6 +2122,7 @@ body.menu-open {
   padding: 2rem 1.5rem;
   text-align: center;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
 }
 
 
@@ -2244,6 +2343,7 @@ body.menu-open {
   
   .hero-vsl .primary-button,
   .hero-vsl .secondary-button {
+    box-sizing: border-box;
     padding: 0.9rem 1.5rem;
     font-size: 1rem;
     min-width: 180px;
@@ -2290,6 +2390,7 @@ body.menu-open {
   
   .hero-vsl .primary-button,
   .hero-vsl .secondary-button {
+    box-sizing: border-box;
     padding: 0.8rem 1.2rem;
     font-size: 0.95rem;
     min-width: 160px;

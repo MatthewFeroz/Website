@@ -297,6 +297,60 @@
         margin: 0 auto 1.75rem;
         line-height: 1.6;
       }
+
+      .ev-booking {
+        max-width: 960px;
+        margin: 0 auto 4rem;
+        padding: 0 1.5rem;
+        scroll-margin-top: calc(var(--navbar-height) + 1.5rem);
+      }
+      .ev-booking-head {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      .ev-booking-head h2 {
+        font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+        margin: 0 auto .75rem;
+        max-width: 24ch;
+        font-weight: 800;
+        letter-spacing: -.02em;
+      }
+      .ev-booking-head p {
+        color: var(--ev-fg-2);
+        max-width: 42rem;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+      .ev-cal-wrap {
+        overflow: hidden;
+        min-height: 620px;
+        background: transparent;
+      }
+      #events-cal-inline {
+        width: 100%;
+        height: 620px;
+        overflow: scroll;
+      }
+      .ev-cal-fallback {
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--text-muted);
+        font-size: .9rem;
+      }
+      .ev-cal-fallback a {
+        color: var(--brand);
+        font-weight: 700;
+      }
+      @media (max-width: 640px) {
+        .ev-booking {
+          padding: 0;
+        }
+        .ev-cal-wrap,
+        #events-cal-inline {
+          min-height: 620px;
+          height: 620px;
+        }
+      }
     </style>
 </head>
 <body>
@@ -310,9 +364,10 @@
                 <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
                 <a href="/guide/" class="nav-link">Learning</a>
                 <a href="/blog/" class="nav-link">Blog</a>
+                <a href="/events/" class="nav-link">Events</a>
                 <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="nav-link">Community</a>
             </nav>
-            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="nav-cta" data-tf-popup="T2ZPmUED" data-tf-medium="events-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
+            <a href="#book-event-call" class="nav-cta"><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
         </div>
         <div id="mobile-menu" class="mobile-menu" hidden>
             <button class="mobile-close" aria-label="Close menu">✕</button>
@@ -320,8 +375,9 @@
             <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
             <a href="/guide/" class="mobile-link">Learning</a>
             <a href="/blog/" class="mobile-link">Blog</a>
+            <a href="/events/" class="mobile-link">Events</a>
             <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="mobile-link">Community</a>
-            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="mobile-cta" data-tf-popup="T2ZPmUED" data-tf-medium="events-cta-mobile" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>BOOK A FREE CALL</a>
+            <a href="#book-event-call" class="mobile-cta">BOOK A FREE CALL</a>
         </div>
     </header>
 
@@ -329,10 +385,9 @@
 
         <!-- Hero -->
         <section class="ev-hero">
-            <span class="ev-eyebrow">Live AI Events</span>
             <h1>Bring practical AI education to your audience.</h1>
             <p>I help companies, communities, accelerators, schools, and conferences put on live AI workshops, founder sessions, hackathons, and technical talks that turn curiosity into action.</p>
-            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="primary-button" data-tf-popup="T2ZPmUED" data-tf-medium="events-hero-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>HOST AN EVENT WITH ME</a>
+            <a href="#book-event-call" class="primary-button">HOST AN EVENT WITH ME</a>
         </section>
 
         <!-- From the room gallery -->
@@ -430,11 +485,15 @@
             </div>
         </section>
 
-        <!-- Book Matt CTA -->
-        <section class="ev-cta">
-            <h2>Want me to host or speak at your event?</h2>
-            <p>I run workshops on Claude Code, Claude Cowork, AI for founders, and the modern AI toolkit for teams, communities, and conferences. Tell me what you're putting together and I'll see how I can help.</p>
-            <a href="https://form.typeform.com/to/T2ZPmUED" target="_blank" rel="noopener" class="primary-button" data-tf-popup="T2ZPmUED" data-tf-medium="events-book-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>BOOK A FREE CALL</a>
+        <section class="ev-booking" id="book-event-call">
+            <div class="ev-booking-head">
+                <h2>Book an initial event call</h2>
+                <p>Share what you're planning and grab a 15-minute slot so we can talk through fit, format, and next steps.</p>
+            </div>
+            <div class="ev-cal-wrap">
+                <div id="events-cal-inline"></div>
+            </div>
+            <p class="ev-cal-fallback">Having trouble seeing the scheduler? <a href="https://cal.com/matthew-feroz/15min" target="_blank" rel="noopener">Open it in Cal.com</a>.</p>
         </section>
 
     </main>
@@ -454,7 +513,50 @@
     </footer>
 
     <script src="/main.js" defer></script>
-    <script src="https://embed.typeform.com/next/embed.js" defer></script>
+    <script>
+      (function (C, A, L) {
+        var p = function (a, ar) { a.q.push(ar); };
+        var d = C.document;
+        C.Cal = C.Cal || function () {
+          var cal = C.Cal;
+          var ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            var api = function () { p(api, arguments); };
+            var namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = api;
+              p(api, ar);
+            } else {
+              p(cal, ar);
+            }
+            return;
+          }
+          p(cal, ar);
+        };
+      })(window, "https://app.cal.com/embed/embed.js", "init");
+
+      Cal("init", "events-call", { origin: "https://cal.com" });
+      Cal.ns["events-call"]("inline", {
+        elementOrSelector: "#events-cal-inline",
+        calLink: "matthew-feroz/15min"
+      });
+      Cal.ns["events-call"]("ui", {
+        theme: "dark",
+        styles: {
+          branding: { brandColor: "#f85f00" }
+        },
+        hideEventTypeDetails: true,
+        showTimezoneWhenEventDetailsHidden: true,
+        layout: "month_view"
+      });
+    </script>
 
     <!-- PostHog Analytics -->
     <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
