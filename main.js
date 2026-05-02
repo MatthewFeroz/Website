@@ -169,6 +169,74 @@
     resetHeroPointer();
   }
 
+  const setupTestimonials = () => {
+    const marquee = document.querySelector('[data-testimonials-marquee]');
+    if (!marquee || marquee.dataset.ready === "true") return;
+    marquee.dataset.ready = "true";
+
+    const cards = Array.from(marquee.querySelectorAll('.testimonial-card:not([aria-hidden="true"])'));
+    const allCards = Array.from(marquee.querySelectorAll('.testimonial-card'));
+    const prevBtn = document.querySelector('[data-testimonial-prev]');
+    const nextBtn = document.querySelector('[data-testimonial-next]');
+    let activeIndex = 0;
+
+    const clearSelection = () => {
+      marquee.classList.remove('is-paused');
+      marquee.classList.remove('is-manual');
+      marquee.style.removeProperty('--testimonial-offset');
+      allCards.forEach((card) => {
+        card.classList.remove('is-selected');
+        card.setAttribute('aria-pressed', 'false');
+      });
+    };
+
+    const selectCard = (index) => {
+      if (!cards.length) return;
+      activeIndex = (index + cards.length) % cards.length;
+      const card = cards[activeIndex];
+      marquee.classList.add('is-paused', 'is-manual');
+      marquee.style.setProperty('--testimonial-offset', `${card.offsetLeft}px`);
+
+      allCards.forEach((item) => {
+        item.classList.remove('is-selected');
+        item.setAttribute('aria-pressed', 'false');
+      });
+      card.classList.add('is-selected');
+      card.setAttribute('aria-pressed', 'true');
+    };
+
+    cards.forEach((card, index) => {
+      card.addEventListener('click', () => {
+        const wasSelected = card.classList.contains('is-selected');
+        clearSelection();
+
+        if (!wasSelected) {
+          selectCard(index);
+        }
+      });
+    });
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => selectCard(activeIndex - 1));
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => selectCard(activeIndex + 1));
+    }
+
+    window.addEventListener('resize', () => {
+      if (marquee.classList.contains('is-manual')) selectCard(activeIndex);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && marquee.classList.contains('is-paused')) {
+        clearSelection();
+      }
+    });
+  };
+
+  setupTestimonials();
+
   // GSAP-powered animations below — safe to skip if GSAP failed to load
   const CONVEX_SITE_URL = "https://grateful-pony-674.convex.site";
   const YOUTUBE_ENDPOINTS = [
@@ -433,4 +501,3 @@
     });
   });
 })();
-
