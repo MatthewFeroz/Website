@@ -1070,12 +1070,12 @@ body.menu-open {
 }
 
 .testimonial-card {
-  width: clamp(260px, 31vw, 350px);
-  min-height: 220px;
+  width: clamp(300px, 34vw, 390px);
+  min-height: 260px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   padding: 1.15rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1097,12 +1097,38 @@ body.menu-open {
   outline: none;
 }
 
-.testimonial-result {
-  color: var(--brand);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.testimonial-person {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 0.8rem;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #24262b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.testimonial-avatar-fallback {
+  display: inline-grid;
+  place-items: center;
+  color: var(--white);
+  font-size: 0.82rem;
+  font-weight: 800;
+  background: rgba(var(--brand-rgb), 0.18);
+  border-color: rgba(var(--brand-rgb), 0.38);
+}
+
+.testimonial-author,
+.testimonial-role {
+  display: block;
+  min-width: 0;
 }
 
 .testimonial-quote {
@@ -1112,9 +1138,18 @@ body.menu-open {
 }
 
 .testimonial-author {
+  color: var(--white);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.testimonial-role {
   color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 0.12rem;
 }
 
 @keyframes testimonials-scroll {
@@ -1133,8 +1168,8 @@ body.menu-open {
   }
 
   .testimonial-card {
-    width: min(78vw, 320px);
-    min-height: 240px;
+    width: min(82vw, 340px);
+    min-height: 280px;
   }
 }
 
