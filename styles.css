@@ -1101,7 +1101,6 @@ body.menu-open {
 .testimonial-card.is-selected {
   border-color: rgba(var(--brand-rgb), 0.55);
   background: #18191d;
-  transform: translateY(-4px);
   outline: none;
 }
 
