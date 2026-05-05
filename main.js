@@ -6,25 +6,26 @@
   const navToggle = document.querySelector('.nav-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
   if (navToggle && mobileMenu) {
+    // Drop the [hidden] attribute once JS is in control — visibility is now
+    // driven by aria-hidden + CSS transitions instead of display:none.
+    mobileMenu.removeAttribute('hidden');
+
+    const isOpen = () => navToggle.getAttribute('aria-expanded') === 'true';
+
     const setOpen = (open) => {
       navToggle.setAttribute('aria-expanded', String(open));
-      if (open) {
-        mobileMenu.removeAttribute('hidden');
-        mobileMenu.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('menu-open');
-      } else {
-        mobileMenu.setAttribute('hidden', '');
-        mobileMenu.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('menu-open');
-      }
+      navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      mobileMenu.setAttribute('aria-hidden', String(!open));
+      document.body.classList.toggle('menu-open', open);
     };
     setOpen(false);
-    navToggle.addEventListener('click', () => {
-      const open = navToggle.getAttribute('aria-expanded') === 'true';
-      setOpen(!open);
+
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(!isOpen());
     });
 
-    // Close on close button or when a menu link/cta is clicked
+    // Close on close button (legacy support) or when any link/cta is clicked
     const mobileCloseButton = mobileMenu.querySelector('.mobile-close');
     if (mobileCloseButton) {
       mobileCloseButton.addEventListener('click', () => setOpen(false));
@@ -32,14 +33,49 @@
     mobileMenu.querySelectorAll('.mobile-link, .mobile-cta').forEach((el) => {
       el.addEventListener('click', () => setOpen(false));
     });
+
+    // Stop clicks inside the menu from bubbling up and triggering close-on-outside
+    mobileMenu.addEventListener('click', (e) => e.stopPropagation());
+
+    // Click anywhere outside the navbar/menu to close
+    document.addEventListener('click', () => {
+      if (isOpen()) setOpen(false);
+    });
+
+    // ESC closes and returns focus to the toggle
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        navToggle.focus();
+      }
+    });
+
+    // If the viewport grows past the desktop breakpoint while open, reset state
+    const desktopMq = window.matchMedia('(min-width: 900px)');
+    const handleMqChange = (mq) => {
+      if (mq.matches && isOpen()) setOpen(false);
+    };
+    if (desktopMq.addEventListener) {
+      desktopMq.addEventListener('change', handleMqChange);
+    } else if (desktopMq.addListener) {
+      desktopMq.addListener(handleMqChange); // Safari < 14 fallback
+    }
   }
 
-  // Hide navbar on scroll down, show on scroll up
+  // Hide navbar on scroll down, show on scroll up — but never while the
+  // mobile menu is open (the dropdown is anchored to the navbar, so hiding
+  // the navbar would hide the menu out from under the user's tap).
   let lastScrollTop = 0;
   const navbar = document.querySelector('.navbar');
   const scrollThreshold = 50;
 
   window.addEventListener('scroll', () => {
+    if (!navbar) return;
+    if (document.body.classList.contains('menu-open')) {
+      navbar.classList.remove('navbar-hidden');
+      return;
+    }
+
     const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
     if (currentScroll > scrollThreshold) {
@@ -67,7 +103,7 @@
       if (typeformLoaded) return;
       
       typeformLoaded = true;
-      typeformIframe.src = 'https://form.typeform.com/to/T2ZPmUED?disable-auto-focus=true';
+      typeformIframe.src = 'https://form.typeform.com/to/VrRYF3dQ?disable-auto-focus=true';
       typeformIframe.style.display = 'block';
       typeformPlaceholder.style.display = 'none';
     };
@@ -91,7 +127,7 @@
     observer.observe(typeformPlaceholder);
     
     // Also load when any "BOOK A FREE CALL" button is clicked
-    document.querySelectorAll('[data-tf-popup="T2ZPmUED"]').forEach(button => {
+    document.querySelectorAll('[data-tf-popup="VrRYF3dQ"]').forEach(button => {
       button.addEventListener('click', (e) => {
         // If it's not a popup button, load the embedded form
         if (!button.hasAttribute('data-tf-popup') || button.getAttribute('data-tf-medium') !== 'site-cta') {
@@ -132,6 +168,74 @@
     heroShell.addEventListener('pointerleave', resetHeroPointer);
     resetHeroPointer();
   }
+
+  const setupTestimonials = () => {
+    const marquee = document.querySelector('[data-testimonials-marquee]');
+    if (!marquee || marquee.dataset.ready === "true") return;
+    marquee.dataset.ready = "true";
+
+    const cards = Array.from(marquee.querySelectorAll('.testimonial-card:not([aria-hidden="true"])'));
+    const allCards = Array.from(marquee.querySelectorAll('.testimonial-card'));
+    const prevBtn = document.querySelector('[data-testimonial-prev]');
+    const nextBtn = document.querySelector('[data-testimonial-next]');
+    let activeIndex = 0;
+
+    const clearSelection = () => {
+      marquee.classList.remove('is-paused');
+      marquee.classList.remove('is-manual');
+      marquee.style.removeProperty('--testimonial-offset');
+      allCards.forEach((card) => {
+        card.classList.remove('is-selected');
+        card.setAttribute('aria-pressed', 'false');
+      });
+    };
+
+    const selectCard = (index) => {
+      if (!cards.length) return;
+      activeIndex = (index + cards.length) % cards.length;
+      const card = cards[activeIndex];
+      marquee.classList.add('is-paused', 'is-manual');
+      marquee.style.setProperty('--testimonial-offset', `${card.offsetLeft}px`);
+
+      allCards.forEach((item) => {
+        item.classList.remove('is-selected');
+        item.setAttribute('aria-pressed', 'false');
+      });
+      card.classList.add('is-selected');
+      card.setAttribute('aria-pressed', 'true');
+    };
+
+    cards.forEach((card, index) => {
+      card.addEventListener('click', () => {
+        const wasSelected = card.classList.contains('is-selected');
+        clearSelection();
+
+        if (!wasSelected) {
+          selectCard(index);
+        }
+      });
+    });
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => selectCard(activeIndex - 1));
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => selectCard(activeIndex + 1));
+    }
+
+    window.addEventListener('resize', () => {
+      if (marquee.classList.contains('is-manual')) selectCard(activeIndex);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && marquee.classList.contains('is-paused')) {
+        clearSelection();
+      }
+    });
+  };
+
+  setupTestimonials();
 
   // GSAP-powered animations below — safe to skip if GSAP failed to load
   const CONVEX_SITE_URL = "https://grateful-pony-674.convex.site";
@@ -397,4 +501,3 @@
     });
   });
 })();
-
