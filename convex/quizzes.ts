@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalAction, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { getPostHogClient } from "./posthog";
 
 /**
  * Get all active quizzes
@@ -114,6 +116,20 @@ export const submitQuiz = mutation({
       timeSpentSeconds,
     });
 
+    // Schedule PostHog tracking (mutations can't make external HTTP calls)
+    await ctx.scheduler.runAfter(0, internal.quizzes.trackQuizCompleted, {
+      userId: userId.toString(),
+      email: user.email,
+      quizId: quizId.toString(),
+      quizTitle: quiz.title,
+      quizCategory: quiz.category,
+      score,
+      passed,
+      correctCount,
+      totalQuestions: quiz.questions.length,
+      timeSpentSeconds: timeSpentSeconds ?? null,
+    });
+
     // Return results with explanations
     return {
       success: true,
@@ -136,6 +152,42 @@ export const submitQuiz = mutation({
         };
       }),
     };
+  },
+});
+
+export const trackQuizCompleted = internalAction({
+  args: {
+    userId: v.string(),
+    email: v.string(),
+    quizId: v.string(),
+    quizTitle: v.string(),
+    quizCategory: v.string(),
+    score: v.number(),
+    passed: v.boolean(),
+    correctCount: v.number(),
+    totalQuestions: v.number(),
+    timeSpentSeconds: v.union(v.number(), v.null()),
+  },
+  handler: async (_ctx, args) => {
+    const posthog = getPostHogClient();
+    try {
+      posthog.capture({
+        distinctId: args.email,
+        event: "quiz completed",
+        properties: {
+          quiz_id: args.quizId,
+          quiz_title: args.quizTitle,
+          quiz_category: args.quizCategory,
+          score: args.score,
+          passed: args.passed,
+          correct_count: args.correctCount,
+          total_questions: args.totalQuestions,
+          time_spent_seconds: args.timeSpentSeconds,
+        },
+      });
+    } finally {
+      await posthog.shutdown();
+    }
   },
 });
 

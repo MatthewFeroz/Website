@@ -7,6 +7,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { Resend } from "resend";
+import { getPostHogClient } from "./posthog";
 
 /* ------------------------------------------------------------------ */
 /*  Shared arg shape                                                  */
@@ -66,6 +67,25 @@ export const submitRoadmapLead = action({
       // Lead is already saved — don't fail the submission just because
       // the email bounced. Matt can follow up manually from the dashboard.
       console.error("[roadmap] email send failed (lead still saved):", err);
+    }
+
+    // Track lead submission
+    const posthog = getPostHogClient();
+    try {
+      posthog.capture({
+        distinctId: email,
+        event: "lead submitted",
+        properties: {
+          $set: { email, first_name: args.firstName.trim() },
+          ai_level: args.aiLevel,
+          primary_goal: args.primaryGoal,
+          weekly_hours: args.weeklyHours,
+          stage: args.stage,
+          source: args.source,
+        },
+      });
+    } finally {
+      await posthog.shutdown();
     }
 
     return { success: true, id };

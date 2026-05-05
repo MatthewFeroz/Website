@@ -3,6 +3,7 @@ import { internalAction, internalMutation, internalQuery } from "./_generated/se
 import { internal } from "./_generated/api";
 import Stripe from "stripe";
 import { Resend } from "resend";
+import { getPostHogClient } from "./posthog";
 
 // Generate access code (same pattern as admin.ts)
 function generateAccessCode(): string {
@@ -80,6 +81,23 @@ export const handleWebhook = internalAction({
         email,
         accessCode,
       });
+
+      // Track payment completion
+      const posthog = getPostHogClient();
+      try {
+        posthog.capture({
+          distinctId: email,
+          event: "payment completed",
+          properties: {
+            $set: { email },
+            amount_total: session.amount_total,
+            currency: session.currency,
+            stripe_session_id: session.id,
+          },
+        });
+      } finally {
+        await posthog.shutdown();
+      }
 
       return { success: true, email, accessCode };
     }

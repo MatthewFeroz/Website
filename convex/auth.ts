@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalAction, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { getPostHogClient } from "./posthog";
 
 /**
  * Validate an access code and create a user session
@@ -31,6 +33,11 @@ export const validateAccessCode = mutation({
         await ctx.db.patch(existingUser._id, {
           lastLoginAt: Date.now(),
         });
+        await ctx.scheduler.runAfter(0, internal.auth.trackAuthEvent, {
+          email: existingUser.email,
+          event: "user logged in",
+          isReturningUser: true,
+        });
         return {
           success: true,
           userId: existingUser._id,
@@ -58,12 +65,40 @@ export const validateAccessCode = mutation({
       lastLoginAt: Date.now(),
     });
 
+    await ctx.scheduler.runAfter(0, internal.auth.trackAuthEvent, {
+      email: accessCode.email,
+      event: "access code redeemed",
+      isReturningUser: false,
+    });
     return {
       success: true,
       userId,
       email: accessCode.email,
       isReturningUser: false,
     };
+  },
+});
+
+export const trackAuthEvent = internalAction({
+  args: {
+    email: v.string(),
+    event: v.string(),
+    isReturningUser: v.boolean(),
+  },
+  handler: async (_ctx, args) => {
+    const posthog = getPostHogClient();
+    try {
+      posthog.capture({
+        distinctId: args.email,
+        event: args.event,
+        properties: {
+          $set: { email: args.email },
+          is_returning_user: args.isReturningUser,
+        },
+      });
+    } finally {
+      await posthog.shutdown();
+    }
   },
 });
 

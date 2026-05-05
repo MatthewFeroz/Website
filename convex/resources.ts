@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalAction, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { getPostHogClient } from "./posthog";
 
 function validateAdminSecret(adminSecret: string | undefined): boolean {
   const expectedSecret = process.env.ADMIN_SECRET;
@@ -115,11 +117,46 @@ export const recordDownload = mutation({
     resourceId: v.id("resources"),
   },
   handler: async (ctx, args) => {
+    const resource = await ctx.db.get(args.resourceId);
+    const user = await ctx.db.get(args.userId);
     await ctx.db.insert("resourceDownloads", {
       userId: args.userId,
       resourceId: args.resourceId,
       downloadedAt: Date.now(),
     });
+    if (resource && user) {
+      await ctx.scheduler.runAfter(0, internal.resources.trackResourceDownloaded, {
+        email: user.email,
+        resourceId: args.resourceId.toString(),
+        resourceTitle: resource.title,
+        fileName: resource.fileName,
+      });
+    }
+  },
+});
+
+export const trackResourceDownloaded = internalAction({
+  args: {
+    email: v.string(),
+    resourceId: v.string(),
+    resourceTitle: v.string(),
+    fileName: v.string(),
+  },
+  handler: async (_ctx, args) => {
+    const posthog = getPostHogClient();
+    try {
+      posthog.capture({
+        distinctId: args.email,
+        event: "resource downloaded",
+        properties: {
+          resource_id: args.resourceId,
+          resource_title: args.resourceTitle,
+          file_name: args.fileName,
+        },
+      });
+    } finally {
+      await posthog.shutdown();
+    }
   },
 });
 

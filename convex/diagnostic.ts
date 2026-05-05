@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalAction, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { getPostHogClient } from "./posthog";
 
 /**
  * Calculate skill level based on score percentage
@@ -244,6 +246,18 @@ export const submitDiagnostic = mutation({
       recommendations,
     });
 
+    // Schedule PostHog tracking (mutations can't make external HTTP calls)
+    const distinctId = userId ? userId.toString() : (guestId as string);
+    await ctx.scheduler.runAfter(0, internal.diagnostic.trackDiagnosticCompleted, {
+      distinctId,
+      overallScore,
+      overallLevel,
+      totalCorrect,
+      totalQuestions,
+      timeSpentSeconds: timeSpentSeconds ?? null,
+      diagnosticVersion: diagnostic.version,
+    });
+
     // Return results
     return {
       success: true,
@@ -314,6 +328,37 @@ export const getDiagnosticResults = query({
       completedAt: attempt.completedAt,
       timeSpentSeconds: attempt.timeSpentSeconds,
     };
+  },
+});
+
+export const trackDiagnosticCompleted = internalAction({
+  args: {
+    distinctId: v.string(),
+    overallScore: v.number(),
+    overallLevel: v.string(),
+    totalCorrect: v.number(),
+    totalQuestions: v.number(),
+    timeSpentSeconds: v.union(v.number(), v.null()),
+    diagnosticVersion: v.number(),
+  },
+  handler: async (_ctx, args) => {
+    const posthog = getPostHogClient();
+    try {
+      posthog.capture({
+        distinctId: args.distinctId,
+        event: "diagnostic completed",
+        properties: {
+          overall_score: args.overallScore,
+          overall_level: args.overallLevel,
+          total_correct: args.totalCorrect,
+          total_questions: args.totalQuestions,
+          time_spent_seconds: args.timeSpentSeconds,
+          diagnostic_version: args.diagnosticVersion,
+        },
+      });
+    } finally {
+      await posthog.shutdown();
+    }
   },
 });
 
