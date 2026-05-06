@@ -461,17 +461,6 @@
     }
   }
 
-  // Help cards reveal
-  const helpCards = document.querySelectorAll('.help-card');
-  if (helpCards.length) {
-    gsap.set(helpCards, { opacity: 0, y: 18 });
-    if (window.ScrollTrigger) {
-      gsap.to(helpCards, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.08, scrollTrigger: { trigger: '.help', start: 'top 80%' } });
-    } else {
-      gsap.to(helpCards, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.08, delay: 0.3 });
-    }
-  }
-
   // Scroll reveal for resource cards
   document.querySelectorAll('.resource-card').forEach((el) => {
     gsap.set(el, { opacity: 0, y: 24 });
