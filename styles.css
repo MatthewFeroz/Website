@@ -596,8 +596,37 @@ body.menu-open {
 }
 
 @media (max-width: 1024px) {
-  .hero-portrait {
+  /* On smaller screens the right portrait is dropped, and the left portrait
+     is pulled out of absolute positioning so it stacks below the hero text
+     with its bottom edge flush against the section's bottom. */
+  .hero-portrait--right {
     display: none;
+  }
+
+  /* Use .hero.hero-banner to win over the generic .hero { padding: ... } rule
+     in the @media (max-width: 768px) block — without the bumped specificity
+     that later rule re-applies a bottom padding and reopens the gap. */
+  .hero.hero-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0;
+  }
+
+  .hero-banner .hero-inner {
+    width: 100%;
+  }
+
+  .hero-portrait--left {
+    position: static;
+    /* Default flex order is 0; bumping the portrait to 1 places it after
+       the hero-inner, which keeps its natural-DOM order on desktop. */
+    order: 1;
+    width: min(100%, 380px);
+    max-width: none;
+    height: auto;
+    margin: 2rem 0 0;
+    display: block;
   }
 }
 
@@ -1040,6 +1069,16 @@ main > .hero-banner:first-child {
 
   .hero-content {
     text-align: left;
+  }
+
+  /* The hero-banner stays center-aligned on mobile, even though other heroes
+     switch to left-aligned text at this breakpoint. */
+  .hero-banner .hero-content {
+    text-align: center;
+  }
+
+  .hero-banner .hero-content h1 {
+    max-width: none;
   }
 
   .hero-content h1 {
