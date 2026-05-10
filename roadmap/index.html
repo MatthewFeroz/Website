@@ -230,17 +230,17 @@
         align-items: center;
         justify-content: center;
         gap: .55rem;
-        padding: 1.1rem 2.25rem;
+        padding: 1rem 2.5rem;
         border: 2.5px solid var(--brand);
         background: var(--brand);
         color: #fff;
         text-decoration: none;
         border-radius: 999px;
         font-weight: 800;
-        font-size: .95rem;
-        letter-spacing: .04em;
+        font-size: .9rem;
+        letter-spacing: .08em;
         text-transform: uppercase;
-        transition: transform .2s ease-out, background-color .2s linear, box-shadow .2s, color .2s;
+        transition: background-color .2s linear, color .2s;
         cursor: pointer;
         font-family: inherit;
       }
@@ -248,14 +248,10 @@
       .rm-primary:focus {
         background: #fff;
         color: var(--brand);
-        transform: translateY(-1px);
-        box-shadow: 0 0 0 6px rgba(248,95,0,.18), 0 12px 40px rgba(248,95,0,.45);
       }
       .rm-primary:disabled {
         opacity: .35;
         cursor: not-allowed;
-        transform: none !important;
-        box-shadow: none !important;
         background: var(--brand);
         color: #fff;
       }
@@ -284,7 +280,6 @@
         gap: .85rem;
         margin-top: 1.75rem;
       }
-      .step-nav .rm-primary { padding: 1rem 2.5rem; font-size: .9rem; letter-spacing: .08em; }
 
       /* Form fields */
       .form-field {
@@ -542,6 +537,40 @@
         .ty-cta { width: 100%; }
       }
 
+      /* Cal.com booking embed on thank-you screen */
+      .ty-book {
+        width: 100%;
+        margin: 2rem 0 0.5rem;
+        text-align: left;
+      }
+      .ty-book-head {
+        color: var(--white);
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin: 0 0 .35rem;
+        text-align: center;
+      }
+      .ty-book-sub {
+        color: var(--rm-fg-2);
+        font-size: .95rem;
+        line-height: 1.55;
+        margin: 0 auto 1.25rem;
+        max-width: 32rem;
+        text-align: center;
+      }
+      .ty-cal-embed {
+        display: block;
+        width: 100%;
+        height: 720px;
+        border: none;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,.3);
+      }
+      @media (max-width: 768px) {
+        .ty-cal-embed { height: 880px; }
+      }
+
       /* Submit spinner */
       .rm-primary.loading { position: relative; color: transparent; pointer-events: none; }
       .rm-primary.loading::after {
@@ -785,13 +814,22 @@
                 <div class="ty-check" aria-hidden="true">
                     <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16.5 L13 23 L26 9"/></svg>
                 </div>
-                <h2 class="ty-title">Check Your Email for Your 100 Hours Back AI Roadmap!</h2>
-                <p class="ty-congrats">Congratulations <span id="ty-name">friend</span>, you're at <b class="ty-stage" id="ty-stage">Stage 1: Monetize</b>.</p>
+                <h2 class="ty-title">You're on the waitlist, <span id="ty-name">friend</span>!</h2>
+                <p class="ty-congrats">The 100 Hours Back AI Roadmap isn't quite finished yet. I'll email you the moment it ships — no spam in between.</p>
 
-                <div class="stage-dial" id="stageDial"></div>
+                <div class="ty-book">
+                    <h3 class="ty-book-head">Book a free follow-up call while you wait</h3>
+                    <p class="ty-book-sub">Pick a time and we'll talk through where you're at with AI right now and what you're trying to build.</p>
+                    <iframe
+                        class="ty-cal-embed"
+                        src="https://cal.com/matthew-feroz/roadmap"
+                        title="Book a free roadmap follow-up call"
+                        loading="lazy"
+                    ></iframe>
+                </div>
 
-                <p class="ty-inbetween">In the meantime, you can start watching the video version of the course below.</p>
-                <a class="rm-primary ty-cta" href="https://www.youtube.com/@MattFeroz" target="_blank" rel="noopener">Watch the scaling roadmap course <span class="arrow">&rarr;</span></a>
+                <p class="ty-inbetween">Free videos on my YouTube channel are the best place to start.</p>
+                <a class="rm-primary ty-cta" href="https://www.youtube.com/@MattFeroz" target="_blank" rel="noopener">Watch on YouTube <span class="arrow">&rarr;</span></a>
 
                 <button class="rm-back ty-reset" type="button" onclick="resetFlow()">Start over</button>
             </div>
@@ -1052,7 +1090,7 @@
                     } catch (_) { /* non-fatal */ }
                 }
 
-                renderResult(s);
+                renderResult();
                 goTo(5);
             } catch (err) {
                 console.error('[roadmap] submit failed', err);
@@ -1064,21 +1102,9 @@
         }
         window.finish = finish;
 
-        function renderResult(s){
+        function renderResult(){
             const tyName = document.getElementById('ty-name');
             if(tyName) tyName.textContent = answers.firstName || 'friend';
-            const tyStage = document.getElementById('ty-stage');
-            if(tyStage) tyStage.textContent = s.label;
-            const dial = document.getElementById('stageDial');
-            if(dial){
-                dial.innerHTML = '';
-                s.rungs.forEach((label, i) => {
-                    const d = document.createElement('div');
-                    d.className = 'rung' + (i === s.idx ? ' active' : '') + (i < s.idx ? ' done' : '');
-                    d.innerHTML = `<span class="n">0${i+1}</span><span class="l">${label}</span>`;
-                    dial.appendChild(d);
-                });
-            }
         }
 
         function resetFlow(){
