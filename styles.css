@@ -125,6 +125,7 @@ p {
 .nav-menu {
   display: none;
   gap: var(--space-lg);
+  align-items: center;
 }
 
 .nav-link {
@@ -153,6 +154,136 @@ p {
   background: var(--brand-dark);
   box-shadow: 0 6px 18px rgba(var(--brand-rgb), 0.24);
   transform: translateY(-1px);
+}
+
+/* Desktop nav dropdown — click-toggled via .is-open class (added by main.js) */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-trigger {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  /* Button reset so a <button> trigger inherits the surrounding nav-link look */
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-weight: inherit;
+}
+
+.nav-dropdown-trigger::after {
+  content: "\25BE";
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+.nav-dropdown.is-open .nav-dropdown-trigger::after {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 240px;
+  background: rgba(24, 28, 34, 0.97);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  padding: 0.4rem;
+  z-index: 70;
+  display: none;
+}
+
+.nav-dropdown.is-open .nav-dropdown-menu {
+  display: block;
+}
+
+.nav-dropdown-item {
+  display: block;
+  padding: 0.65rem 0.9rem;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-dropdown-item:hover,
+.nav-dropdown-item:focus-visible {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--white);
+}
+
+/* Hide the desktop dropdown menu on mobile; items are inlined under the mobile menu instead */
+@media (max-width: 899px) {
+  .nav-dropdown-menu { display: none; }
+}
+
+/* Mobile nav: small section label above grouped sub-links */
+.mobile-section-label {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 700;
+  padding: 0.4rem 1rem 0.1rem;
+  margin-top: 0.25rem;
+}
+
+/* Mobile nav dropdown — click-toggled via aria-expanded */
+.mobile-dropdown {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
+}
+
+.mobile-dropdown-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+}
+
+.mobile-dropdown-trigger::after {
+  content: "\25BE";
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.mobile-dropdown-trigger[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.mobile-dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.mobile-dropdown-menu[hidden] {
+  display: none;
 }
 
 .nav-toggle {

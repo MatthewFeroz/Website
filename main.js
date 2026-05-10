@@ -17,6 +17,13 @@
       navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       mobileMenu.setAttribute('aria-hidden', String(!open));
       document.body.classList.toggle('menu-open', open);
+      if (!open) {
+        mobileMenu.querySelectorAll('.mobile-dropdown-trigger').forEach((trigger) => {
+          trigger.setAttribute('aria-expanded', 'false');
+          const menu = trigger.parentElement && trigger.parentElement.querySelector('.mobile-dropdown-menu');
+          if (menu) menu.hidden = true;
+        });
+      }
     };
     setOpen(false);
 
@@ -30,8 +37,18 @@
     if (mobileCloseButton) {
       mobileCloseButton.addEventListener('click', () => setOpen(false));
     }
-    mobileMenu.querySelectorAll('.mobile-link, .mobile-cta').forEach((el) => {
+    mobileMenu.querySelectorAll('.mobile-link:not(.mobile-dropdown-trigger), .mobile-cta').forEach((el) => {
       el.addEventListener('click', () => setOpen(false));
+    });
+
+    mobileMenu.querySelectorAll('.mobile-dropdown-trigger').forEach((trigger) => {
+      const menu = trigger.parentElement && trigger.parentElement.querySelector('.mobile-dropdown-menu');
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const expanded = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!expanded));
+        if (menu) menu.hidden = expanded;
+      });
     });
 
     // Stop clicks inside the menu from bubbling up and triggering close-on-outside
@@ -61,6 +78,37 @@
       desktopMq.addListener(handleMqChange); // Safari < 14 fallback
     }
   }
+
+  // Desktop nav dropdowns — click to toggle, click outside or Escape to close
+  document.querySelectorAll('.nav-dropdown').forEach((dropdown) => {
+    const trigger = dropdown.querySelector('.nav-dropdown-trigger');
+    if (!trigger) return;
+
+    const close = () => {
+      dropdown.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = !dropdown.classList.contains('is-open');
+      dropdown.classList.toggle('is-open', open);
+      trigger.setAttribute('aria-expanded', String(open));
+    });
+
+    document.addEventListener('click', (e) => {
+      if (dropdown.classList.contains('is-open') && !dropdown.contains(e.target)) {
+        close();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dropdown.classList.contains('is-open')) {
+        close();
+        trigger.focus();
+      }
+    });
+  });
 
   // Hide navbar on scroll down, show on scroll up — but never while the
   // mobile menu is open (the dropdown is anchored to the navbar, so hiding
