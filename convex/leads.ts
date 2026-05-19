@@ -55,13 +55,12 @@ export const submitRoadmapLead = action({
     );
 
     try {
-      await ctx.runAction(internal.leads.sendRoadmapEmail, {
+      // While the actual roadmap PDF is in progress, we send a waitlist
+      // confirmation instead of the stage-based roadmap email. Swap back to
+      // `sendRoadmapEmail` here when the final roadmap is ready to ship.
+      await ctx.runAction(internal.leads.sendWaitlistEmail, {
         email,
         firstName: args.firstName.trim(),
-        stage: args.stage ?? "Stage 1: Monetize",
-        aiLevel: args.aiLevel ?? "curious",
-        primaryGoal: args.primaryGoal ?? "automate",
-        weeklyHours: args.weeklyHours ?? "balanced",
       });
     } catch (err) {
       // Lead is already saved — don't fail the submission just because
@@ -400,6 +399,146 @@ export const sendRoadmapEmail = internalAction({
     }
 
     console.log("Roadmap email sent successfully:", data?.id);
+    return { success: true, emailId: data?.id };
+  },
+});
+
+/* ------------------------------------------------------------------ */
+/*  Waitlist email — sent while the full roadmap PDF is in progress.  */
+/*  Replace the call site in `submitRoadmapLead` with                 */
+/*  `sendRoadmapEmail` once the final roadmap is ready.               */
+/* ------------------------------------------------------------------ */
+
+export const sendWaitlistEmail = internalAction({
+  args: {
+    email: v.string(),
+    firstName: v.string(),
+  },
+  handler: async (_ctx, args) => {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      console.error("Missing RESEND_API_KEY environment variable");
+      throw new Error("Email service not configured");
+    }
+
+    const resend = new Resend(resendApiKey);
+    const firstName = esc(args.firstName || "friend");
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're on the 100 Hours Back AI Roadmap waitlist</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #171719; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #171719; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #1e1e21; border-radius: 12px; overflow: hidden; max-width: 600px;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #f85f00; padding: 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 2px;">MATT FEROZ</h1>
+              <p style="color: #ffd8bf; margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;">100 Hours Back AI Roadmap — Waitlist</p>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding: 40px 30px 10px;">
+              <h2 style="color: #ffffff; margin: 0 0 16px; font-size: 24px; font-weight: 800;">You're on the list, ${firstName} 👋</h2>
+              <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+                Thanks for signing up for the <b style="color: #ffffff;">100 Hours Back AI Roadmap</b>. The full version isn't quite ready yet — I'm putting the finishing touches on it so it's actually worth your time.
+              </p>
+              <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                The moment it ships, it lands in your inbox. No spam in between.
+              </p>
+            </td>
+          </tr>
+
+          <!-- CTA: Book a follow-up call -->
+          <tr>
+            <td style="padding: 10px 30px;">
+              <div style="background-color: #252528; border-left: 4px solid #f85f00; border-radius: 8px; padding: 22px 24px;">
+                <div style="color: #ffffff; font-size: 17px; font-weight: 800; margin-bottom: 8px;">Want to skip the wait?</div>
+                <div style="color: #cbd5e1; font-size: 15px; line-height: 1.6; margin-bottom: 14px;">
+                  Grab a free follow-up call. We'll talk through where you are with AI today and what you're actually trying to build.
+                </div>
+                <a href="https://cal.com/matthew-feroz/roadmap" style="background-color: #f85f00; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 800; font-size: 14px; display: inline-block; letter-spacing: 1px; text-transform: uppercase;">Book a free call →</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- CTA: YouTube course -->
+          <tr>
+            <td style="padding: 30px 30px 10px;" align="center">
+              <p style="color: #cbd5e1; font-size: 15px; line-height: 1.6; margin: 0 0 18px; text-align: center;">
+                In the meantime, the free video version of the course on YouTube is the best place to start:
+              </p>
+              <a href="https://www.youtube.com/@MattFeroz" style="background-color: transparent; color: #f85f00; padding: 14px 28px; text-decoration: none; border: 2px solid #f85f00; border-radius: 999px; font-weight: 800; font-size: 14px; display: inline-block; letter-spacing: 1px; text-transform: uppercase;">Watch on YouTube →</a>
+            </td>
+          </tr>
+
+          <!-- Sign-off -->
+          <tr>
+            <td style="padding: 30px 30px 30px;">
+              <p style="color: #cbd5e1; font-size: 15px; line-height: 1.6; margin: 0;">Talk soon,</p>
+              <p style="color: #ffffff; font-size: 16px; font-weight: 700; margin: 6px 0 0;">— Matt</p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #151517; padding: 22px 30px; text-align: center;">
+              <p style="color: #64748b; font-size: 13px; margin: 0 0 6px;">
+                You're getting this because you joined the waitlist at
+                <a href="https://matthewferoz.com/roadmap/" style="color: #f85f00; text-decoration: none;">matthewferoz.com/roadmap</a>.
+              </p>
+              <p style="color: #64748b; font-size: 12px; margin: 0;">
+                Questions? Just hit reply — it goes straight to me.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    const text = [
+      `Hey ${args.firstName || "friend"},`,
+      ``,
+      `Thanks for signing up for the 100 Hours Back AI Roadmap. The full version isn't quite ready yet — I'm putting the finishing touches on it so it's actually worth your time.`,
+      ``,
+      `The moment it ships, it lands in your inbox. No spam in between.`,
+      ``,
+      `Want to skip the wait? Grab a free follow-up call: https://cal.com/matthew-feroz/roadmap`,
+      ``,
+      `In the meantime, start with the free video version on YouTube: https://www.youtube.com/@MattFeroz`,
+      ``,
+      `Talk soon,`,
+      `— Matt`,
+    ].join("\n");
+
+    const { data, error } = await resend.emails.send({
+      from: "Matt Feroz <noreply@matthewferoz.com>",
+      to: args.email,
+      subject: `${args.firstName || "You're"} on the 100 Hours Back AI Roadmap waitlist`,
+      html,
+      text,
+      replyTo: "matthew@pioneeringminds.ai",
+    });
+
+    if (error) {
+      console.error("Failed to send waitlist email:", error);
+      throw new Error("Failed to send waitlist email");
+    }
+
+    console.log("Waitlist email sent successfully:", data?.id);
     return { success: true, emailId: data?.id };
   },
 });
