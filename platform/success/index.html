@@ -266,6 +266,7 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="/convex-site.js"></script>
     <script src="../../main.js" defer></script>
     <script src="https://embed.typeform.com/next/embed.js" defer></script>
 
@@ -281,7 +282,7 @@
     <!-- Access Code Retrieval Script -->
     <script>
         // Convex HTTP endpoint URL - Update this to your actual Convex deployment URL
-        const CONVEX_HTTP_URL = 'https://grateful-pony-674.convex.site';
+        const CONVEX_HTTP_URL = window.CONVEX_SITE_URL || 'https://lovable-tapir-496.convex.site';
 
         // Get session_id from URL parameters
         const urlParams = new URLSearchParams(window.location.search);

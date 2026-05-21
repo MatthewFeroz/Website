@@ -1,14 +1,14 @@
 // Quiz Platform Configuration
 //
 // CONVEX_URL auto-switches based on hostname:
-//   - localhost / 127.0.0.1 → dev deployment  (grateful-pony-674)
+//   - localhost / 127.0.0.1 → dev deployment  (exciting-gazelle-615 via convex dev)
 //   - anywhere else         → prod deployment (kindhearted-swordfish-668)
 //
 // This keeps local testing safely pointed at dev so test submissions don't
 // create real leads or fire real emails, while the live site at
 // matthewferoz.com automatically hits prod.
 
-const CONVEX_URL_DEV  = "https://grateful-pony-674.convex.cloud";
+const CONVEX_URL_DEV  = "https://exciting-gazelle-615.convex.cloud";
 const CONVEX_URL_PROD = "https://kindhearted-swordfish-668.convex.cloud";
 
 const _isLocal =

@@ -14,6 +14,8 @@ import type * as blog from "../blog.js";
 import type * as diagnostic from "../diagnostic.js";
 import type * as http from "../http.js";
 import type * as leads from "../leads.js";
+import type * as newsletter from "../newsletter.js";
+import type * as posthog from "../posthog.js";
 import type * as quizzes from "../quizzes.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
@@ -32,6 +34,8 @@ declare const fullApi: ApiFromModules<{
   diagnostic: typeof diagnostic;
   http: typeof http;
   leads: typeof leads;
+  newsletter: typeof newsletter;
+  posthog: typeof posthog;
   quizzes: typeof quizzes;
   resources: typeof resources;
   seed: typeof seed;

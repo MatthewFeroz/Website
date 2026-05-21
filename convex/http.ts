@@ -9,6 +9,8 @@ const JSON_CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+const NEWSLETTER_CONFIRMATION_SUCCESS_URL = "https://matthewferoz.com/newsletter/?confirmed=1";
+const NEWSLETTER_CONFIRMATION_ERROR_URL = "https://matthewferoz.com/newsletter/?confirmed=0";
 
 // Newsletter signup endpoint
 http.route({
@@ -30,15 +32,8 @@ http.route({
       }
 
       const api = internal as any;
-      const resendResult = await ctx.runAction(api.newsletter.subscribeToResend, {
-        email,
-        firstName,
-        role,
-        source,
-        page,
-      });
-
-      await ctx.runMutation(api.newsletter.saveSubscriber, {
+      const token = crypto.randomUUID();
+      const saved = await ctx.runMutation(api.newsletter.savePendingSubscriber, {
         email,
         firstName,
         role,
@@ -46,15 +41,91 @@ http.route({
         page,
         referrer,
         userAgent,
-        resendContactId: resendResult.contactId,
-        resendSegmentId: resendResult.segmentId,
-        resendTopicId: resendResult.topicId,
+        confirmationToken: token,
       });
 
-      return jsonResponse({ ok: true, message: "You're on the list. Watch your inbox for NYC AI events." });
+      if (!saved.alreadyConfirmed) {
+        await ctx.runAction(api.newsletter.sendConfirmationEmail, {
+          email,
+          firstName,
+          token,
+          confirmationBaseUrl: new URL(request.url).origin,
+        });
+      }
+
+      return jsonResponse({
+        ok: true,
+        message: saved.alreadyConfirmed
+          ? "You're already confirmed. Watch your inbox for the next issue."
+          : "Check your inbox to confirm your subscription.",
+      });
     } catch (error) {
       console.error("Newsletter signup error:", error);
       return jsonResponse({ ok: false, error: "Something went wrong. Please try again in a minute." }, 500);
+    }
+  }),
+});
+
+http.route({
+  path: "/newsletter/confirm",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const token = new URL(request.url).searchParams.get("token") || "";
+
+    if (!token) {
+      return Response.redirect(NEWSLETTER_CONFIRMATION_ERROR_URL, 302);
+    }
+
+    try {
+      const api = internal as any;
+      const confirmation = await ctx.runMutation(api.newsletter.confirmSubscriberByToken, { token });
+
+      if (!confirmation.ok) {
+        return Response.redirect(
+          `${NEWSLETTER_CONFIRMATION_ERROR_URL}&reason=${confirmation.reason}`,
+          302
+        );
+      }
+
+      const subscriber = confirmation.subscriber;
+
+      try {
+        const resendResult = await ctx.runAction(api.newsletter.subscribeToResend, {
+          email: subscriber.email,
+          firstName: subscriber.firstName,
+          role: subscriber.role,
+          source: subscriber.source,
+          page: subscriber.page,
+        });
+
+        await ctx.runMutation(api.newsletter.updateConfirmedSubscriberResend, {
+          email: subscriber.email,
+          resendContactId: resendResult.contactId,
+          resendSegmentId: resendResult.segmentId,
+          resendTopicId: resendResult.topicId,
+        });
+      } catch (error) {
+        console.error("Newsletter Resend subscribe error:", error);
+      }
+
+      try {
+        const welcomeResult = await ctx.runAction(api.newsletter.sendLatestWelcomeEmail, {
+          email: subscriber.email,
+          firstName: subscriber.firstName,
+        });
+
+        await ctx.runMutation(api.newsletter.markLatestWelcomeSent, {
+          email: subscriber.email,
+          broadcastId: welcomeResult.broadcastId,
+        });
+      } catch (error) {
+        console.error("Newsletter welcome email error:", error);
+      }
+
+      return Response.redirect(NEWSLETTER_CONFIRMATION_SUCCESS_URL, 302);
+    } catch (error) {
+      console.error("Newsletter confirmation error:", error);
+      return Response.redirect(NEWSLETTER_CONFIRMATION_ERROR_URL, 302);
     }
   }),
 });

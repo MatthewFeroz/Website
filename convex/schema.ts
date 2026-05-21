@@ -164,6 +164,12 @@ export default defineSchema({
     page: v.optional(v.string()),
     referrer: v.optional(v.string()),
     userAgent: v.optional(v.string()),
+    status: v.optional(v.union(v.literal("pending"), v.literal("confirmed"), v.literal("unsubscribed"))),
+    confirmationToken: v.optional(v.string()),
+    confirmationTokenExpiresAt: v.optional(v.number()),
+    confirmedAt: v.optional(v.number()),
+    latestWelcomeSentAt: v.optional(v.number()),
+    latestWelcomeBroadcastId: v.optional(v.string()),
     resendContactId: v.optional(v.string()),
     resendSegmentId: v.optional(v.string()),
     resendTopicId: v.optional(v.string()),
@@ -171,6 +177,7 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_email", ["email"])
+    .index("by_confirmationToken", ["confirmationToken"])
     .index("by_createdAt", ["createdAt"]),
 
   // Cached blog feed from Substack RSS

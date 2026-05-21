@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter | Matt Feroz</title>
+    <meta name="description" content="The NYC AI event guide. Subscribe to Matt Feroz's newsletter for what he's hosting, where he'll be attending, and the AI events worth showing up to." />
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      :root {
+        --nl-fg-2: #cbd5e1;
+        --nl-surface: rgba(255,255,255,.03);
+        --nl-border-soft: rgba(255,255,255,.08);
+      }
+      .nl-hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 880px;
+        margin: 0 auto;
+        min-height: calc(100vh - var(--navbar-height));
+        min-height: calc(100dvh - var(--navbar-height));
+        padding: 2.5rem 1.5rem 3rem;
+        text-align: center;
+        gap: 1rem;
+        box-sizing: border-box;
+      }
+      .nl-hero h1 {
+        font-size: clamp(2rem, 4.5vw, 3.25rem);
+        line-height: 1.05;
+        letter-spacing: -.03em;
+        font-weight: 800;
+        margin: 0 auto;
+        max-width: 22ch;
+        color: var(--white);
+      }
+      .nl-hero p {
+        color: var(--nl-fg-2);
+        font-size: 1.02rem;
+        line-height: 1.55;
+        max-width: 36rem;
+        margin: 0 auto .75rem;
+      }
+      .nl-card {
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto;
+        background: var(--nl-surface);
+        border: 1px solid var(--nl-border-soft);
+        border-radius: 16px;
+        padding: 1.75rem 1.75rem 1.5rem;
+        text-align: left;
+      }
+      .nl-form {
+        display: grid;
+        gap: 1rem;
+      }
+      .nl-form label {
+        display: block;
+        color: var(--nl-fg-2);
+        font-size: .92rem;
+        font-weight: 500;
+        margin-bottom: .4rem;
+      }
+      .nl-form input,
+      .nl-form select {
+        box-sizing: border-box;
+        width: 100%;
+        background: rgba(255,255,255,.04);
+        border: 1.5px solid rgba(255,255,255,.14);
+        border-radius: 8px;
+        color: var(--white);
+        padding: .85rem 1rem;
+        font-family: inherit;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color .2s, background-color .2s, box-shadow .2s;
+      }
+      .nl-form input::placeholder {
+        color: rgba(255,255,255,.4);
+      }
+      .nl-form input:focus,
+      .nl-form select:focus {
+        border-color: var(--brand);
+        background: rgba(248,95,0,.06);
+        box-shadow: 0 0 0 4px rgba(248,95,0,.12);
+      }
+      .nl-form select {
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        padding-right: 2.5rem;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23cbd5e1' d='M0 0l5 6 5-6z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+      }
+      .nl-form select option { background: #242528; color: var(--white); }
+      .nl-form .primary-button {
+        width: 100%;
+        justify-content: center;
+        cursor: pointer;
+        margin-top: .25rem;
+        padding: .875rem 1.25rem;
+        font-size: 1rem;
+      }
+      .nl-status {
+        min-height: 0;
+        color: var(--text-muted);
+        font-size: .85rem;
+        line-height: 1.4;
+        margin: 0;
+      }
+      .nl-status:not(:empty) {
+        min-height: 1.2rem;
+      }
+      .nl-status.success { color: #86efac; }
+      .nl-status.error { color: #fca5a5; }
+      .nl-banner {
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto 1rem;
+        padding: 1rem 1.15rem;
+        border-radius: 12px;
+        font-size: .95rem;
+        line-height: 1.5;
+        text-align: left;
+      }
+      .nl-banner.success {
+        background: rgba(34, 197, 94, .12);
+        border: 1px solid rgba(134, 239, 172, .35);
+        color: #bbf7d0;
+      }
+      .nl-banner.error {
+        background: rgba(239, 68, 68, .1);
+        border: 1px solid rgba(252, 165, 165, .35);
+        color: #fecaca;
+      }
+      .nl-banner[hidden] { display: none; }
+      .nl-issues-head {
+        max-width: 1100px;
+        margin: 2rem auto 1rem;
+        padding: 0 1.5rem;
+        text-align: center;
+      }
+      .nl-issues-head h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.02em;
+        margin: 0 0 .35rem;
+      }
+      .nl-issues-head p {
+        color: var(--text-muted);
+        margin: 0;
+      }
+      @media (max-width: 768px) {
+        .nl-hero {
+          min-height: calc(100svh - var(--navbar-height));
+          padding: 2rem 1.25rem 2.5rem;
+        }
+        .nl-card {
+          padding: 1.5rem 1.35rem 1.35rem;
+        }
+      }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+            <nav class="nav-menu">
+                <a href="/events/" class="nav-link">Events</a>
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <div class="nav-dropdown">
+                    <button type="button" class="nav-link nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true">Learning</button>
+                    <div class="nav-dropdown-menu">
+                        <a href="/roadmap/" class="nav-dropdown-item">100 Hours Back AI Roadmap</a>
+                    </div>
+                </div>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="nav-link">Community</a>
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
+                <a href="/newsletter/" class="nav-link">Newsletter</a>
+            </nav>
+            <a href="https://form.typeform.com/to/VrRYF3dQ" target="_blank" rel="noopener" class="nav-cta" data-tf-popup="VrRYF3dQ" data-tf-medium="site-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
+        </div>
+        <div id="mobile-menu" class="mobile-menu" hidden>
+            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <a href="/events/" class="mobile-link">Events</a>
+            <a href="/coaching/" class="mobile-link">Coaching</a>
+            <div class="mobile-dropdown">
+                <button type="button" class="mobile-link mobile-dropdown-trigger" aria-expanded="false">Learning</button>
+                <div class="mobile-dropdown-menu" hidden>
+                    <a href="/roadmap/" class="mobile-link">100 Hours Back AI Roadmap</a>
+                </div>
+            </div>
+            <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="mobile-link">Community</a>
+            <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
+            <a href="/newsletter/" class="mobile-link">Newsletter</a>
+            <a href="https://form.typeform.com/to/VrRYF3dQ" target="_blank" rel="noopener" class="mobile-cta" data-tf-popup="VrRYF3dQ" data-tf-medium="site-cta-mobile" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>BOOK A FREE CALL</a>
+        </div>
+    </header>
+    <main>
+        <section class="nl-hero">
+            <h1>Find your next AI event.</h1>
+            <p>I'll send you what I'm hosting, where I'll be attending, and the NYC AI events actually worth showing up to.</p>
+            <div id="newsletter-confirm-banner" class="nl-banner" hidden role="status" aria-live="polite"></div>
+            <div class="nl-card">
+                <form class="nl-form" id="newsletter-form">
+                    <div>
+                        <label for="newsletter-first-name">First name</label>
+                        <input id="newsletter-first-name" name="firstName" type="text" autocomplete="given-name" placeholder="Matthew">
+                    </div>
+                    <div>
+                        <label for="newsletter-email">Email</label>
+                        <input id="newsletter-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+                    </div>
+                    <div>
+                        <label for="newsletter-role">I am a...</label>
+                        <select id="newsletter-role" name="role">
+                            <option value="">Choose one</option>
+                            <option value="product-manager">Product manager</option>
+                            <option value="founder">Founder</option>
+                            <option value="operator">Operator</option>
+                            <option value="engineer">Engineer / builder</option>
+                            <option value="student">Student</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <button class="primary-button" type="submit">SUBSCRIBE</button>
+                    <p class="nl-status" id="newsletter-status" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+
+        <section class="blog-posts-section">
+            <div class="nl-issues-head">
+                <h2>From the blog</h2>
+                <p>Long-form posts from my Substack on AI, building, and what I'm learning along the way.</p>
+                <a href="https://matthewferoz.substack.com" target="_blank" rel="noopener" class="nl-substack-link">Read on Substack <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+            <div class="blog-posts-inner">
+                <div id="blog-loading" class="blog-loading">
+                    <div class="blog-skeleton-card"></div>
+                    <div class="blog-skeleton-card"></div>
+                    <div class="blog-skeleton-card"></div>
+                </div>
+
+                <div id="blog-posts" class="blog-grid" style="display:none;"></div>
+
+                <div id="blog-error" class="blog-error" style="display:none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3>Couldn't load posts</h3>
+                    <p>There was an issue fetching posts from Substack. Please try again.</p>
+                    <button class="primary-button" id="blog-retry">Try Again</button>
+                </div>
+
+                <div id="blog-empty" class="blog-empty" style="display:none;">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <h3>First post coming soon</h3>
+                    <p>Subscribe above to be the first to read it.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
+                <a href="/newsletter/" class="footer-link">Newsletter</a>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="footer-link">Community</a>
+                <a href="/terms/" class="footer-link">Terms &amp; Conditions</a>
+                <a href="/privacy/" class="footer-link">Privacy Policy</a>
+            </nav>
+        </div>
+    </footer>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="/convex-site.js"></script>
+    <script src="/main.js" defer></script>
+    <script src="https://embed.typeform.com/next/embed.js" defer></script>
+
+    <!-- PostHog Analytics -->
+    <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
+    <script>
+        posthog.init('phc_NYfQd50P3VMosArZ6rMnOUWB4RDO7nfFG4XJFCOpSog', {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'identified_only'
+        })
+    </script>
+
+    <!-- Newsletter signup -->
+    <script>
+      const CONVEX_SITE_URL = window.CONVEX_SITE_URL || "https://lovable-tapir-496.convex.site";
+      const NEWSLETTER_ENDPOINT = `${CONVEX_SITE_URL}/newsletter/subscribe`;
+
+      const newsletterForm = document.getElementById("newsletter-form");
+      const newsletterStatus = document.getElementById("newsletter-status");
+      const confirmBanner = document.getElementById("newsletter-confirm-banner");
+
+      (function showConfirmationBanner() {
+        if (!confirmBanner) return;
+        const params = new URLSearchParams(window.location.search);
+        const confirmed = params.get("confirmed");
+        if (confirmed !== "1" && confirmed !== "0") return;
+
+        const reason = params.get("reason");
+        const messages = {
+          "1": {
+            type: "success",
+            text: "You're confirmed. Check your inbox for the latest issue and future NYC AI event updates.",
+          },
+          "0": {
+            type: "error",
+            text:
+              reason === "expired"
+                ? "This confirmation link has expired. Subscribe again to get a fresh email."
+                : reason === "invalid"
+                  ? "This confirmation link is invalid or was already used. Subscribe again if you still want in."
+                  : "We couldn't confirm your subscription. Please try subscribing again.",
+          },
+        };
+
+        const message = messages[confirmed];
+        confirmBanner.hidden = false;
+        confirmBanner.className = `nl-banner ${message.type}`;
+        confirmBanner.textContent = message.text;
+
+        if (window.posthog) {
+          window.posthog.capture("newsletter_confirmation_viewed", {
+            confirmed: confirmed === "1",
+            reason: reason || null,
+          });
+        }
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("confirmed");
+        cleanUrl.searchParams.delete("reason");
+        window.history.replaceState({}, "", cleanUrl);
+      })();
+
+      if (newsletterForm && newsletterStatus) {
+        newsletterForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const submitButton = newsletterForm.querySelector('button[type="submit"]');
+          const originalLabel = submitButton.textContent;
+          const formData = new FormData(newsletterForm);
+          const payload = {
+            firstName: String(formData.get("firstName") || "").trim(),
+            email: String(formData.get("email") || "").trim(),
+            role: String(formData.get("role") || "").trim(),
+            source: "newsletter-page",
+            page: window.location.pathname,
+            referrer: document.referrer || "",
+          };
+
+          newsletterStatus.className = "nl-status";
+          newsletterStatus.textContent = "Adding you to the list...";
+          submitButton.disabled = true;
+          submitButton.textContent = "ADDING...";
+
+          try {
+            const response = await fetch(NEWSLETTER_ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || !data.ok) {
+              throw new Error(data.error || "Signup failed");
+            }
+
+            newsletterStatus.className = "nl-status success";
+            newsletterStatus.textContent = data.message || "You're on the list. Watch your inbox.";
+            newsletterForm.reset();
+
+            if (window.posthog) {
+              window.posthog.capture("newsletter_subscribed", {
+                source: payload.source,
+                role: payload.role || "unknown",
+              });
+            }
+          } catch (error) {
+            newsletterStatus.className = "nl-status error";
+            newsletterStatus.textContent = error.message || "Something went wrong. Please try again.";
+          } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalLabel;
+          }
+        });
+      }
+    </script>
+
+    <!-- Newsletter issues fetch -->
+    <script type="module">
+        const CONVEX_SITE_URL = window.CONVEX_SITE_URL || "https://lovable-tapir-496.convex.site";
+        const FEED_ENDPOINTS = [
+            `${window.location.origin}/blog/feed`,
+            `${CONVEX_SITE_URL}/blog/feed`,
+        ];
+
+        const CACHE_KEY = "blog_cache";
+        const CACHE_TTL = 15 * 60 * 1000;
+
+        const loadingEl = document.getElementById("blog-loading");
+        const postsEl = document.getElementById("blog-posts");
+        const errorEl = document.getElementById("blog-error");
+        const emptyEl = document.getElementById("blog-empty");
+        const retryBtn = document.getElementById("blog-retry");
+
+        function getCachedPosts() {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                const cached = JSON.parse(raw);
+                if (Date.now() - cached.timestamp < CACHE_TTL && cached.posts && cached.posts.length > 0) {
+                    return cached;
+                }
+            } catch (e) { /* ignore corrupt cache */ }
+            return null;
+        }
+
+        function saveCachedPosts(posts) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ posts, timestamp: Date.now() }));
+            } catch (e) { /* storage full or unavailable */ }
+        }
+
+        async function fetchFeed(endpoint) {
+            const res = await fetch(endpoint);
+            if (!res.ok) {
+                throw new Error(`Feed fetch failed with status ${res.status}`);
+            }
+
+            const data = await res.json();
+            return Array.isArray(data.posts) ? data.posts : [];
+        }
+
+        async function fetchFresh() {
+            let lastError = null;
+
+            for (const endpoint of FEED_ENDPOINTS) {
+                try {
+                    const posts = await fetchFeed(endpoint);
+                    if (posts.length > 0) {
+                        saveCachedPosts(posts);
+                    }
+                    return posts;
+                } catch (err) {
+                    lastError = err;
+                }
+            }
+
+            console.error("Newsletter fetch error:", lastError);
+            return null;
+        }
+
+        function renderPosts(posts, animate) {
+            if (!posts || posts.length === 0) {
+                loadingEl.style.display = "none";
+                postsEl.style.display = "none";
+                emptyEl.style.display = "";
+                return;
+            }
+
+            postsEl.innerHTML = "";
+            posts.forEach((post) => {
+                const card = createPostCard(post);
+                postsEl.appendChild(card);
+            });
+
+            loadingEl.style.display = "none";
+            errorEl.style.display = "none";
+            emptyEl.style.display = "none";
+            postsEl.style.display = "";
+
+            if (animate && window.gsap) {
+                window.gsap.from(".blog-card", {
+                    opacity: 0,
+                    y: 24,
+                    duration: 0.5,
+                    ease: "power2.out",
+                    stagger: 0.08,
+                });
+            }
+        }
+
+        async function fetchPosts() {
+            errorEl.style.display = "none";
+            emptyEl.style.display = "none";
+
+            const cached = getCachedPosts();
+            if (cached) {
+                renderPosts(cached.posts, true);
+                fetchFresh().then(freshPosts => {
+                    if (freshPosts && JSON.stringify(freshPosts) !== JSON.stringify(cached.posts)) {
+                        renderPosts(freshPosts, false);
+                    }
+                });
+                return;
+            }
+
+            loadingEl.style.display = "";
+            postsEl.style.display = "none";
+
+            const posts = await fetchFresh();
+            if (posts) {
+                renderPosts(posts, true);
+            } else {
+                loadingEl.style.display = "none";
+                errorEl.style.display = "";
+            }
+        }
+
+        function createPostCard(post) {
+            const article = document.createElement("article");
+            article.className = "blog-card";
+
+            const formattedDate = new Date(post.pubDate).toLocaleDateString(
+                "en-US",
+                { month: "short", day: "numeric", year: "numeric" }
+            );
+
+            const excerpt =
+                post.description.length > 160
+                    ? post.description.slice(0, 160).trim() + "…"
+                    : post.description;
+
+            const thumbnailHTML = post.thumbnail
+                ? `<div class="blog-card-image-wrapper">
+                     <img class="blog-card-image" src="${post.thumbnail}" alt="${post.title}" loading="lazy" onerror="this.parentElement.classList.add('blog-card-no-image')">
+                   </div>`
+                : `<div class="blog-card-image-wrapper blog-card-no-image">
+                     <i class="fa-solid fa-newspaper"></i>
+                   </div>`;
+
+            article.innerHTML = `
+                <a href="${post.link}" target="_blank" rel="noopener" class="blog-card-link-wrapper">
+                    ${thumbnailHTML}
+                    <div class="blog-card-content">
+                        <span class="blog-card-date">${formattedDate}</span>
+                        <h3 class="blog-card-title">${post.title}</h3>
+                        <p class="blog-card-excerpt">${excerpt}</p>
+                        <span class="blog-card-read">Read on Substack &rarr;</span>
+                    </div>
+                </a>
+            `;
+
+            return article;
+        }
+
+        retryBtn.addEventListener("click", () => {
+            localStorage.removeItem(CACHE_KEY);
+            fetchPosts();
+        });
+        fetchPosts();
+    </script>
+</body>
+</html>

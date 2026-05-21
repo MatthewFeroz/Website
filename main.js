@@ -139,154 +139,8 @@
     lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
   });
 
-  // Typeform lazy loading functionality
-  const typeformPlaceholder = document.getElementById('typeform-placeholder');
-  const typeformIframe = document.getElementById('typeform-iframe');
-  const loadTypeformBtn = document.getElementById('load-typeform-btn');
-  
-  if (typeformPlaceholder && typeformIframe && loadTypeformBtn) {
-    let typeformLoaded = false;
-    
-    const loadTypeform = () => {
-      if (typeformLoaded) return;
-      
-      typeformLoaded = true;
-      typeformIframe.src = 'https://form.typeform.com/to/VrRYF3dQ?disable-auto-focus=true';
-      typeformIframe.style.display = 'block';
-      typeformPlaceholder.style.display = 'none';
-    };
-    
-    // Load on button click
-    loadTypeformBtn.addEventListener('click', loadTypeform);
-    
-    // Load when user scrolls near the form (Intersection Observer)
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !typeformLoaded) {
-          // Load the form when it comes into view
-          loadTypeform();
-        }
-      });
-    }, {
-      threshold: 0.3, // Load when 30% of the placeholder is visible
-      rootMargin: '50px' // Start loading 50px before it's fully visible
-    });
-    
-    observer.observe(typeformPlaceholder);
-    
-    // Also load when any "BOOK A FREE CALL" button is clicked
-    document.querySelectorAll('[data-tf-popup="VrRYF3dQ"]').forEach(button => {
-      button.addEventListener('click', (e) => {
-        // If it's not a popup button, load the embedded form
-        if (!button.hasAttribute('data-tf-popup') || button.getAttribute('data-tf-medium') !== 'site-cta') {
-          e.preventDefault();
-          loadTypeform();
-        }
-      });
-    });
-  }
-
-  const heroShell = document.querySelector('.hero-shell');
-  const heroShowcase = document.querySelector('.hero-showcase');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const supportsFinePointer = window.matchMedia('(pointer: fine)').matches;
-
-  if (heroShell && heroShowcase && !prefersReducedMotion && supportsFinePointer) {
-    const setHeroPointer = (event) => {
-      const rect = heroShell.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 100;
-      const y = ((event.clientY - rect.top) / rect.height) * 100;
-      const tiltX = ((x - 50) / 50) * 4;
-      const tiltY = ((y - 50) / 50) * 4;
-
-      heroShell.style.setProperty('--hero-spotlight-x', `${x}%`);
-      heroShell.style.setProperty('--hero-spotlight-y', `${y}%`);
-      heroShowcase.style.setProperty('--hero-tilt-x', tiltX.toFixed(2));
-      heroShowcase.style.setProperty('--hero-tilt-y', tiltY.toFixed(2));
-    };
-
-    const resetHeroPointer = () => {
-      heroShell.style.setProperty('--hero-spotlight-x', '50%');
-      heroShell.style.setProperty('--hero-spotlight-y', '50%');
-      heroShowcase.style.setProperty('--hero-tilt-x', '0');
-      heroShowcase.style.setProperty('--hero-tilt-y', '0');
-    };
-
-    heroShell.addEventListener('pointermove', setHeroPointer);
-    heroShell.addEventListener('pointerleave', resetHeroPointer);
-    resetHeroPointer();
-  }
-
-  const setupTestimonials = () => {
-    const marquee = document.querySelector('[data-testimonials-marquee]');
-    if (!marquee || marquee.dataset.ready === "true") return;
-    marquee.dataset.ready = "true";
-
-    const cards = Array.from(marquee.querySelectorAll('.testimonial-card:not([aria-hidden="true"])'));
-    const allCards = Array.from(marquee.querySelectorAll('.testimonial-card'));
-    const prevBtn = document.querySelector('[data-testimonial-prev]');
-    const nextBtn = document.querySelector('[data-testimonial-next]');
-    let activeIndex = 0;
-
-    const clearSelection = () => {
-      marquee.classList.remove('is-paused');
-      marquee.classList.remove('is-manual');
-      marquee.style.removeProperty('--testimonial-offset');
-      allCards.forEach((card) => {
-        card.classList.remove('is-selected');
-        card.setAttribute('aria-pressed', 'false');
-      });
-    };
-
-    const selectCard = (index) => {
-      if (!cards.length) return;
-      activeIndex = (index + cards.length) % cards.length;
-      const card = cards[activeIndex];
-      marquee.classList.add('is-paused', 'is-manual');
-      marquee.style.setProperty('--testimonial-offset', `${card.offsetLeft}px`);
-
-      allCards.forEach((item) => {
-        item.classList.remove('is-selected');
-        item.setAttribute('aria-pressed', 'false');
-      });
-      card.classList.add('is-selected');
-      card.setAttribute('aria-pressed', 'true');
-    };
-
-    cards.forEach((card, index) => {
-      card.addEventListener('click', () => {
-        const wasSelected = card.classList.contains('is-selected');
-        clearSelection();
-
-        if (!wasSelected) {
-          selectCard(index);
-        }
-      });
-    });
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => selectCard(activeIndex - 1));
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => selectCard(activeIndex + 1));
-    }
-
-    window.addEventListener('resize', () => {
-      if (marquee.classList.contains('is-manual')) selectCard(activeIndex);
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && marquee.classList.contains('is-paused')) {
-        clearSelection();
-      }
-    });
-  };
-
-  setupTestimonials();
-
   // GSAP-powered animations below — safe to skip if GSAP failed to load
-  const CONVEX_SITE_URL = "https://grateful-pony-674.convex.site";
+  const CONVEX_SITE_URL = window.CONVEX_SITE_URL || "https://lovable-tapir-496.convex.site";
   const YOUTUBE_ENDPOINTS = [
     `${window.location.origin}/youtube/videos`,
     `${CONVEX_SITE_URL}/youtube/videos`,
@@ -417,7 +271,6 @@
     const status = document.getElementById("videos-status");
     if (!scroller) return;
 
-    scroller.classList.remove("is-loading");
     scroller.innerHTML = "";
     videos.forEach((video) => scroller.appendChild(createVideoCard(video)));
     if (status) status.textContent = statusText || "";
@@ -467,58 +320,6 @@
 
   hydrateYouTubeVideos();
   setupVideoControls();
-
-  if (!window.gsap) return;
-  const gsap = window.gsap;
-  if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
-
-  // Entrance animation for hero
-  gsap.set([".hero-kicker", ".hero-title", ".hero-description", ".hero-proof-pill", ".hero-actions .primary-button", ".hero-actions .secondary-button", ".hero-stat-card", ".hero-showcase", ".hero-path-card"], { opacity: 0, y: 24 });
-  gsap.to(".hero-kicker", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", delay: 0.08 });
-  gsap.to(".hero-title", { opacity: 1, y: 0, duration: 0.72, ease: "power3.out", delay: 0.16 });
-  gsap.to(".hero-description", { opacity: 1, y: 0, duration: 0.65, ease: "power3.out", delay: 0.26 });
-  gsap.to(".hero-proof-pill", { opacity: 1, y: 0, duration: 0.48, ease: "power2.out", stagger: 0.08, delay: 0.34 });
-  gsap.to([".hero-actions .primary-button", ".hero-actions .secondary-button"], { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.08, delay: 0.42 });
-  gsap.to(".hero-stat-card", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.1, delay: 0.5 });
-  gsap.to(".hero-showcase", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.18 });
-  gsap.to(".hero-path-card", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.08, delay: 0.54 });
-  
-  // Ensure elements are visible on mobile (override any GSAP hiding)
-  if (window.innerWidth <= 768) {
-    gsap.set([".hero-kicker", ".hero-title", ".hero-description", ".hero-proof-pill", ".hero-actions .primary-button", ".hero-actions .secondary-button", ".hero-stat-card", ".hero-showcase", ".hero-path-card"], { 
-      opacity: 1, 
-      y: 0
-    });
-  }
-
-  // Logos stagger reveal
-  const logos = document.querySelectorAll(".logos-grid .logo-item");
-  if (logos.length) {
-    gsap.set(logos, { opacity: 0, y: 16 });
-    if (window.ScrollTrigger) {
-      gsap.to(logos, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        stagger: 0.06,
-        scrollTrigger: { trigger: ".logos", start: "top 80%" }
-      });
-    } else {
-      gsap.to(logos, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", stagger: 0.06, delay: 0.3 });
-    }
-  }
-
-  // Scroll reveal for resource cards
-  document.querySelectorAll('.resource-card').forEach((el) => {
-    gsap.set(el, { opacity: 0, y: 24 });
-    if (window.ScrollTrigger) {
-      gsap.to(el, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%' } });
-    } else {
-      gsap.to(el, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.2 });
-    }
-  });
-  // Parallax on hover removed per request — image stays static
 
   // FAQ Toggle functionality (multiple can be open)
   const faqQuestions = document.querySelectorAll('.faq-question');
