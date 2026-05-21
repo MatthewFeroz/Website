@@ -155,6 +155,24 @@ export default defineSchema({
     .index("by_email", ["email"])
     .index("by_createdAt", ["createdAt"]),
 
+  // Newsletter subscribers for NYC AI events and How AI Works updates
+  newsletterSubscribers: defineTable({
+    email: v.string(),
+    firstName: v.optional(v.string()),
+    role: v.optional(v.string()),
+    source: v.optional(v.string()),
+    page: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    resendContactId: v.optional(v.string()),
+    resendSegmentId: v.optional(v.string()),
+    resendTopicId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_createdAt", ["createdAt"]),
+
   // Cached blog feed from Substack RSS
   blogCache: defineTable({
     posts: v.array(
