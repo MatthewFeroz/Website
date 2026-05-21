@@ -10,7 +10,7 @@ Resend resources created:
   - ID: `4acd0291-67fd-4817-ae17-aa079c750315`
 - Broadcast draft:
   - ID: `fbd2dd52-280d-4ca3-a7a1-e85fa38d68d4`
-  - From: `How AI Works <events@matthewferoz.com>`
+  - From: `How AI Works <events@howaiworks.io>`
   - Reply-to: `Matthew Feroz <matt@matthewferoz.com>`
 
 Files:
@@ -20,7 +20,7 @@ Files:
 
 The `/events/` page signup form posts to Convex:
 
-`https://grateful-pony-674.convex.site/newsletter/subscribe`
+`https://kindhearted-swordfish-668.convex.site/newsletter/subscribe`
 
 Convex env vars needed in production:
 
