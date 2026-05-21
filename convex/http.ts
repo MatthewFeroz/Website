@@ -9,8 +9,9 @@ const JSON_CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
 };
-const NEWSLETTER_CONFIRMATION_SUCCESS_URL = "https://matthewferoz.com/newsletter/?confirmed=1";
-const NEWSLETTER_CONFIRMATION_ERROR_URL = "https://matthewferoz.com/newsletter/?confirmed=0";
+const NEWSLETTER_SITE_ORIGIN = "https://matthewferoz.com";
+const NEWSLETTER_CONFIRMATION_SUCCESS_URL = `${NEWSLETTER_SITE_ORIGIN}/newsletter/?confirmed=1`;
+const NEWSLETTER_CONFIRMATION_ERROR_URL = `${NEWSLETTER_SITE_ORIGIN}/newsletter/?confirmed=0`;
 
 // Newsletter signup endpoint
 http.route({
@@ -49,7 +50,7 @@ http.route({
           email,
           firstName,
           token,
-          confirmationBaseUrl: new URL(request.url).origin,
+          confirmationBaseUrl: NEWSLETTER_SITE_ORIGIN,
         });
       }
 

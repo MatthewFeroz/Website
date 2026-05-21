@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirming subscription | Matt Feroz</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+      .nl-confirm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - var(--navbar-height));
+        min-height: calc(100dvh - var(--navbar-height));
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        gap: 1rem;
+      }
+      .nl-confirm h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--white);
+        margin: 0;
+      }
+      .nl-confirm p {
+        color: var(--text-muted);
+        margin: 0;
+        max-width: 28rem;
+        line-height: 1.5;
+      }
+      .nl-confirm a {
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .nl-confirm a:hover { text-decoration: underline; }
+    </style>
+    <script src="/convex-site.js"></script>
+</head>
+<body>
+    <main class="nl-confirm">
+        <h1>Confirming your subscription…</h1>
+        <p id="nl-confirm-status">One moment while we verify your link.</p>
+    </main>
+    <script>
+      (function () {
+        const statusEl = document.getElementById("nl-confirm-status");
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+
+        if (!token) {
+          window.location.replace("/newsletter/?confirmed=0&reason=invalid");
+          return;
+        }
+
+        const convexBase = window.CONVEX_SITE_URL || "https://lovable-tapir-496.convex.site";
+        const target = convexBase + "/newsletter/confirm?token=" + encodeURIComponent(token);
+        window.location.replace(target);
+      })();
+    </script>
+</body>
+</html>

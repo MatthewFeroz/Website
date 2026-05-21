@@ -234,27 +234,36 @@ const server = http.createServer(async (req, res) => {
     return res.end("Forbidden");
   }
 
-  const ext = path.extname(fullPath);
+  const candidates = [
+    fullPath,
+    fullPath + ".html",
+    path.join(fullPath, "index.html"),
+  ];
+
+  tryServe(candidates, 0, res);
+});
+
+function tryServe(candidates, index, res) {
+  if (index >= candidates.length) {
+    res.writeHead(404, { "Content-Type": "text/html" });
+    res.end("<h1>404 Not Found</h1>");
+    return;
+  }
+
+  const filePath = candidates[index];
+  const ext = path.extname(filePath);
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
-  fs.readFile(fullPath, (err, data) => {
+  fs.readFile(filePath, (err, data) => {
     if (err) {
-      // Try adding .html extension
-      fs.readFile(fullPath + ".html", (err2, data2) => {
-        if (err2) {
-          res.writeHead(404, { "Content-Type": "text/html" });
-          res.end("<h1>404 Not Found</h1>");
-        } else {
-          res.writeHead(200, { "Content-Type": "text/html" });
-          res.end(data2);
-        }
-      });
-    } else {
-      res.writeHead(200, { "Content-Type": contentType });
-      res.end(data);
+      tryServe(candidates, index + 1, res);
+      return;
     }
+
+    res.writeHead(200, { "Content-Type": contentType });
+    res.end(data);
   });
-});
+}
 
 server.listen(PORT, () => {
   console.log(`\n  🚀 Dev server running at http://localhost:${PORT}`);
