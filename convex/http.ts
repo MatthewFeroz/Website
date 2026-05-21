@@ -4,6 +4,77 @@ import { internal } from "./_generated/api";
 
 const http = httpRouter();
 const YOUTUBE_VIDEOS_URL = "https://www.youtube.com/@MattFeroz/videos";
+const JSON_CORS_HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+// Newsletter signup endpoint
+http.route({
+  path: "/newsletter/subscribe",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    try {
+      const body = await request.json();
+      const email = normalizeEmail(body.email);
+      const firstName = normalizeText(body.firstName, 80);
+      const role = normalizeText(body.role, 80);
+      const source = normalizeText(body.source, 80) || "events-page";
+      const page = normalizeText(body.page, 200);
+      const referrer = normalizeText(body.referrer, 500);
+      const userAgent = normalizeText(request.headers.get("user-agent") || body.userAgent, 500);
+
+      if (!email) {
+        return jsonResponse({ ok: false, error: "Please enter a valid email address." }, 400);
+      }
+
+      const api = internal as any;
+      const resendResult = await ctx.runAction(api.newsletter.subscribeToResend, {
+        email,
+        firstName,
+        role,
+        source,
+        page,
+      });
+
+      await ctx.runMutation(api.newsletter.saveSubscriber, {
+        email,
+        firstName,
+        role,
+        source,
+        page,
+        referrer,
+        userAgent,
+        resendContactId: resendResult.contactId,
+        resendSegmentId: resendResult.segmentId,
+        resendTopicId: resendResult.topicId,
+      });
+
+      return jsonResponse({ ok: true, message: "You're on the list. Watch your inbox for NYC AI events." });
+    } catch (error) {
+      console.error("Newsletter signup error:", error);
+      return jsonResponse({ ok: false, error: "Something went wrong. Please try again in a minute." }, 500);
+    }
+  }),
+});
+
+// CORS preflight for newsletter signup
+http.route({
+  path: "/newsletter/subscribe",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "86400",
+      },
+    });
+  }),
+});
 
 // Stripe webhook endpoint
 http.route({
@@ -268,6 +339,25 @@ http.route({
     });
   }),
 });
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: JSON_CORS_HEADERS,
+  });
+}
+
+function normalizeEmail(value: unknown): string {
+  if (typeof value !== "string") return "";
+  const email = value.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
+}
+
+function normalizeText(value: unknown, maxLength: number): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim().replace(/\s+/g, " ").slice(0, maxLength);
+  return normalized || undefined;
+}
 
 function parseRSS(xml: string) {
   const posts: Array<{
