@@ -132,6 +132,9 @@ p {
   color: #cbd5e1;
   text-decoration: none;
   font-size: 0.9rem;
+  line-height: 1.25;
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-link:hover {
@@ -159,7 +162,9 @@ p {
 /* Desktop nav dropdown — click-toggled via .is-open class (added by main.js) */
 .nav-dropdown {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  align-self: center;
 }
 
 .nav-dropdown-trigger {
@@ -167,6 +172,7 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  line-height: 1.25;
   /* Button reset so a <button> trigger inherits the surrounding nav-link look */
   background: transparent;
   border: 0;
@@ -174,12 +180,20 @@ p {
   margin: 0;
   font-family: inherit;
   font-weight: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.nav-dropdown-trigger:hover {
+  color: var(--white);
 }
 
 .nav-dropdown-trigger::after {
   content: "\25BE";
   font-size: 0.75em;
+  line-height: 1;
   opacity: 0.7;
+  transform: translateY(0.05em);
 }
 
 .nav-dropdown.is-open .nav-dropdown-trigger::after {
