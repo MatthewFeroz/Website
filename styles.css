@@ -1767,17 +1767,6 @@ main > .hero-banner:first-child {
   margin-bottom: var(--space-md);
 }
 
-.blog-card-read {
-  color: var(--brand);
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: opacity 0.2s ease;
-}
-
-.blog-card:hover .blog-card-read {
-  opacity: 0.85;
-}
-
 /* Loading skeletons */
 .blog-loading {
   display: grid;
