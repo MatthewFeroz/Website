@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account | Matt Feroz</title>
+    <meta name="description" content="Sign in to access your courses." />
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .account-section { max-width: 720px; margin: 0 auto; padding: 8rem 1.5rem 4rem; }
+        .account-card {
+            background: #1e1e21; border: 1px solid #2a2a2e; border-radius: 16px;
+            padding: 2.5rem; text-align: center;
+        }
+        .account-card h1 { margin: 0 0 .5rem; }
+        .account-muted { color: #9aa0aa; }
+        .account-row { margin: 1.25rem 0; }
+        .account-status-ok { color: #43c463; font-weight: 600; }
+        .account-status-no { color: #ff8a65; font-weight: 600; }
+        .auth-signin-btn, #signin-btn {
+            background: #f85f00; color: #fff; border: none; border-radius: 10px;
+            padding: .85rem 2rem; font-size: 1rem; font-weight: 600; cursor: pointer;
+            font-family: inherit;
+        }
+        .auth-signin-btn:hover, #signin-btn:hover { background: #ff7a1f; }
+        #user-button { display: flex; justify-content: center; margin-bottom: 1rem; }
+        .account-actions { margin-top: 1.5rem; display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+        .account-actions a {
+            display: inline-block; padding: .75rem 1.5rem; border-radius: 10px;
+            text-decoration: none; font-weight: 600;
+        }
+        .btn-primary { background: #f85f00; color: #fff; }
+        .btn-ghost { border: 1px solid #2a2a2e; color: #e7e7ea; }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+            <nav class="nav-menu">
+                <a href="/events/" class="nav-link">Events</a>
+                <a href="/coaching/" class="nav-link">Coaching</a>
+                <div class="nav-dropdown">
+                    <button type="button" class="nav-link nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true">Learning</button>
+                    <div class="nav-dropdown-menu">
+                        <a href="/roadmap/" class="nav-dropdown-item">100 Hours Back AI Roadmap</a>
+                    </div>
+                </div>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="nav-link">Community</a>
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="nav-link">YouTube</a>
+                <a href="/newsletter/" class="nav-link">Newsletter</a>
+            </nav>
+            <a href="https://form.typeform.com/to/VrRYF3dQ" target="_blank" rel="noopener" class="nav-cta" data-tf-popup="VrRYF3dQ" data-tf-medium="site-cta" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus><span class="cta-full">BOOK A FREE CALL</span><span class="cta-short">BOOK</span></a>
+        </div>
+        <div id="mobile-menu" class="mobile-menu" hidden>
+            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <a href="/events/" class="mobile-link">Events</a>
+            <a href="/coaching/" class="mobile-link">Coaching</a>
+            <div class="mobile-dropdown">
+                <button type="button" class="mobile-link mobile-dropdown-trigger" aria-expanded="false">Learning</button>
+                <div class="mobile-dropdown-menu" hidden>
+                    <a href="/roadmap/" class="mobile-link">100 Hours Back AI Roadmap</a>
+                </div>
+            </div>
+            <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="mobile-link">Community</a>
+            <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="mobile-link">YouTube</a>
+            <a href="/newsletter/" class="mobile-link">Newsletter</a>
+            <a href="https://form.typeform.com/to/VrRYF3dQ" target="_blank" rel="noopener" class="mobile-cta" data-tf-popup="VrRYF3dQ" data-tf-medium="site-cta-mobile" data-tf-size="70" data-tf-opacity="100" data-tf-disable-auto-focus>BOOK A FREE CALL</a>
+        </div>
+    </header>
+
+    <section class="account-section">
+        <div class="account-card">
+            <div id="account-loading">
+                <h1>Account</h1>
+                <p class="account-muted">Loading…</p>
+            </div>
+
+            <div id="account-signedout" hidden>
+                <h1>Sign in</h1>
+                <p class="account-muted account-row">Sign in with Google to access your courses.</p>
+                <button id="signin-btn" type="button">Sign in</button>
+            </div>
+
+            <div id="account-signedin" hidden>
+                <div id="user-button"></div>
+                <h1>Your Account</h1>
+                <p class="account-row">Signed in as <strong id="acct-email"></strong></p>
+                <p class="account-row" id="acct-access"></p>
+                <div class="account-actions">
+                    <a id="acct-courses" class="btn-primary" href="/courses/">Go to Courses</a>
+                    <a id="acct-admin" class="btn-ghost" href="/courses/admin.html" hidden>Admin · Manage courses</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="/" class="footer-logo">MATT FEROZ</a>
+            <nav class="footer-menu">
+                <a href="https://www.youtube.com/@MattFeroz" target="_blank" class="footer-link">YouTube</a>
+                <a href="https://www.instagram.com/mattferoz" target="_blank" class="footer-link">Instagram</a>
+                <a href="/newsletter/" class="footer-link">Newsletter</a>
+                <a href="https://www.skool.com/feroz-academy-1644" target="_blank" rel="noopener" class="footer-link">Community</a>
+                <a href="/terms/" class="footer-link">Terms &amp; Conditions</a>
+                <a href="/privacy/" class="footer-link">Privacy Policy</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="/main.js" defer></script>
+
+    <script type="module">
+        import { getClerk, syncUser } from "/auth.js";
+
+        const $ = (id) => document.getElementById(id);
+
+        (async () => {
+            const clerk = await getClerk();
+
+            async function render() {
+                $("account-loading").hidden = true;
+                if (!clerk.user) {
+                    $("account-signedout").hidden = false;
+                    $("account-signedin").hidden = true;
+                    return;
+                }
+                $("account-signedout").hidden = true;
+                $("account-signedin").hidden = false;
+
+                const ub = $("user-button");
+                ub.innerHTML = "";
+                clerk.mountUserButton(ub, { afterSignOutUrl: "/account/" });
+
+                try {
+                    const info = await syncUser(); // { email, role, hasCourseAccess }
+                    $("acct-email").textContent = info.email || "(no email)";
+                    if (info.hasCourseAccess) {
+                        $("acct-access").innerHTML = '<span class="account-status-ok">✓ You have course access.</span>';
+                    } else {
+                        $("acct-access").innerHTML = '<span class="account-status-no">No course access yet.</span> <a href="/platform/" style="color:#f85f00;">Get access →</a>';
+                    }
+                    $("acct-admin").hidden = info.role !== "admin";
+                } catch (e) {
+                    console.error(e);
+                    $("acct-access").textContent = "Could not load account status.";
+                }
+            }
+
+            await render();
+            clerk.addListener(() => { render(); });
+
+            $("signin-btn").addEventListener("click", () => clerk.openSignIn({}));
+        })();
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script src="https://unpkg.com/posthog-js@latest/dist/posthog.min.js"></script>
+    <script>
+        posthog.init('phc_NYfQd50P3VMosArZ6rMnOUWB4RDO7nfFG4XJFCOpSog', {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'identified_only'
+        })
+    </script>
+</body>
+</html>

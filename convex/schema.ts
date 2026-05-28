@@ -27,15 +27,43 @@ export default defineSchema({
     .index("by_sessionId", ["sessionId"])
     .index("by_email", ["email"]),
 
-  // Users who have redeemed an access code
+  // Authenticated users. Identity comes from Clerk (tokenIdentifier); legacy rows
+  // created via access codes are linked by email on first Clerk sign-in.
   users: defineTable({
     email: v.string(),
-    accessCode: v.string(),
+    // Clerk identity: `UserIdentity.tokenIdentifier` (issuer + subject). Optional so
+    // legacy access-code rows validate; populated by identity.syncUser on first login.
+    tokenIdentifier: v.optional(v.string()),
+    role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
+    // Legacy: access code this user originally redeemed (kept for history). Optional now.
+    accessCode: v.optional(v.string()),
     createdAt: v.number(),
     lastLoginAt: v.optional(v.number()),
   })
     .index("by_email", ["email"])
-    .index("by_accessCode", ["accessCode"]),
+    .index("by_accessCode", ["accessCode"])
+    .index("by_token", ["tokenIdentifier"]),
+
+  // Product entitlements (replaces the access-code grant). A Stripe purchase or a
+  // manual/legacy grant creates one of these keyed by email; it's linked to a user's
+  // _id when they sign in. Presence of an active (non-revoked) entitlement = access.
+  entitlements: defineTable({
+    email: v.string(),
+    userId: v.optional(v.id("users")),
+    product: v.string(), // e.g. "course-access"
+    source: v.union(
+      v.literal("stripe"),
+      v.literal("manual"),
+      v.literal("legacy-code")
+    ),
+    stripePaymentId: v.optional(v.string()),
+    stripeSessionId: v.optional(v.string()),
+    grantedAt: v.number(),
+    revokedAt: v.optional(v.number()),
+  })
+    .index("by_email", ["email"])
+    .index("by_userId", ["userId"])
+    .index("by_email_product", ["email", "product"]),
 
   // Quiz definitions
   quizzes: defineTable({

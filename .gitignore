@@ -1,9 +1,10 @@
 # Dependencies
 node_modules/
 
-# Convex
-.env.local
+# Convex / env (all dotenv variants — keep secrets like sk_live out of git)
 .env
+.env.*
+!.env.example
 
 # OS
 .DS_Store

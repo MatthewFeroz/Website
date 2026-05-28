@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import Stripe from "stripe";
 import { Resend } from "resend";
 import { getPostHogClient } from "./posthog";
+import { COURSE_PRODUCT } from "./identity";
 
 // Generate access code (same pattern as admin.ts)
 function generateAccessCode(): string {
@@ -151,6 +152,28 @@ export const createPurchaseRecord = internalMutation({
       currency: args.currency,
       createdAt: now,
     });
+
+    // Dual-write for the new Clerk-based auth model: grant a course entitlement
+    // keyed by email, in addition to the legacy access code above. During the
+    // transition both exist; once the Clerk frontend is live we stop emailing codes.
+    // syncUser links this entitlement to the user's account on first sign-in (by email).
+    const emailLc = args.email.trim().toLowerCase();
+    const existingEnt = await ctx.db
+      .query("entitlements")
+      .withIndex("by_email_product", (q) =>
+        q.eq("email", emailLc).eq("product", COURSE_PRODUCT)
+      )
+      .collect();
+    if (!existingEnt.some((e) => !e.revokedAt)) {
+      await ctx.db.insert("entitlements", {
+        email: emailLc,
+        product: COURSE_PRODUCT,
+        source: "stripe",
+        stripePaymentId: args.paymentIntentId,
+        stripeSessionId: args.sessionId,
+        grantedAt: now,
+      });
+    }
 
     console.log("Created purchase record:", purchaseId, "for email:", args.email);
     return purchaseId;
