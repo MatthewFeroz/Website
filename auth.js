@@ -7,14 +7,23 @@
 // Usage (ES module):
 //   import { getClerk, getConvexClient, api, syncUser, mountAuthControls } from "/auth.js";
 
-import { ConvexClient, anyApi } from "https://esm.sh/convex@1.31.5/browser";
+import { ConvexHttpClient } from "https://esm.sh/convex@1.31.5/browser";
 import {
   CLERK_PUBLISHABLE_KEY,
   CLERK_FRONTEND_API,
   CONVEX_URL,
 } from "/auth-config.js";
 
-export const api = anyApi;
+// Build "module:function" function references without depending on `anyApi`
+// (which isn't reliably exported from convex/browser). Same trick the quiz
+// index.html uses. e.g. api.identity.syncUser === "identity:syncUser".
+export const api = new Proxy(
+  {},
+  {
+    get: (_, module) =>
+      new Proxy({}, { get: (_, fn) => `${String(module)}:${String(fn)}` }),
+  }
+);
 
 let clerkPromise = null;
 let convexClient = null;
@@ -34,36 +43,35 @@ function loadScript(src, attrs = {}) {
 
 /**
  * Load and initialize ClerkJS once. Resolves to the global `Clerk` instance.
+ * Uses clerk-js@5 (UI components bundled in — no separate @clerk/ui bundle and no
+ * `ui:` argument needed, which is far more robust for a no-build static site).
  */
 export function getClerk() {
   if (clerkPromise) return clerkPromise;
   clerkPromise = (async () => {
-    const base = `https://${CLERK_FRONTEND_API}/npm`;
-    // UI bundle must load before clerk-js (it registers window.__internal_ClerkUICtor).
-    await loadScript(`${base}/@clerk/ui@1/dist/ui.browser.js`);
-    await loadScript(`${base}/@clerk/clerk-js@6/dist/clerk.browser.js`, {
-      "data-clerk-publishable-key": CLERK_PUBLISHABLE_KEY,
-    });
-    if (!window.Clerk) throw new Error("ClerkJS failed to initialize");
-    await window.Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } });
+    await loadScript(
+      `https://${CLERK_FRONTEND_API}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`,
+      { "data-clerk-publishable-key": CLERK_PUBLISHABLE_KEY }
+    );
+    if (!window.Clerk) throw new Error("ClerkJS global not found after script load");
+    await window.Clerk.load();
     return window.Clerk;
   })();
   return clerkPromise;
 }
 
 /**
- * A reactive Convex client whose auth token is fetched from Clerk on demand
- * (Convex refreshes it automatically via this callback).
+ * A Convex HTTP client with a fresh Clerk "convex" JWT applied. Call this
+ * before each batch of calls so the (short-lived) token is current.
  */
 export async function getConvexClient() {
   const clerk = await getClerk();
-  if (!convexClient) {
-    convexClient = new ConvexClient(CONVEX_URL);
-    convexClient.setAuth(async () => {
-      if (!clerk.session) return null;
-      return await clerk.session.getToken({ template: "convex" });
-    });
-  }
+  if (!convexClient) convexClient = new ConvexHttpClient(CONVEX_URL);
+  const token = clerk.session
+    ? await clerk.session.getToken({ template: "convex" })
+    : null;
+  if (token) convexClient.setAuth(token);
+  else if (convexClient.clearAuth) convexClient.clearAuth();
   return convexClient;
 }
 

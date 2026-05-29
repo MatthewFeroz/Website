@@ -154,7 +154,16 @@
             clerk.addListener(() => { render(); });
 
             $("signin-btn").addEventListener("click", () => clerk.openSignIn({}));
-        })();
+        })().catch((err) => {
+            console.error("Account page failed to initialize:", err);
+            const l = $("account-loading");
+            l.hidden = false;
+            l.innerHTML =
+                '<h1>Account</h1><p class="account-status-no">Sign-in failed to load.</p>' +
+                '<p class="account-muted" style="font-size:.85rem;word-break:break-word;">' +
+                (err && err.message ? err.message : String(err)) +
+                '</p><p class="account-muted">Please reload. If it persists, let me know this message.</p>';
+        });
     </script>
 
     <!-- PostHog Analytics -->
