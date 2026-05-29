@@ -16,3 +16,8 @@ node_modules/
 
 # Cloudflare Wrangler
 .wrangler/
+
+# Internal setup notes / one-off scripts (operational identifiers — keep out of the
+# published site & repo; Jekyll `exclude` proved unreliable here)
+SETUP-AUTH.md
+clerk-dns-cloudflare.sh

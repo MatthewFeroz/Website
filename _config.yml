@@ -5,7 +5,5 @@ theme: null
 exclude:
   - node_modules
   - README.md
-  - SETUP-AUTH.md
-  - clerk-dns-cloudflare.sh
   - convex
 
