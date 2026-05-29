@@ -272,4 +272,45 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_guestId", ["guestId"]),
+
+  // Video courses (replaces the quiz module). A course has ordered lessons.
+  courses: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    description: v.string(),
+    thumbnailFileId: v.optional(v.id("_storage")),
+    order: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_isActive", ["isActive"]),
+
+  // Lessons within a course. Video + optional poster live in Convex file storage.
+  lessons: defineTable({
+    courseId: v.id("courses"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    videoFileId: v.id("_storage"),
+    posterFileId: v.optional(v.id("_storage")),
+    durationSeconds: v.number(),
+    order: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_courseId", ["courseId"]),
+
+  // Per-user lesson progress (completion + resume position).
+  lessonProgress: defineTable({
+    userId: v.id("users"),
+    courseId: v.id("courses"),
+    lessonId: v.id("lessons"),
+    completed: v.boolean(),
+    lastPositionSeconds: v.number(),
+    completedAt: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_lessonId", ["userId", "lessonId"])
+    .index("by_userId_courseId", ["userId", "courseId"]),
 });

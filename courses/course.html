@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course | Matt Feroz</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .course-wrap { max-width:1180px; margin:0 auto; padding:6.5rem 1.5rem 4rem; }
+        .course-title-row { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+        .course-title-row h1 { margin:0; }
+        .course-pct { color:#f85f00; font-weight:600; }
+        .course-layout { display:grid; grid-template-columns:1fr 340px; gap:1.5rem; align-items:start; }
+        @media (max-width:900px){ .course-layout{ grid-template-columns:1fr; } }
+        .player-col video { width:100%; border-radius:12px; background:#000; aspect-ratio:16/9; }
+        .lesson-now-title { margin:1rem 0 .3rem; font-size:1.3rem; }
+        .lesson-now-desc { color:#9aa0aa; }
+        .playlist { background:#1e1e21; border:1px solid #2a2a2e; border-radius:12px; overflow:hidden; }
+        .playlist h3 { margin:0; padding:1rem 1.2rem; border-bottom:1px solid #2a2a2e; font-size:1rem; }
+        .pl-item { display:flex; gap:.7rem; align-items:flex-start; padding:.8rem 1.2rem; cursor:pointer; border-bottom:1px solid #2a2a2e; }
+        .pl-item:last-child { border-bottom:none; }
+        .pl-item:hover { background:#26262a; }
+        .pl-item.active { background:#2a1f16; border-left:3px solid #f85f00; }
+        .pl-check { width:20px; height:20px; border-radius:50%; border:2px solid #3a3a40; flex:0 0 auto; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:.65rem; color:#fff; }
+        .pl-check.done { background:#43c463; border-color:#43c463; }
+        .pl-text { flex:1; }
+        .pl-text .t { font-size:.92rem; }
+        .pl-text .d { color:#9aa0aa; font-size:.78rem; margin-top:.15rem; }
+        .locked-box, .center-note { text-align:center; color:#9aa0aa; padding:3rem 1rem; }
+        .locked-box a, .signin-cta { display:inline-block; background:#f85f00; color:#fff; padding:.7rem 1.5rem; border-radius:9px; text-decoration:none; font-weight:600; border:none; cursor:pointer; font-family:inherit; }
+        .nav-auth-slot { display:flex; align-items:center; }
+        .auth-signin-btn { background:#f85f00; color:#fff; border:none; border-radius:8px; padding:.5rem 1.1rem; font-weight:600; cursor:pointer; font-family:inherit; }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo"><span class="logo-full">MATT FEROZ</span><span class="logo-short">FEROZ</span></a>
+            <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+            <nav class="nav-menu">
+                <a href="/courses/" class="nav-link">All Courses</a>
+                <a href="/account/" class="nav-link">Account</a>
+            </nav>
+            <div class="nav-auth-slot" id="nav-auth"></div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu" hidden>
+            <button class="mobile-close" aria-label="Close menu">✕</button>
+            <a href="/courses/" class="mobile-link">All Courses</a>
+            <a href="/account/" class="mobile-link">Account</a>
+        </div>
+    </header>
+
+    <div class="course-wrap">
+        <div id="loading" class="center-note">Loading…</div>
+
+        <div id="signin" class="center-note" hidden>
+            <p>Sign in to view this course.</p>
+            <button class="signin-cta" id="signin-btn">Sign in</button>
+        </div>
+
+        <div id="notfound" class="center-note" hidden><p>Course not found. <a href="/courses/" style="color:#f85f00;">Back to courses</a></p></div>
+
+        <div id="course" hidden>
+            <div class="course-title-row">
+                <h1 id="c-title"></h1>
+                <span class="course-pct"><span id="c-pct">0</span>% complete</span>
+            </div>
+
+            <div id="locked" class="locked-box" hidden>
+                <p>You don't have access to this course yet.</p>
+                <a href="/platform/">Get access →</a>
+            </div>
+
+            <div id="layout" class="course-layout" hidden>
+                <div class="player-col">
+                    <video id="player" controls playsinline preload="metadata"></video>
+                    <h2 class="lesson-now-title" id="now-title"></h2>
+                    <p class="lesson-now-desc" id="now-desc"></p>
+                </div>
+                <div class="playlist">
+                    <h3>Lessons</h3>
+                    <div id="pl"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/main.js" defer></script>
+    <script type="module">
+        import { getClerk, getConvexClient, api, mountAuthControls } from "/auth.js";
+
+        const $ = (id) => document.getElementById(id);
+        const params = new URLSearchParams(location.search);
+        const slug = params.get("slug") || "";
+
+        let lessons = [], current = -1, course = null;
+        let saveTimer = null, lastSaved = 0;
+
+        async function call(type, name, args) {
+            const c = await getConvexClient();
+            return type === "q" ? await c.query(name, args) : await c.mutation(name, args);
+        }
+
+        function renderPlaylist() {
+            const pl = $("pl"); pl.innerHTML = "";
+            lessons.forEach((l, i) => {
+                const item = document.createElement("div");
+                item.className = "pl-item" + (i === current ? " active" : "");
+                item.innerHTML =
+                    '<div class="pl-check ' + (l.completed ? "done" : "") + '">' + (l.completed ? '<i class="fa-solid fa-check"></i>' : (i + 1)) + '</div>' +
+                    '<div class="pl-text"><div class="t">' + l.title + '</div><div class="d">' + Math.round(l.durationSeconds/60) + ' min</div></div>';
+                item.onclick = () => playLesson(i);
+                pl.appendChild(item);
+            });
+            const done = lessons.filter((l) => l.completed).length;
+            $("c-pct").textContent = lessons.length ? Math.round(done / lessons.length * 100) : 0;
+        }
+
+        async function playLesson(i) {
+            if (i < 0 || i >= lessons.length) return;
+            current = i; renderPlaylist();
+            const l = lessons[i];
+            $("now-title").textContent = l.title;
+            $("now-desc").textContent = l.description || "";
+            const video = $("player");
+            video.removeAttribute("src"); video.load();
+            try {
+                const data = await call("q", api.courses.getLessonVideoUrl, { lessonId: l._id });
+                if (!data || !data.videoUrl) { $("now-desc").textContent = "Could not load this lesson."; return; }
+                if (data.posterUrl) video.poster = data.posterUrl;
+                video.src = data.videoUrl;
+                video.load();
+                const resume = l.lastPositionSeconds || 0;
+                if (resume > 5 && resume < l.durationSeconds - 5) {
+                    video.addEventListener("loadedmetadata", () => { try { video.currentTime = resume; } catch {} }, { once: true });
+                }
+                video.play().catch(() => {});
+            } catch (e) { $("now-desc").textContent = "Could not load this lesson."; console.error(e); }
+        }
+
+        function wirePlayer() {
+            const video = $("player");
+            video.addEventListener("timeupdate", () => {
+                if (current < 0) return;
+                const now = Date.now();
+                if (now - lastSaved > 5000 && video.currentTime > 0) {
+                    lastSaved = now;
+                    lessons[current].lastPositionSeconds = video.currentTime;
+                    call("m", api.courses.setLessonPosition, { lessonId: lessons[current]._id, positionSeconds: video.currentTime }).catch(() => {});
+                }
+            });
+            const complete = async () => {
+                if (current < 0 || lessons[current].completed) return;
+                lessons[current].completed = true; renderPlaylist();
+                try { await call("m", api.courses.markLessonComplete, { lessonId: lessons[current]._id }); } catch (e) { console.error(e); }
+            };
+            video.addEventListener("timeupdate", () => {
+                if (current >= 0 && video.duration && video.currentTime / video.duration >= 0.95) complete();
+            });
+            video.addEventListener("ended", async () => {
+                await complete();
+                if (current + 1 < lessons.length) playLesson(current + 1);
+            });
+        }
+
+        (async () => {
+            await mountAuthControls("#nav-auth");
+            const clerk = await getClerk();
+            $("loading").hidden = true;
+
+            if (!clerk.user) { $("signin").hidden = false; $("signin-btn").onclick = () => clerk.openSignIn({}); return; }
+
+            course = await call("q", api.courses.getCourse, { slug });
+            if (!course) { $("notfound").hidden = false; return; }
+
+            $("course").hidden = false;
+            $("c-title").textContent = course.title;
+            $("c-pct").textContent = course.percentComplete;
+            lessons = course.lessons;
+
+            if (!course.hasAccess) { $("locked").hidden = false; return; }
+            if (!lessons.length) { $("layout").hidden = false; $("pl").innerHTML = '<p class="center-note">No lessons yet.</p>'; return; }
+
+            $("layout").hidden = false;
+            wirePlayer();
+            renderPlaylist();
+            // Start at first unfinished lesson, else first.
+            const startIdx = Math.max(0, lessons.findIndex((l) => !l.completed));
+            playLesson(startIdx === -1 ? 0 : startIdx);
+
+            clerk.addListener(() => { if (!clerk.user) location.reload(); });
+        })().catch((e) => { $("loading").hidden = false; $("loading").textContent = "Something went wrong."; console.error(e); });
+    </script>
+</body>
+</html>

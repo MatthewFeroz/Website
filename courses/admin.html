@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Admin | Matt Feroz</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .admin-wrap { max-width: 860px; margin: 0 auto; padding: 7rem 1.5rem 4rem; }
+        .admin-wrap h1 { margin-bottom: .25rem; }
+        .admin-card { background:#1e1e21; border:1px solid #2a2a2e; border-radius:14px; padding:1.75rem; margin:1.5rem 0; }
+        .admin-card h2 { margin:0 0 1rem; font-size:1.2rem; }
+        .admin-field { margin-bottom:1rem; display:flex; flex-direction:column; gap:.35rem; }
+        .admin-field label { color:#cbd5e1; font-size:.9rem; }
+        .admin-field input, .admin-field textarea, .admin-field select {
+            background:#141416; border:1px solid #2a2a2e; border-radius:8px; color:#fff;
+            padding:.7rem .8rem; font-family:inherit; font-size:.95rem;
+        }
+        .admin-field textarea { min-height:70px; resize:vertical; }
+        .admin-btn { background:#f85f00; color:#fff; border:none; border-radius:9px; padding:.8rem 1.6rem; font-weight:600; cursor:pointer; font-family:inherit; }
+        .admin-btn:hover { background:#ff7a1f; }
+        .admin-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .admin-muted { color:#9aa0aa; }
+        .admin-status { margin-top:1rem; font-size:.9rem; min-height:1.2em; }
+        .admin-status.ok { color:#43c463; }
+        .admin-status.err { color:#ff8a65; }
+        .course-list-item { display:flex; justify-content:space-between; padding:.6rem 0; border-bottom:1px solid #2a2a2e; }
+        .course-list-item:last-child { border-bottom:none; }
+        #gate, #notadmin { text-align:center; padding:3rem 0; }
+        header.adminbar { display:flex; justify-content:space-between; align-items:center; padding:1rem 1.5rem; border-bottom:1px solid #2a2a2e; }
+        header.adminbar a { color:#fff; text-decoration:none; font-weight:700; }
+        .progress-track { height:8px; background:#141416; border-radius:6px; overflow:hidden; margin-top:.5rem; }
+        .progress-fill { height:100%; width:0; background:#f85f00; transition:width .2s; }
+    </style>
+</head>
+<body>
+    <header class="adminbar">
+        <a href="/">MATT FEROZ</a>
+        <div id="userbtn"></div>
+    </header>
+
+    <div class="admin-wrap">
+        <div id="gate" hidden>
+            <h1>Course Admin</h1>
+            <p class="admin-muted">Sign in with an admin account to manage courses.</p>
+            <button class="admin-btn" id="signin-btn">Sign in</button>
+        </div>
+
+        <div id="notadmin" hidden>
+            <h1>Not authorized</h1>
+            <p class="admin-muted">This account isn't an admin. Signed in as <span id="na-email"></span>.</p>
+        </div>
+
+        <div id="loading"><p class="admin-muted">Loading…</p></div>
+
+        <div id="admin" hidden>
+            <h1>Course Admin</h1>
+            <p class="admin-muted">Create courses and upload video lessons. Videos are processed in your browser (poster + duration via Mediabunny) and stored in Convex.</p>
+
+            <div class="admin-card">
+                <h2>Create a course</h2>
+                <div class="admin-field"><label>Title</label><input id="c-title" placeholder="e.g. AI Foundations"></div>
+                <div class="admin-field"><label>Slug (URL)</label><input id="c-slug" placeholder="ai-foundations"></div>
+                <div class="admin-field"><label>Description</label><textarea id="c-desc"></textarea></div>
+                <button class="admin-btn" id="c-submit">Create course</button>
+                <div class="admin-status" id="c-status"></div>
+            </div>
+
+            <div class="admin-card">
+                <h2>Add a lesson</h2>
+                <div class="admin-field"><label>Course</label><select id="l-course"></select></div>
+                <div class="admin-field"><label>Lesson title</label><input id="l-title" placeholder="e.g. What is a neural network?"></div>
+                <div class="admin-field"><label>Description (optional)</label><textarea id="l-desc"></textarea></div>
+                <div class="admin-field"><label>Video file</label><input type="file" id="l-file" accept="video/*"></div>
+                <button class="admin-btn" id="l-submit">Process &amp; upload lesson</button>
+                <div class="progress-track" hidden id="l-progress"><div class="progress-fill" id="l-progress-fill"></div></div>
+                <div class="admin-status" id="l-status"></div>
+            </div>
+
+            <div class="admin-card">
+                <h2>Existing courses</h2>
+                <div id="course-list"><p class="admin-muted">Loading…</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getClerk, getConvexClient, api, me, syncUser } from "/auth.js";
+        import { Input, ALL_FORMATS, BlobSource, CanvasSink } from "https://esm.sh/mediabunny@1.45.4";
+
+        const $ = (id) => document.getElementById(id);
+        const show = (id, on = true) => { $(id).hidden = !on; };
+
+        async function canvasToBlob(canvas) {
+            if (!canvas) return null;
+            if (canvas.convertToBlob) return await canvas.convertToBlob({ type: "image/jpeg", quality: 0.82 });
+            return await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.82));
+        }
+
+        // Upload a Blob/File to Convex storage; returns the storageId.
+        async function uploadToConvex(client, blob, contentType) {
+            const url = await client.mutation(api.courses.generateUploadUrl, {});
+            const res = await fetch(url, { method: "POST", headers: { "Content-Type": contentType }, body: blob });
+            if (!res.ok) throw new Error("Upload failed (" + res.status + ")");
+            const json = await res.json();
+            return json.storageId;
+        }
+
+        async function loadCourses(client) {
+            const courses = await client.query(api.courses.adminListCourses, {});
+            const sel = $("l-course");
+            sel.innerHTML = "";
+            const list = $("course-list");
+            if (!courses.length) {
+                list.innerHTML = '<p class="admin-muted">No courses yet — create one above.</p>';
+                sel.innerHTML = '<option value="">(create a course first)</option>';
+                return;
+            }
+            list.innerHTML = "";
+            for (const c of courses) {
+                const opt = document.createElement("option");
+                opt.value = c._id; opt.textContent = c.title;
+                sel.appendChild(opt);
+                const row = document.createElement("div");
+                row.className = "course-list-item";
+                row.innerHTML = '<span>' + c.title + ' <span class="admin-muted">/' + c.slug + '</span></span>' +
+                    '<span class="admin-muted">' + c.lessonCount + ' lesson(s)' + (c.isActive ? '' : ' · inactive') + '</span>';
+                list.appendChild(row);
+            }
+        }
+
+        (async () => {
+            const clerk = await getClerk();
+            $("userbtn").innerHTML = "";
+            if (clerk.user) clerk.mountUserButton($("userbtn"), { afterSignOutUrl: "/courses/admin.html" });
+
+            show("loading", false);
+            if (!clerk.user) { show("gate"); $("signin-btn").onclick = () => clerk.openSignIn({}); return; }
+
+            // Ensure the Convex user row exists (and role is set) before checking admin.
+            const who = await syncUser();
+            if (!who || who.role !== "admin") { $("na-email").textContent = who?.email || ""; show("notadmin"); return; }
+
+            show("admin");
+            const client = await getConvexClient();
+            await loadCourses(client);
+
+            // Create course
+            $("c-submit").onclick = async () => {
+                const st = $("c-status"); st.className = "admin-status";
+                try {
+                    $("c-submit").disabled = true; st.textContent = "Creating…";
+                    await client.mutation(api.courses.adminCreateCourse, {
+                        title: $("c-title").value, slug: $("c-slug").value, description: $("c-desc").value,
+                    });
+                    st.className = "admin-status ok"; st.textContent = "Course created.";
+                    $("c-title").value = $("c-slug").value = $("c-desc").value = "";
+                    await loadCourses(await getConvexClient());
+                } catch (e) {
+                    st.className = "admin-status err"; st.textContent = e.message || String(e);
+                } finally { $("c-submit").disabled = false; }
+            };
+
+            // Add lesson
+            $("l-submit").onclick = async () => {
+                const st = $("l-status"); st.className = "admin-status";
+                const file = $("l-file").files[0];
+                const courseId = $("l-course").value;
+                if (!courseId) { st.className = "admin-status err"; st.textContent = "Pick a course."; return; }
+                if (!file) { st.className = "admin-status err"; st.textContent = "Choose a video file."; return; }
+                const setProg = (p) => { show("l-progress"); $("l-progress-fill").style.width = Math.round(p * 100) + "%"; };
+                try {
+                    $("l-submit").disabled = true;
+
+                    st.textContent = "Reading video (duration + poster) with Mediabunny…"; setProg(0.1);
+                    const input = new Input({ formats: ALL_FORMATS, source: new BlobSource(file) });
+                    const duration = await input.computeDuration();
+                    let posterBlob = null;
+                    try {
+                        const track = await input.getPrimaryVideoTrack();
+                        if (track) {
+                            const sink = new CanvasSink(track, { width: 640 });
+                            const at = Math.min(1, Math.max(0, duration / 2));
+                            const r = await sink.getCanvas(at);
+                            const canvas = r && r.canvas ? r.canvas : r;
+                            posterBlob = await canvasToBlob(canvas);
+                        }
+                    } catch (e) { console.warn("poster extraction failed, continuing:", e); }
+
+                    setProg(0.35); st.textContent = "Uploading video…";
+                    const c = await getConvexClient();
+                    const videoFileId = await uploadToConvex(c, file, file.type || "video/mp4");
+
+                    setProg(0.8);
+                    let posterFileId = undefined;
+                    if (posterBlob) { st.textContent = "Uploading poster…"; posterFileId = await uploadToConvex(c, posterBlob, "image/jpeg"); }
+
+                    setProg(0.92); st.textContent = "Saving lesson…";
+                    await c.mutation(api.courses.adminCreateLesson, {
+                        courseId, title: $("l-title").value, description: $("l-desc").value || undefined,
+                        videoFileId, posterFileId, durationSeconds: duration,
+                    });
+
+                    setProg(1); st.className = "admin-status ok";
+                    st.textContent = "Lesson added (" + Math.round(duration) + "s).";
+                    $("l-title").value = $("l-desc").value = ""; $("l-file").value = "";
+                    await loadCourses(await getConvexClient());
+                } catch (e) {
+                    st.className = "admin-status err"; st.textContent = e.message || String(e);
+                    console.error(e);
+                } finally { $("l-submit").disabled = false; setTimeout(() => show("l-progress", false), 1500); }
+            };
+
+            clerk.addListener(() => { if (!clerk.user) location.reload(); });
+        })().catch((e) => {
+            show("loading"); $("loading").innerHTML = '<p class="admin-status err">' + (e.message || e) + '</p>';
+            console.error(e);
+        });
+    </script>
+</body>
+</html>
