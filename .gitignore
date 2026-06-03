@@ -14,6 +14,9 @@ node_modules/
 *.swp
 *.swo
 
+# Claude Code (personal/machine-local settings; shared config lives in settings.json)
+.claude/settings.local.json
+
 # Cloudflare Wrangler
 .wrangler/
 
