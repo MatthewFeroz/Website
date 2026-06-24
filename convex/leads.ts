@@ -68,23 +68,30 @@ export const submitRoadmapLead = action({
       console.error("[roadmap] email send failed (lead still saved):", err);
     }
 
-    // Track lead submission
-    const posthog = getPostHogClient();
+    // Track lead submission. Analytics is best-effort: a missing PostHog env
+    // var or a failed capture must never fail the submission — the lead is
+    // already saved and the email already sent, so the user should still see
+    // the thank-you screen.
     try {
-      posthog.capture({
-        distinctId: email,
-        event: "lead submitted",
-        properties: {
-          $set: { email, first_name: args.firstName.trim() },
-          ai_level: args.aiLevel,
-          primary_goal: args.primaryGoal,
-          weekly_hours: args.weeklyHours,
-          stage: args.stage,
-          source: args.source,
-        },
-      });
-    } finally {
-      await posthog.shutdown();
+      const posthog = getPostHogClient();
+      try {
+        posthog.capture({
+          distinctId: email,
+          event: "lead submitted",
+          properties: {
+            $set: { email, first_name: args.firstName.trim() },
+            ai_level: args.aiLevel,
+            primary_goal: args.primaryGoal,
+            weekly_hours: args.weeklyHours,
+            stage: args.stage,
+            source: args.source,
+          },
+        });
+      } finally {
+        await posthog.shutdown();
+      }
+    } catch (err) {
+      console.error("[roadmap] PostHog capture failed (lead still saved):", err);
     }
 
     return { success: true, id };

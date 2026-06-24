@@ -643,6 +643,15 @@ main > .hero-banner:first-child {
   color: var(--white);
 }
 
+.hero-banner .hero-content h2 {
+  margin: 0 auto 1.25rem;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(1.0625rem, 2vw, 1.375rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--white);
+}
+
 .hero-banner .hero-content p {
   margin: 0;
   font-family: "Poppins", sans-serif;

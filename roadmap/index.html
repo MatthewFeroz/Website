@@ -58,6 +58,15 @@
         font-weight: 800;
         max-width: 22ch;
       }
+      .page-sub {
+        font-size: clamp(1rem, 1.6vw, 1.15rem);
+        line-height: 1.6;
+        color: var(--rm-fg-2);
+        font-weight: 500;
+        margin: 1rem auto 0;
+        max-width: 50ch;
+      }
+      .page-sub b { color: var(--white); font-weight: 700; }
       body.step-thankyou .page-head { display: none; }
 
       /* Flat mock roadmap preview — lives in .page-head so it stays visible on every input step */
@@ -645,6 +654,7 @@
         <!-- Persistent header: H1 + roadmap preview stay visible across every input step -->
         <div class="page-head" id="pageHead">
             <h1 class="page-h1" id="pageH1">Get Your Free 100 Hours Back AI Roadmap In Under 30 Seconds.</h1>
+            <p class="page-sub">A short PDF mapping the <b>levels of AI mastery</b> from beginner to expert and how to reach each stage.</p>
             <div class="mock-preview" aria-hidden="true">
                 <div class="sheet front">
                     <div class="m-head">Your 100 Hours Back AI Roadmap</div>

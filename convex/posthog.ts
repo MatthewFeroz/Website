@@ -21,11 +21,21 @@ type QueuedEvent = {
 export function getPostHogClient() {
   const key = process.env.POSTHOG_PROJECT_TOKEN;
   const host = process.env.POSTHOG_HOST;
-  if (!key) {
-    throw new Error("Missing POSTHOG_PROJECT_TOKEN environment variable");
-  }
-  if (!host) {
-    throw new Error("Missing POSTHOG_HOST environment variable");
+
+  // Analytics is non-critical. If PostHog isn't configured, return a no-op
+  // client instead of throwing — a missing env var must never break the
+  // user-facing flow that fired the event (lead capture, auth, checkout, etc.).
+  if (!key || !host) {
+    if (!key) {
+      console.warn("PostHog disabled: missing POSTHOG_PROJECT_TOKEN");
+    }
+    if (!host) {
+      console.warn("PostHog disabled: missing POSTHOG_HOST");
+    }
+    return {
+      capture(_args: CaptureArgs) {},
+      async shutdown() {},
+    };
   }
 
   const events: QueuedEvent[] = [];
