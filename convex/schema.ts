@@ -4,6 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   youtubeCache: defineTable({
     fetchedAt: v.number(),
+    version: v.optional(v.number()),
     videos: v.array(v.object({
       title: v.string(), videoId: v.string(), link: v.string(),
       published: v.string(), views: v.string(), thumbnail: v.string(),

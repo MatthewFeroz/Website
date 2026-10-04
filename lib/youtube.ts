@@ -1,13 +1,19 @@
 // Verified from @MattFeroz's channel metadata, not a display-name search.
 export const CHANNEL_ID = "UCXiSA-iF5o-je14bN-UVupA";
 export const FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+// The uploads feed doesn't mark livestreams, and watch pages hit YouTube's bot check
+// from servers. The auto-generated "UULV" playlist mirrors the channel's Live tab:
+// past, upcoming and live-now streams, in the same Atom format.
+export const LIVE_FEED_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=UULV${CHANNEL_ID.slice(2)}`;
+// Bump to discard cached lists built by older filtering rules.
+export const CACHE_VERSION = 2;
 export const CACHE_TTL = 15 * 60 * 1000;
 export const STALE_TTL = 7 * 24 * 60 * 60 * 1000;
 export type Video = {
   title: string; videoId: string; link: string;
   published: string; views: string; thumbnail: string;
 };
-export type FeedCache = { videos: Video[]; fetchedAt: number };
+export type FeedCache = { videos: Video[]; fetchedAt: number; version?: number };
 
 // YouTube's public Atom feed has a fixed schema. Keep this reader self-contained
 // because Pages compiles Functions without installing packages in this project.
@@ -25,7 +31,7 @@ function xmlText(xml: string, tag: string): string {
     }).trim();
 }
 
-export function parseYouTubeFeed(xml: string): Video[] {
+function feedEntries(xml: string): string[] {
   const feed = xml.replace(/<!--[\s\S]*?-->/g, "").trim().replace(/^<\?xml[^>]*\?>\s*/, "");
   if (!/^<feed(?:\s[^>]*)?>[\s\S]*<\/feed>$/.test(feed) || /<!DOCTYPE/i.test(feed)) {
     throw new Error("Invalid YouTube feed");
@@ -39,14 +45,22 @@ export function parseYouTubeFeed(xml: string): Video[] {
   const entries = [...feed.matchAll(/<entry(?:\s[^>]*)?>([\s\S]*?)<\/entry>/g)];
   if (entries.length !== (feed.match(/<entry(?:\s[^>]*)?>/g) ?? []).length ||
       entries.length !== (feed.match(/<\/entry>/g) ?? []).length) throw new Error("Incomplete YouTube entries");
+  return entries.map(([, entry]) => entry);
+}
+
+export function parseLiveStreamIds(xml: string): Set<string> {
+  return new Set(feedEntries(xml).map(entry => xmlText(entry, "yt:videoId")));
+}
+
+export function parseYouTubeFeed(xml: string, exclude: ReadonlySet<string> = new Set()): Video[] {
   const seen = new Set<string>();
   const videos: Video[] = [];
-  for (const [, entry] of entries) {
+  for (const entry of feedEntries(xml)) {
     const videoId = xmlText(entry, "yt:videoId");
     const title = xmlText(entry, "title");
     const published = xmlText(entry, "published");
     if (xmlText(entry, "yt:channelId") !== CHANNEL_ID || !/^[\w-]{11}$/.test(videoId) ||
-        seen.has(videoId) || !title || !Number.isFinite(Date.parse(published))) continue;
+        seen.has(videoId) || exclude.has(videoId) || !title || !Number.isFinite(Date.parse(published))) continue;
     seen.add(videoId);
     const views = entry.match(/<media:statistics\b[^>]*\bviews\s*=\s*["'](\d+)["']/)?.[1];
     videos.push({
@@ -65,15 +79,23 @@ export async function getYouTubeFeed(options: {
   cached?: FeedCache | null; fetcher?: typeof fetch; now?: number;
 } = {}) {
   const now = options.now ?? Date.now();
-  const cached = options.cached;
+  const cached = options.cached?.version === CACHE_VERSION && options.cached.videos.length ? options.cached : null;
   const age = cached ? now - cached.fetchedAt : Infinity;
-  if (cached?.videos.length && age >= 0 && age < CACHE_TTL) return { ...cached, stale: false };
+  if (cached && age >= 0 && age < CACHE_TTL) return { ...cached, version: CACHE_VERSION, stale: false };
   try {
-    const response = await (options.fetcher ?? fetch)(FEED_URL, { signal: AbortSignal.timeout(8000) });
-    if (!response.ok) throw new Error(`YouTube returned ${response.status}`);
-    return { videos: parseYouTubeFeed(await response.text()), fetchedAt: now, stale: false };
+    const fetcher = options.fetcher ?? fetch;
+    // Fail the refresh if the stream list is unavailable rather than risk showing streams.
+    const [uploads, streams] = await Promise.all([FEED_URL, LIVE_FEED_URL].map(async (url) => {
+      const response = await fetcher(url, { signal: AbortSignal.timeout(8000) });
+      if (!response.ok) throw new Error(`YouTube returned ${response.status}`);
+      return response.text();
+    }));
+    return {
+      videos: parseYouTubeFeed(uploads, parseLiveStreamIds(streams)),
+      fetchedAt: now, version: CACHE_VERSION, stale: false,
+    };
   } catch (error) {
-    if (cached?.videos.length && age >= 0 && age < STALE_TTL) return { ...cached, stale: true };
+    if (cached && age >= 0 && age < STALE_TTL) return { ...cached, version: CACHE_VERSION, stale: true };
     throw error;
   }
 }

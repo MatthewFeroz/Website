@@ -358,7 +358,7 @@ http.route({
       const feed = await getYouTubeFeed({ cached });
       if (!feed.stale && feed.fetchedAt !== cached?.fetchedAt) {
         await ctx.runMutation(internal.youtube.saveCache, {
-          videos: feed.videos, fetchedAt: feed.fetchedAt,
+          videos: feed.videos, fetchedAt: feed.fetchedAt, version: feed.version,
         });
       }
       return youtubeResponse(feed);
