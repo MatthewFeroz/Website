@@ -27,6 +27,19 @@ describe("YouTube feed", () => {
       expect(() => parseYouTubeFeed(bad)).toThrow();
     }
   });
+  test("reads CDATA and decimal or hexadecimal Unicode entities without double decoding", () => {
+    const result = parseYouTubeFeed(xml(
+      entry("wx1DomKBs2s", "2026-09-17T04:08:08Z", "<![CDATA[AI & software <tools>]]>"),
+      entry("TGEtkQCvnM8", "2026-09-01T19:14:23Z", "Theo&#x2019;s &#128640; &amp;lt; &apos;AI&apos;")
+    ));
+    expect(result[0].title).toBe("AI & software <tools>");
+    expect(result[1].title).toBe("Theo’s 🚀 &lt; 'AI'");
+  });
+  test("rejects truncated feeds and invalid XML characters", () => {
+    for (const bad of [feedXml.replace("</entry>", ""), feedXml.replace("</feed>", ""), xml(entry("wx1DomKBs2s", "2026-09-17T04:08:08Z", "&#x110000;"))]) {
+      expect(() => parseYouTubeFeed(bad)).toThrow();
+    }
+  });
   test("returns at most eight newest uploads", () => {
     expect(parseYouTubeFeed(xml(...Array.from({ length: 12 }, (_, i) => entry(`videoid${String(i).padStart(4, "0")}`, `2026-09-${String(i + 1).padStart(2, "0")}T00:00:00Z`))))).toHaveLength(8);
   });
