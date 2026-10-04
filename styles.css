@@ -1941,7 +1941,7 @@ main.sponsorship-page > .sponsor-article {
 .sponsor-article h1 { font-size: clamp(2rem, 5vw, 2.75rem); line-height: 1.1; color: var(--white); }
 .sponsor-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-sm); }
 .sponsor-article section { margin-bottom: var(--space-xl); }
-.sponsor-article h2 { font-size: 1.25rem; color: var(--white); margin-bottom: var(--space-sm); }
+.sponsor-article h2 { font-size: 1.15rem; letter-spacing: 0.02em; color: var(--white); margin-bottom: var(--space-sm); }
 .sponsor-article p { margin: 0; }
 .sponsor-article em { color: var(--white); }
 .sponsor-article ul { margin: 0; padding-left: 1.25rem; }
