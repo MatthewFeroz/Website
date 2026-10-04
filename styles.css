@@ -687,6 +687,23 @@ main > .hero-banner:first-child {
   transform: none;
 }
 
+.hero-banner .secondary-button {
+  background: transparent;
+  border: 2.5px solid var(--white);
+  color: var(--white);
+  font-family: "Poppins", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 16px 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.hero-banner .secondary-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: none;
+}
+
 .button-row {
   margin-top: var(--space-lg);
   display: flex;
