@@ -1963,3 +1963,11 @@ main.sponsorship-page > .sponsor-article {
 .sponsor-feature img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; margin-bottom: var(--space-sm); transition: opacity 0.2s; }
 .sponsor-article a.sponsor-feature:hover { color: var(--white); }
 .sponsor-feature:hover img { opacity: 0.85; }
+.sponsor-quote { margin: 0 0 var(--space-2xl); padding-left: var(--space-lg); border-left: 2px solid rgba(var(--brand-rgb), 0.4); }
+.sponsor-quote p { color: var(--text-muted); }
+.sponsor-quote p span { color: var(--white); }
+.sponsor-quote footer { display: flex; align-items: center; gap: 0.75rem; margin-top: var(--space-lg); line-height: 1.3; }
+.sponsor-quote-logo { width: 40px; height: 40px; flex-shrink: 0; }
+.sponsor-quote cite { display: block; color: var(--white); font-size: 0.875rem; font-style: normal; font-weight: 500; }
+.sponsor-article .sponsor-quote a { color: var(--text-muted); font-size: 0.75rem; text-decoration: none; }
+.sponsor-article .sponsor-quote a:hover { color: var(--brand); }
