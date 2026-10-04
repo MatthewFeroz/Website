@@ -1943,7 +1943,7 @@ main.sponsorship-page > .sponsor-article {
 .sponsor-article section { margin-bottom: var(--space-xl); }
 .sponsor-article h2 { font-size: 1.15rem; letter-spacing: 0.02em; color: var(--white); margin-bottom: var(--space-sm); }
 .sponsor-article p { margin: 0; }
-.sponsor-article em { color: var(--white); }
+.sponsor-article em, .sponsor-article strong { color: var(--white); }
 .sponsor-article ul { margin: 0; padding-left: 1.25rem; }
 .sponsor-article li::marker { color: var(--brand); }
 .sponsor-article a { color: var(--white); text-decoration: underline; text-decoration-color: var(--brand); text-underline-offset: 4px; }
