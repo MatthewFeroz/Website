@@ -23,6 +23,7 @@ import type * as quizzes from "../quizzes.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
 import type * as stripe from "../stripe.js";
+import type * as youtube from "../youtube.js";
 
 import type {
   ApiFromModules,
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   resources: typeof resources;
   seed: typeof seed;
   stripe: typeof stripe;
+  youtube: typeof youtube;
 }>;
 
 /**

@@ -7,3 +7,5 @@ exclude:
   - README.md
   - convex
 
+  - lib
+  - tests

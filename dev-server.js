@@ -9,7 +9,8 @@ const https = require("https");
 
 const PORT = Number(process.env.PORT || 3000);
 const SUBSTACK_FEED = "https://matthewferoz.substack.com/feed";
-const YOUTUBE_VIDEOS_URL = "https://www.youtube.com/@MattFeroz/videos";
+const { getYouTubeFeed, youtubeResponse, youtubeErrorResponse } = require("./lib/youtube.ts");
+let youtubeCache = null;
 
 const MIME_TYPES = {
   ".html": "text/html",
@@ -88,87 +89,6 @@ function fetchSubstackFeed() {
   });
 }
 
-function parseYouTubeFeed(html) {
-  const videos = [];
-  const seen = new Set();
-  const rendererRegex = /"videoRenderer":\{([\s\S]*?)"showActionMenu"/g;
-  let match;
-
-  while ((match = rendererRegex.exec(html)) !== null) {
-    const block = match[1];
-    const videoId = extractJsonString(block, "videoId");
-    if (!videoId || seen.has(videoId)) continue;
-
-    const title =
-      extractJsonString(block, "text") ||
-      extractJsonString(block, "simpleText") ||
-      "Watch on YouTube";
-    const published = extractPublishedTime(block);
-    const views = extractViewCount(block);
-
-    seen.add(videoId);
-    videos.push({
-      title: decodeJsonString(title),
-      link: `https://www.youtube.com/watch?v=${videoId}`,
-      videoId,
-      published: decodeJsonString(published),
-      views: decodeJsonString(views),
-      thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-    });
-
-    if (videos.length >= 12) break;
-  }
-
-  return videos;
-}
-
-function decodeEntities(value) {
-  return value
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-}
-
-function extractJsonString(jsonFragment, key) {
-  const regex = new RegExp(`"${key}":"((?:\\\\.|[^"\\\\])*)"`);
-  const match = jsonFragment.match(regex);
-  return match ? match[1] : "";
-}
-
-function extractPublishedTime(jsonFragment) {
-  const match = jsonFragment.match(/"publishedTimeText":\{"simpleText":"((?:\\.|[^"\\])*)"/);
-  return match ? match[1] : "";
-}
-
-function extractViewCount(jsonFragment) {
-  const match = jsonFragment.match(/"viewCountText":\{"simpleText":"((?:\\.|[^"\\])*)"/);
-  return match ? match[1] : "";
-}
-
-function decodeJsonString(value) {
-  try {
-    return JSON.parse(`"${value.replace(/"/g, '\\"')}"`);
-  } catch {
-    return value
-      .replace(/\\u0026/g, "&")
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, "\\");
-  }
-}
-
-function fetchYouTubeFeed() {
-  return new Promise((resolve, reject) => {
-    https.get(YOUTUBE_VIDEOS_URL, { headers: { "User-Agent": "Mozilla/5.0" } }, (res) => {
-      let data = "";
-      res.on("data", (chunk) => (data += chunk));
-      res.on("end", () => resolve(data));
-      res.on("error", reject);
-    }).on("error", reject);
-  });
-}
-
 const server = http.createServer(async (req, res) => {
   // Handle blog feed API
   if (req.url === "/blog/feed") {
@@ -204,16 +124,16 @@ const server = http.createServer(async (req, res) => {
       return res.end();
     }
 
+    let response;
     try {
-      const xml = await fetchYouTubeFeed();
-      const videos = parseYouTubeFeed(xml).slice(0, 8);
-      res.writeHead(200);
-      res.end(JSON.stringify({ videos }));
-    } catch (err) {
-      console.error("YouTube fetch error:", err);
-      res.writeHead(502);
-      res.end(JSON.stringify({ videos: [], error: "Failed to fetch feed" }));
+      const feed = await getYouTubeFeed({ cached: youtubeCache });
+      if (!feed.stale) youtubeCache = feed;
+      response = youtubeResponse(feed);
+    } catch {
+      response = youtubeErrorResponse();
     }
+    res.writeHead(response.status, Object.fromEntries(response.headers));
+    res.end(await response.text());
     return;
   }
 

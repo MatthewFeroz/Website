@@ -6,4 +6,9 @@
   const CONVEX_SITE_PROD = "https://lovable-tapir-496.convex.site";
   const isLocal = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(window.location.hostname);
   window.CONVEX_SITE_URL = isLocal ? CONVEX_SITE_DEV : CONVEX_SITE_PROD;
+  // The YouTube feed uses the production deployment of the currently configured
+  // matthewferoz-website project. Keep existing newsletter/auth routes separate.
+  window.CONVEX_YOUTUBE_SITE_URL = isLocal
+    ? "https://grateful-pony-674.convex.site"
+    : "https://kindhearted-swordfish-668.convex.site";
 })();

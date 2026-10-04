@@ -140,13 +140,13 @@
   });
 
   // GSAP-powered animations below — safe to skip if GSAP failed to load
-  const CONVEX_SITE_URL = window.CONVEX_SITE_URL || "https://lovable-tapir-496.convex.site";
+  const YOUTUBE_CONVEX_SITE_URL = window.CONVEX_YOUTUBE_SITE_URL || "https://kindhearted-swordfish-668.convex.site";
   const YOUTUBE_ENDPOINTS = [
     `${window.location.origin}/youtube/videos`,
-    `${CONVEX_SITE_URL}/youtube/videos`,
+    `${YOUTUBE_CONVEX_SITE_URL}/youtube/videos`,
   ];
-  const VIDEO_CACHE_KEY = "youtube_videos_cache";
-  const VIDEO_CACHE_TTL = 30 * 60 * 1000;
+  const VIDEO_CACHE_KEY = "youtube_videos_cache_v2";
+  const VIDEO_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
   const FALLBACK_VIDEOS = [
     { title: "This programming language makes you rich?", videoId: "M3vM01-tIa0", link: "https://www.youtube.com/watch?v=M3vM01-tIa0", published: "" },
     { title: "This $500,000 Kickstarter Is Now DEAD...", videoId: "RqWaNgRw7Uk", link: "https://www.youtube.com/watch?v=RqWaNgRw7Uk", published: "" },
@@ -162,8 +162,10 @@
       const raw = localStorage.getItem(VIDEO_CACHE_KEY);
       if (!raw) return null;
       const cached = JSON.parse(raw);
-      if (Date.now() - cached.timestamp < VIDEO_CACHE_TTL && Array.isArray(cached.videos) && cached.videos.length) {
-        return cached.videos;
+      if (Number.isFinite(cached.timestamp) && Date.now() >= cached.timestamp &&
+          Date.now() - cached.timestamp < VIDEO_CACHE_TTL && Array.isArray(cached.videos) && cached.videos.length &&
+          cached.videos.every(video => video && /^[\w-]{11}$/.test(video.videoId) && typeof video.title === "string")) {
+        return cached;
       }
     } catch (e) {
       // Ignore broken cache data.
@@ -171,9 +173,9 @@
     return null;
   };
 
-  const saveCachedVideos = (videos) => {
+  const saveCachedVideos = (feed) => {
     try {
-      localStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify({ videos, timestamp: Date.now() }));
+      localStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify({ videos: feed.videos, timestamp: feed.fetchedAt }));
     } catch (e) {
       // Storage can be disabled or full.
     }
@@ -266,7 +268,9 @@
     requestAnimationFrame(updateButtons);
   };
 
-  const renderVideos = (videos, statusText) => {
+  const renderVideos = (videos, statusText, featured = false) => {
+    const heading = document.getElementById("videos-heading");
+    if (heading) heading.textContent = featured ? "Featured Videos" : "My Most Recent Videos";
     const scroller = document.getElementById("videos-scroller");
     const status = document.getElementById("videos-status");
     if (!scroller) return;
@@ -287,10 +291,12 @@
     let lastError = null;
     for (const endpoint of YOUTUBE_ENDPOINTS) {
       try {
-        const response = await fetch(endpoint);
+        const response = await fetch(endpoint, { signal: AbortSignal.timeout(10000) });
         if (!response.ok) throw new Error(`YouTube feed failed with ${response.status}`);
         const data = await response.json();
-        if (Array.isArray(data.videos) && data.videos.length) return data.videos;
+        if (Array.isArray(data.videos) && data.videos.length && Number.isFinite(data.fetchedAt) &&
+            data.videos.every(video => /^[\w-]{11}$/.test(video.videoId) && typeof video.title === "string")) return data;
+        throw new Error("YouTube returned an invalid or empty feed");
       } catch (error) {
         lastError = error;
       }
@@ -304,17 +310,21 @@
     if (!scroller) return;
 
     const cachedVideos = getCachedVideos();
-    if (cachedVideos) renderVideos(cachedVideos, "Updated from YouTube recently.");
+    if (cachedVideos) renderVideos(cachedVideos.videos, "Showing saved uploads while checking YouTube.");
 
     const freshVideos = await fetchYouTubeVideos();
     if (freshVideos) {
       saveCachedVideos(freshVideos);
-      renderVideos(freshVideos, "Latest uploads from Matt's YouTube channel.");
+      renderVideos(freshVideos.videos, freshVideos.stale
+        ? `YouTube is unavailable. Showing uploads saved ${new Date(freshVideos.fetchedAt).toLocaleDateString()}.`
+        : "Latest uploads from Matt's YouTube channel.");
       return;
     }
 
-    if (!cachedVideos) {
-      renderVideos(FALLBACK_VIDEOS, "Showing featured videos while YouTube is unavailable.");
+    if (cachedVideos) {
+      renderVideos(cachedVideos.videos, `YouTube is unavailable. Showing uploads saved ${new Date(cachedVideos.timestamp).toLocaleDateString()}.`);
+    } else {
+      renderVideos(FALLBACK_VIDEOS, "Showing featured videos while YouTube is unavailable.", true);
     }
   };
 
