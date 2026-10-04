@@ -6,6 +6,9 @@ node_modules/
 .env.*
 !.env.example
 
+# Logs (e.g. redirected dev-server output)
+*.log
+
 # OS
 .DS_Store
 
