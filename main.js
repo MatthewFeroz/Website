@@ -145,7 +145,7 @@
     `${window.location.origin}/youtube/videos`,
     `${YOUTUBE_CONVEX_SITE_URL}/youtube/videos`,
   ];
-  const VIDEO_CACHE_KEY = "youtube_videos_cache_v2";
+  const VIDEO_CACHE_KEY = "youtube_videos_cache_v3";
   const VIDEO_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
   const FALLBACK_VIDEOS = [
     { title: "This programming language makes you rich?", videoId: "M3vM01-tIa0", link: "https://www.youtube.com/watch?v=M3vM01-tIa0", published: "" },
